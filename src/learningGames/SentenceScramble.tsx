@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { RotateCcw, Undo2 } from 'lucide-react'
 import type {
   LearningGameAttempt,
@@ -32,6 +32,16 @@ export function SentenceScramble({
   const valid = validSequenceRounds(rounds)
   const complete = valid && index >= rounds.length
   const correct = Boolean(round && checked && sequenceIsCorrect(round, selectedIds))
+
+  useEffect(() => {
+    if (!checked) return
+    const timer = window.setTimeout(() => {
+      if (correct) setIndex((current) => current + 1)
+      setSelectedIds([])
+      setChecked(false)
+    }, 1100)
+    return () => window.clearTimeout(timer)
+  }, [checked, correct])
 
   function select(tokenId: string) {
     if (checked || selectedIds.includes(tokenId)) return
@@ -69,12 +79,6 @@ export function SentenceScramble({
     onAttempt?.(attempt)
   }
 
-  function continueRound() {
-    if (correct) setIndex((current) => current + 1)
-    setSelectedIds([])
-    setChecked(false)
-  }
-
   const summary = summarizeLearningGame('sentence-scramble', attempts)
   return <LearningGameShell title={title} eyebrow={eyebrow} progress={`${Math.min(index, rounds.length)}/${rounds.length}`} onExit={onExit}>
     {!valid ? <LearningGameEmpty onExit={onExit} /> : complete ? <LearningGameComplete
@@ -103,9 +107,9 @@ export function SentenceScramble({
         >{token.label}</button>)}
       </div>
       {!checked && <button className="lg-primary" type="button" disabled={selectedIds.length !== round.tokens.length} onClick={check}>Check sentence</button>}
-      {checked && <div className={`lg-feedback is-${correct ? 'correct' : 'incorrect'}`} role="status">
+      {checked && <div className={`lg-feedback is-${correct ? 'correct' : 'incorrect'} is-auto`} role="status">
         <strong>{correct ? 'That sentence is in order!' : 'Not quite. Reset the pieces and try again.'}</strong>
-        <button className="lg-primary" type="button" onClick={continueRound}>{correct ? 'Next sentence' : <><RotateCcw size={16} /> Reset</>}</button>
+        <span className="lg-auto-status">{correct ? 'Next sentence coming up…' : <><RotateCcw size={14} /> Resetting the pieces…</>}</span>
       </div>}
     </section> : null}
   </LearningGameShell>

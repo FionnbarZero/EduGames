@@ -1,0 +1,89 @@
+:root {
+  color: #f7f8ff;
+  background: #080c1c;
+  font-family: Inter, ui-rounded, "Avenir Next", system-ui, sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { min-width: 320px; min-height: 100vh; margin: 0; background: #080c1c; }
+button, a { font: inherit; }
+button { color: inherit; }
+
+.playground { min-height: 100vh; overflow: hidden; background: radial-gradient(circle at 85% 0, rgb(112 79 255 / 16%), transparent 34rem), radial-gradient(circle at 5% 34%, rgb(42 220 194 / 8%), transparent 28rem), #080c1c; }
+.playground-nav { display: flex; align-items: center; justify-content: space-between; width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 24px 0; }
+.brand { display: inline-flex; align-items: center; gap: 10px; color: #fafaff; text-decoration: none; font-weight: 900; letter-spacing: -.03em; }
+.brand > span { display: grid; place-items: center; width: 35px; height: 35px; border-radius: 11px; color: #08101d; background: linear-gradient(135deg, #69efd2, #78a8ff); }
+.nav-note { display: flex; align-items: center; gap: 8px; color: #8e9bb9; font-size: .75rem; font-weight: 750; letter-spacing: .04em; text-transform: uppercase; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: #58e2aa; box-shadow: 0 0 12px #58e2aa; }
+
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) 390px; align-items: center; gap: 65px; width: min(1120px, calc(100% - 40px)); min-height: 500px; margin: 15px auto 68px; padding: 55px 0; }
+.hero-copy { position: relative; z-index: 1; }
+.eyebrow { display: flex; align-items: center; gap: 7px; margin: 0 0 13px; color: #6ce5cf; font-size: .72rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.hero h1 { max-width: 740px; margin: 0; font-family: Georgia, serif; font-size: clamp(4rem, 8.5vw, 7rem); font-weight: 400; letter-spacing: -.07em; line-height: .89; }
+.hero h1 em { color: #a98dff; font-weight: 400; }
+.hero-description { max-width: 650px; margin: 29px 0; color: #aeb8d2; font-size: clamp(1rem, 2vw, 1.2rem); line-height: 1.65; }
+.hero-meta { display: flex; flex-wrap: wrap; gap: 9px; }
+.hero-meta span { display: flex; align-items: center; gap: 7px; padding: 9px 12px; border: 1px solid rgb(255 255 255 / 9%); border-radius: 999px; color: #c8cee0; background: rgb(255 255 255 / 4%); font-size: .75rem; font-weight: 750; }
+
+.hero-orbit { position: relative; width: 340px; aspect-ratio: 1; border: 1px solid rgb(139 114 255 / 22%); border-radius: 50%; box-shadow: 0 0 0 42px rgb(139 114 255 / 3%), 0 0 90px rgb(81 66 181 / 16%); animation: breathe 5s ease-in-out infinite alternate; }
+.hero-orbit::before { position: absolute; inset: 64px; border: 1px dashed rgb(103 235 210 / 22%); border-radius: 50%; content: ""; }
+.orbit-core { position: absolute; inset: 50%; display: grid; place-items: center; width: 126px; aspect-ratio: 1; translate: -50% -50%; border: 1px solid rgb(255 255 255 / 18%); border-radius: 38px; color: #07131d; background: linear-gradient(145deg, #80f3da, #6f9fff); box-shadow: 0 24px 60px rgb(78 182 208 / 24%); font-family: Georgia, serif; font-size: 4.5rem; rotate: -7deg; }
+.orbit-item { position: absolute; display: grid; place-items: center; width: 54px; aspect-ratio: 1; border: 1px solid rgb(255 255 255 / 13%); border-radius: 17px; background: #151d38; box-shadow: 0 14px 30px rgb(0 0 0 / 25%); font-family: Georgia, serif; font-size: 1.5rem; }
+.orbit-one { top: 8px; left: 62px; color: #ffb667; rotate: -9deg; }
+.orbit-two { right: -1px; bottom: 75px; color: #75e7ae; rotate: 8deg; }
+.orbit-three { bottom: -4px; left: 51px; color: #d2a0ff; rotate: -4deg; }
+
+.catalog { width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding-bottom: 90px; }
+.section-heading { display: flex; align-items: end; justify-content: space-between; gap: 30px; margin-bottom: 25px; }
+.section-heading h2 { margin: 0; font-family: Georgia, serif; font-size: clamp(2.25rem, 5vw, 3.6rem); font-weight: 400; letter-spacing: -.045em; }
+.section-heading > p { max-width: 290px; margin: 0 0 7px; color: #7e8aa8; font-size: .83rem; line-height: 1.5; text-align: right; }
+.game-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 15px; }
+.game-card { --card-accent: #8e77ff; position: relative; display: grid; grid-template-columns: 1fr auto; gap: 24px; min-height: 280px; overflow: hidden; padding: 26px; border: 1px solid rgb(255 255 255 / 8%); border-radius: 25px; background: linear-gradient(145deg, rgb(26 34 64 / 95%), rgb(13 19 41 / 97%)); box-shadow: 0 18px 40px rgb(0 0 0 / 17%); }
+.game-card::after { position: absolute; right: -55px; bottom: -75px; width: 210px; aspect-ratio: 1; border: 1px solid color-mix(in srgb, var(--card-accent), transparent 78%); border-radius: 50%; box-shadow: 0 0 0 30px color-mix(in srgb, var(--card-accent), transparent 96%); content: ""; pointer-events: none; }
+.tone-1 { --card-accent: #51e1e5; }
+.tone-2 { --card-accent: #ff718a; }
+.tone-3 { --card-accent: #72e493; }
+.tone-4 { --card-accent: #ad8cff; }
+.tone-5 { --card-accent: #ffd05e; }
+.card-top, .card-copy, .game-card > button { position: relative; z-index: 1; }
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; grid-column: 1 / -1; }
+.game-icon { display: grid; place-items: center; width: 58px; height: 58px; border: 1px solid color-mix(in srgb, var(--card-accent), transparent 67%); border-radius: 17px; color: var(--card-accent); background: color-mix(in srgb, var(--card-accent), transparent 90%); font-size: 1.7rem; }
+.game-time { padding: 7px 10px; border: 1px solid rgb(255 255 255 / 7%); border-radius: 999px; color: #8490ad; background: rgb(255 255 255 / 3%); font-size: .67rem; font-weight: 800; }
+.card-copy > p:first-child { margin: 0 0 6px; color: var(--card-accent); font-size: .65rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.card-copy h3 { margin: 0 0 10px; font-family: Georgia, serif; font-size: 1.75rem; font-weight: 400; letter-spacing: -.035em; }
+.card-copy > p:last-child { max-width: 420px; margin: 0; color: #9ba7c3; font-size: .85rem; line-height: 1.55; }
+.game-card > button { align-self: end; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 120px; min-height: 45px; padding: 10px 14px; border: 1px solid color-mix(in srgb, var(--card-accent), transparent 55%); border-radius: 13px; color: #f6f7ff; background: color-mix(in srgb, var(--card-accent), transparent 87%); cursor: pointer; font-weight: 850; transition: transform 150ms ease, background 150ms ease; }
+.game-card > button:hover { color: #080c1c; background: var(--card-accent); transform: translateY(-2px); }
+
+.last-result { display: flex; align-items: center; gap: 25px; width: min(1180px, calc(100% - 40px)); margin: -30px auto 65px; padding: 15px 18px; border: 1px solid rgb(97 227 190 / 25%); border-radius: 18px; background: rgb(25 59 55 / 63%); }
+.last-result div { display: grid; gap: 2px; }
+.last-result div span { color: #73e8c8; font-size: .6rem; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+.last-result p { flex: 1; margin: 0; color: #a9bdbb; font-size: .82rem; }
+.last-result button { display: inline-flex; align-items: center; gap: 7px; padding: 9px 12px; border: 0; border-radius: 10px; color: #0c1917; background: #73e8c8; cursor: pointer; font-size: .75rem; font-weight: 850; }
+
+@keyframes breathe { to { transform: translateY(-8px) rotate(2deg); box-shadow: 0 0 0 46px rgb(139 114 255 / 4%), 0 0 110px rgb(81 66 181 / 22%); } }
+
+@media (max-width: 820px) {
+  .hero { grid-template-columns: 1fr; min-height: 0; margin-top: 25px; }
+  .hero-orbit { display: none; }
+  .game-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .playground-nav, .hero, .catalog, .last-result { width: min(100% - 24px, 1180px); }
+  .hero { margin-bottom: 35px; padding: 40px 0; }
+  .hero h1 { font-size: clamp(3.4rem, 18vw, 5rem); }
+  .section-heading { align-items: start; flex-direction: column; gap: 10px; }
+  .section-heading > p { text-align: left; }
+  .game-card { grid-template-columns: 1fr; }
+  .game-card > button { justify-self: stretch; }
+  .last-result { align-items: stretch; flex-direction: column; gap: 11px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero-orbit { animation: none; }
+}

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { Volume2 } from 'lucide-react'
 import type {
   ContextGameRound,
@@ -60,6 +60,15 @@ function SelectionRunner({
   const valid = validateRounds(rounds)
   const complete = valid && index >= rounds.length
 
+  useEffect(() => {
+    if (!selectedChoiceId) return
+    const timer = window.setTimeout(() => {
+      setIndex((current) => current + 1)
+      setSelectedChoiceId(null)
+    }, 1100)
+    return () => window.clearTimeout(timer)
+  }, [selectedChoiceId])
+
   function choose(choiceId: string) {
     if (!round || selectedChoiceId) return
     const correct = choiceId === round.correctChoiceId
@@ -77,11 +86,6 @@ function SelectionRunner({
     setStreak(nextStreak)
     setBestStreak((current) => Math.max(current, nextStreak))
     onAttempt?.(attempt)
-  }
-
-  function advance() {
-    setIndex((current) => current + 1)
-    setSelectedChoiceId(null)
   }
 
   const summary = summarizeLearningGame(gameId, attempts)
@@ -116,9 +120,9 @@ function SelectionRunner({
           >{choice.label}</button>
         })}
       </div>
-      {selectedChoiceId && <div className={`lg-feedback is-${selectedChoiceId === round.correctChoiceId ? 'correct' : 'incorrect'}`} role="status">
+      {selectedChoiceId && <div className={`lg-feedback is-${selectedChoiceId === round.correctChoiceId ? 'correct' : 'incorrect'} is-auto`} role="status">
         <strong>{selectedChoiceId === round.correctChoiceId ? 'Correct!' : 'Good try—the answer is highlighted.'}</strong>
-        <button className="lg-primary" type="button" onClick={advance}>{index + 1 === rounds.length ? 'See result' : 'Next'}</button>
+        <span className="lg-auto-status">{index + 1 === rounds.length ? 'Preparing your result…' : 'Next prompt coming up…'}</span>
       </div>}
     </section> : null}
   </LearningGameShell>
