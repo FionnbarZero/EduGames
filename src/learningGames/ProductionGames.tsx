@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Headphones, Mic, PencilLine, Sparkles, Volume2 } from 'lucide-react'
 import type {
   LearningGameAttempt,
@@ -21,6 +21,18 @@ function validProductionRounds(rounds: readonly ProductionGameRound[]) {
   return rounds.length > 0
     && new Set(rounds.map((round) => round.id)).size === rounds.length
     && rounds.every((round) => round.id && round.targetId && round.targetText)
+}
+
+type AssessmentFeedback = 'correct' | 'incorrect'
+
+function AutoAssessmentFeedback({ feedback, lastRound }: {
+  readonly feedback: AssessmentFeedback
+  readonly lastRound: boolean
+}) {
+  return <div className={`lg-feedback is-${feedback} is-auto lg-assessment-feedback`} role="status">
+    <strong>{feedback === 'correct' ? 'Nice work!' : 'Marked for more practice.'}</strong>
+    <span className="lg-auto-status">{lastRound ? 'Preparing your result…' : 'Next prompt coming up…'}</span>
+  </div>
 }
 
 type ProductionRunnerProps = LearningGameBaseProps & {
@@ -61,12 +73,23 @@ function ProductionRunner({
   const [attempts, setAttempts] = useState<readonly LearningGameAttempt[]>([])
   const [streak, setStreak] = useState(0)
   const [bestStreak, setBestStreak] = useState(0)
+  const [feedback, setFeedback] = useState<AssessmentFeedback | null>(null)
   const round = rounds[index]
   const valid = validProductionRounds(rounds)
   const complete = valid && index >= rounds.length
 
+  useEffect(() => {
+    if (!feedback) return
+    const timer = window.setTimeout(() => {
+      setIndex((current) => current + 1)
+      setRevealed(false)
+      setFeedback(null)
+    }, 1100)
+    return () => window.clearTimeout(timer)
+  }, [feedback])
+
   function assess(correct: boolean) {
-    if (!round) return
+    if (!round || feedback) return
     const attempt: LearningGameAttempt = {
       gameId,
       promptId: round.id,
@@ -80,8 +103,7 @@ function ProductionRunner({
     setStreak(nextStreak)
     setBestStreak((current) => Math.max(current, nextStreak))
     onAttempt?.(attempt)
-    setIndex((current) => current + 1)
-    setRevealed(false)
+    setFeedback(correct ? 'correct' : 'incorrect')
   }
 
   const summary = summarizeLearningGame(gameId, attempts)
@@ -96,7 +118,7 @@ function ProductionRunner({
         <span><strong>{streak}</strong> streak</span>
         <span><strong>{bestStreak}</strong> best</span>
       </div>
-      {directResponse ? directResponse(round, { onAssess: assess, index, total: rounds.length }) : !revealed ? prompt(round, {
+      {feedback ? <AutoAssessmentFeedback feedback={feedback} lastRound={index + 1 === rounds.length} /> : directResponse ? directResponse(round, { onAssess: assess, index, total: rounds.length }) : !revealed ? prompt(round, {
         reveal: () => setRevealed(true),
         playAudio,
         index,
@@ -193,12 +215,23 @@ export function CopyHideWriteCombo({
   const [index, setIndex] = useState(0)
   const [phase, setPhase] = useState<'copy' | 'write' | 'assess'>('copy')
   const [attempts, setAttempts] = useState<readonly LearningGameAttempt[]>([])
+  const [feedback, setFeedback] = useState<AssessmentFeedback | null>(null)
   const round = rounds[index]
   const valid = validProductionRounds(rounds)
   const complete = valid && index >= rounds.length
 
+  useEffect(() => {
+    if (!feedback) return
+    const timer = window.setTimeout(() => {
+      setIndex((current) => current + 1)
+      setPhase('copy')
+      setFeedback(null)
+    }, 1100)
+    return () => window.clearTimeout(timer)
+  }, [feedback])
+
   function assess(correct: boolean) {
-    if (!round) return
+    if (!round || feedback) return
     const attempt: LearningGameAttempt = {
       gameId: 'copy-hide-write-combo',
       promptId: round.id,
@@ -209,8 +242,7 @@ export function CopyHideWriteCombo({
     }
     setAttempts((current) => [...current, attempt])
     onAttempt?.(attempt)
-    setIndex((current) => current + 1)
-    setPhase('copy')
+    setFeedback(correct ? 'correct' : 'incorrect')
   }
 
   const summary = summarizeLearningGame('copy-hide-write-combo', attempts)
@@ -223,6 +255,7 @@ export function CopyHideWriteCombo({
           <b>{stepIndex + 1}</b>{step === 'copy' ? 'Look & copy' : step === 'write' ? 'Hide & write' : 'Check'}
         </span>)}
       </div>
+      {feedback ? <AutoAssessmentFeedback feedback={feedback} lastRound={index + 1 === rounds.length} /> : <>
       {phase === 'copy' && <>
         <Sparkles className="lg-production-icon" size={42} aria-hidden="true" />
         <h2>Look carefully and copy</h2>
@@ -240,6 +273,7 @@ export function CopyHideWriteCombo({
         <p className="lg-kicker">The target was</p>
         <div className="lg-reveal-word" lang="zh-Hans">{round.targetText}</div>
         <SelfAssessmentButtons onAnswer={assess} />
+      </>}
       </>}
     </section> : null}
   </LearningGameShell>
@@ -260,9 +294,21 @@ export function CorrectionRescue({
   const [copiesFinished, setCopiesFinished] = useState(0)
   const [phase, setPhase] = useState<'copy' | 'hidden' | 'assess'>('copy')
   const [attempts, setAttempts] = useState<readonly LearningGameAttempt[]>([])
+  const [feedback, setFeedback] = useState<AssessmentFeedback | null>(null)
   const round = rounds[index]
   const valid = validProductionRounds(rounds)
   const complete = valid && index >= rounds.length
+
+  useEffect(() => {
+    if (!feedback) return
+    const timer = window.setTimeout(() => {
+      setIndex((current) => current + 1)
+      setCopiesFinished(0)
+      setPhase('copy')
+      setFeedback(null)
+    }, 1100)
+    return () => window.clearTimeout(timer)
+  }, [feedback])
 
   function finishCopy() {
     const next = copiesFinished + 1
@@ -271,7 +317,7 @@ export function CorrectionRescue({
   }
 
   function assess(correct: boolean) {
-    if (!round) return
+    if (!round || feedback) return
     const attempt: LearningGameAttempt = {
       gameId: 'correction-rescue',
       promptId: round.id,
@@ -282,9 +328,7 @@ export function CorrectionRescue({
     }
     setAttempts((current) => [...current, attempt])
     onAttempt?.(attempt)
-    setIndex((current) => current + 1)
-    setCopiesFinished(0)
-    setPhase('copy')
+    setFeedback(correct ? 'correct' : 'incorrect')
   }
 
   const summary = summarizeLearningGame('correction-rescue', attempts)
@@ -295,6 +339,7 @@ export function CorrectionRescue({
         <span className={phase === 'assess' ? 'is-rescued' : ''}>★</span>
         <div>{Array.from({ length: requiredCopies }, (_, step) => <i key={step} className={step < copiesFinished ? 'is-cleared' : ''} />)}</div>
       </div>
+      {feedback ? <AutoAssessmentFeedback feedback={feedback} lastRound={index + 1 === rounds.length} /> : <>
       {phase === 'copy' && <>
         <div className="lg-rescue-meter" aria-label={`${copiesFinished} of ${requiredCopies} copies complete`}>
           {Array.from({ length: requiredCopies }, (_, step) => <span key={step} className={step < copiesFinished ? 'is-complete' : ''} />)}
@@ -313,6 +358,7 @@ export function CorrectionRescue({
         <p className="lg-kicker">The target was</p>
         <div className="lg-reveal-word" lang="zh-Hans">{round.targetText}</div>
         <SelfAssessmentButtons onAnswer={assess} />
+      </>}
       </>}
     </section> : null}
   </LearningGameShell>

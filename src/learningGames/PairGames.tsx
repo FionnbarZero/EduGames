@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { RotateCcw } from 'lucide-react'
 import type {
   GameChoice,
@@ -37,7 +37,17 @@ export function SpeedMatch({
     return [...pairs.slice(split), ...pairs.slice(0, split)]
   }, [pairs])
   const valid = validGamePairs(pairs)
-  const complete = valid && matchedPairIds.length === pairs.length
+  const complete = valid && matchedPairIds.length === pairs.length && !feedback
+
+  useEffect(() => {
+    if (!feedback) return
+    const timer = window.setTimeout(() => {
+      setSelectedLeft(null)
+      setSelectedRight(null)
+      setFeedback(null)
+    }, 1100)
+    return () => window.clearTimeout(timer)
+  }, [feedback])
 
   function resolve(left: GameChoice, right: GameChoice) {
     const pair = pairs.find((candidate) => candidate.left.id === left.id)
@@ -69,12 +79,6 @@ export function SpeedMatch({
     if (feedback || matchedPairIds.some((id) => pairs.find((pair) => pair.id === id)?.right.id === choice.id)) return
     setSelectedRight(choice)
     if (selectedLeft) resolve(selectedLeft, choice)
-  }
-
-  function continueMatching() {
-    setSelectedLeft(null)
-    setSelectedRight(null)
-    setFeedback(null)
   }
 
   const summary = summarizeLearningGame('speed-match', attempts)
@@ -113,9 +117,9 @@ export function SpeedMatch({
           >{pair.right.label}</button>)}
         </div>
       </div>
-      {feedback && <div className={`lg-feedback is-${feedback}`} role="status">
+      {feedback && <div className={`lg-feedback is-${feedback} is-auto`} role="status">
         <strong>{lastMessage}</strong>
-        <button className="lg-primary" type="button" onClick={continueMatching}>{feedback === 'correct' ? 'Next pair' : 'Try again'}</button>
+        <span className="lg-auto-status">{feedback === 'correct' ? 'Loading the next pair…' : 'Resetting the tiles…'}</span>
       </div>}
     </section>}
   </LearningGameShell>
@@ -138,6 +142,19 @@ export function MemoryFlip({
   const pairMatch = twoFlipped && flippedCards[0]?.pairId === flippedCards[1]?.pairId
   const valid = validGamePairs(pairs)
   const complete = valid && matchedPairIds.length === pairs.length
+
+  useEffect(() => {
+    if (!twoFlipped) return
+    const timer = window.setTimeout(() => {
+      const first = deck.find((card) => card.id === flippedIds[0])
+      const second = deck.find((card) => card.id === flippedIds[1])
+      if (first && second && first.pairId === second.pairId) {
+        setMatchedPairIds((current) => current.includes(first.pairId) ? current : [...current, first.pairId])
+      }
+      setFlippedIds([])
+    }, 1100)
+    return () => window.clearTimeout(timer)
+  }, [deck, flippedIds, twoFlipped])
 
   function flip(cardId: string) {
     if (twoFlipped || flippedIds.includes(cardId)) return
@@ -162,14 +179,6 @@ export function MemoryFlip({
     }
     setAttempts((current) => [...current, attempt])
     onAttempt?.(attempt)
-  }
-
-  function continueMemory() {
-    const matchedCard = flippedCards[0]
-    if (pairMatch && matchedCard) {
-      setMatchedPairIds((current) => [...current, matchedCard.pairId])
-    }
-    setFlippedIds([])
   }
 
   const summary = summarizeLearningGame('memory-flip', attempts)
@@ -197,9 +206,9 @@ export function MemoryFlip({
           ><span aria-hidden={!visible}>{visible ? card.face.label : '?'}</span></button>
         })}
       </div>
-      {twoFlipped && <div className={`lg-feedback is-${pairMatch ? 'correct' : 'incorrect'}`} role="status">
+      {twoFlipped && <div className={`lg-feedback is-${pairMatch ? 'correct' : 'incorrect'} is-auto`} role="status">
         <strong>{pairMatch ? 'A matching pair!' : 'Remember those two locations.'}</strong>
-        <button className="lg-primary" type="button" onClick={continueMemory}>{pairMatch ? 'Keep going' : <><RotateCcw size={16} /> Turn them back</>}</button>
+        <span className="lg-auto-status">{pairMatch ? 'Saving the match…' : <><RotateCcw size={14} /> Turning them back…</>}</span>
       </div>}
     </section>}
   </LearningGameShell>
