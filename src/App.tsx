@@ -78,54 +78,64 @@ const selectionRounds: readonly SelectionGameRound[] = [
 
 const contextRounds: readonly ContextGameRound[] = [
   {
-    id: 'context-1', targetId: 'like', targetText: '喜欢', cueText: 'Complete the sentence',
-    sentenceBefore: '我', sentenceAfter: '学习中文。',
-    choices: [{ id: 'like', label: '喜欢' }, { id: 'eat', label: '吃' }, { id: 'see', label: '看' }], correctChoiceId: 'like',
+    id: 'context-1', targetId: 'water', targetText: '水',
+    cueText: '跑步后，美美打开水瓶喝____。', audioText: '跑步后，美美打开水瓶喝____。',
+    sentenceBefore: '跑步后，美美打开水瓶喝', sentenceAfter: '。',
+    choices: [{ id: 'milk', label: '牛奶' }, { id: 'water', label: '水' }, { id: 'tea', label: '茶' }], correctChoiceId: 'water',
   },
   {
-    id: 'context-2', targetId: 'school', targetText: '学校', cueText: 'Complete the sentence',
-    sentenceBefore: '她去', sentenceAfter: '。',
-    choices: [{ id: 'book', label: '书' }, { id: 'school', label: '学校' }, { id: 'tea', label: '茶' }], correctChoiceId: 'school',
+    id: 'context-2', targetId: 'school', targetText: '学校',
+    cueText: '丽丽背着书包去____上课。', audioText: '丽丽背着书包去____上课。',
+    sentenceBefore: '丽丽背着书包去', sentenceAfter: '上课。',
+    choices: [{ id: 'park', label: '公园' }, { id: 'store', label: '商店' }, { id: 'school', label: '学校' }], correctChoiceId: 'school',
   },
   {
-    id: 'context-3', targetId: 'tea', targetText: '茶', cueText: 'Complete the sentence',
-    sentenceBefore: '爸爸喝', sentenceAfter: '。',
-    choices: [{ id: 'tea', label: '茶' }, { id: 'book', label: '书' }, { id: 'school', label: '学校' }], correctChoiceId: 'tea',
+    id: 'context-3', targetId: 'apple', targetText: '苹果',
+    cueText: '爸爸给小明一个红色的____。', audioText: '爸爸给小明一个红色的____。',
+    sentenceBefore: '爸爸给小明一个红色的', sentenceAfter: '。',
+    choices: [{ id: 'apple', label: '苹果' }, { id: 'orange', label: '橙子' }, { id: 'banana', label: '香蕉' }], correctChoiceId: 'apple',
   },
   {
-    id: 'context-4', targetId: 'book', targetText: '书', cueText: 'Complete the sentence',
-    sentenceBefore: '我看', sentenceAfter: '。',
-    choices: [{ id: 'water', label: '水' }, { id: 'cat', label: '猫' }, { id: 'book', label: '书' }], correctChoiceId: 'book',
+    id: 'context-4', targetId: 'book', targetText: '书',
+    cueText: '睡觉前，我打开____读故事。', audioText: '睡觉前，我打开____读故事。',
+    sentenceBefore: '睡觉前，我打开', sentenceAfter: '读故事。',
+    choices: [{ id: 'menu', label: '菜单' }, { id: 'book', label: '书' }, { id: 'map', label: '地图' }], correctChoiceId: 'book',
   },
   {
-    id: 'context-5', targetId: 'friend', targetText: '朋友', cueText: 'Complete the sentence',
-    sentenceBefore: '他是我的', sentenceAfter: '。',
-    choices: [{ id: 'teacher', label: '老师' }, { id: 'friend', label: '朋友' }, { id: 'student', label: '学生' }], correctChoiceId: 'friend',
+    id: 'context-5', targetId: 'friend', targetText: '朋友',
+    cueText: '乐乐每天跟我玩。他是我的好____。', audioText: '乐乐每天跟我玩。他是我的好____。',
+    sentenceBefore: '乐乐每天跟我玩。他是我的好', sentenceAfter: '。',
+    choices: [{ id: 'doctor', label: '医生' }, { id: 'teacher', label: '老师' }, { id: 'friend', label: '朋友' }], correctChoiceId: 'friend',
   },
   {
-    id: 'context-6', targetId: 'apple', targetText: '苹果', cueText: 'Complete the sentence',
-    sentenceBefore: '妈妈买', sentenceAfter: '。',
-    choices: [{ id: 'apple', label: '苹果' }, { id: 'rain', label: '雨' }, { id: 'car', label: '车' }], correctChoiceId: 'apple',
+    id: 'context-6', targetId: 'teacher', targetText: '老师',
+    cueText: '王女士教我们中文。她是____。', audioText: '王女士教我们中文。她是____。',
+    sentenceBefore: '王女士教我们中文。她是', sentenceAfter: '。',
+    choices: [{ id: 'teacher', label: '老师' }, { id: 'student', label: '学生' }, { id: 'friend', label: '朋友' }], correctChoiceId: 'teacher',
   },
   {
-    id: 'context-7', targetId: 'home', targetText: '家', cueText: 'Complete the sentence',
-    sentenceBefore: '我们回', sentenceAfter: '。',
-    choices: [{ id: 'store', label: '商店' }, { id: 'park', label: '公园' }, { id: 'home', label: '家' }], correctChoiceId: 'home',
+    id: 'context-7', targetId: 'home', targetText: '家',
+    cueText: '放学了，我们回____吃晚饭。', audioText: '放学了，我们回____吃晚饭。',
+    sentenceBefore: '放学了，我们回', sentenceAfter: '吃晚饭。',
+    choices: [{ id: 'park', label: '公园' }, { id: 'home', label: '家' }, { id: 'store', label: '商店' }], correctChoiceId: 'home',
   },
   {
-    id: 'context-8', targetId: 'teacher', targetText: '老师', cueText: 'Complete the sentence',
-    sentenceBefore: '她是中文', sentenceAfter: '。',
-    choices: [{ id: 'friend', label: '朋友' }, { id: 'teacher', label: '老师' }, { id: 'doctor', label: '医生' }], correctChoiceId: 'teacher',
+    id: 'context-8', targetId: 'today', targetText: '今天',
+    cueText: '现在太阳出来了，____天气很好。', audioText: '现在太阳出来了，____天气很好。',
+    sentenceBefore: '现在太阳出来了，', sentenceAfter: '天气很好。',
+    choices: [{ id: 'yesterday', label: '昨天' }, { id: 'tomorrow', label: '明天' }, { id: 'today', label: '今天' }], correctChoiceId: 'today',
   },
   {
-    id: 'context-9', targetId: 'today', targetText: '今天', cueText: 'Complete the sentence',
-    sentenceBefore: '', sentenceAfter: '天气很好。',
-    choices: [{ id: 'today', label: '今天' }, { id: 'yesterday', label: '昨天' }, { id: 'tomorrow', label: '明天' }], correctChoiceId: 'today',
+    id: 'context-9', targetId: 'chinese', targetText: '中文',
+    cueText: '美美在北京长大，她跟奶奶说____。', audioText: '美美在北京长大，她跟奶奶说____。',
+    sentenceBefore: '美美在北京长大，她跟奶奶说', sentenceAfter: '。',
+    choices: [{ id: 'chinese', label: '中文' }, { id: 'english', label: '英文' }, { id: 'french', label: '法文' }], correctChoiceId: 'chinese',
   },
   {
-    id: 'context-10', targetId: 'chinese', targetText: '中文', cueText: 'Complete the sentence',
-    sentenceBefore: '我会说', sentenceAfter: '。',
-    choices: [{ id: 'english', label: '英文' }, { id: 'chinese', label: '中文' }, { id: 'name', label: '名字' }], correctChoiceId: 'chinese',
+    id: 'context-10', targetId: 'tea', targetText: '茶',
+    cueText: '爷爷把____倒进茶杯。', audioText: '爷爷把____倒进茶杯。',
+    sentenceBefore: '爷爷把', sentenceAfter: '倒进茶杯。',
+    choices: [{ id: 'water', label: '水' }, { id: 'tea', label: '茶' }, { id: 'milk', label: '牛奶' }], correctChoiceId: 'tea',
   },
 ]
 
@@ -154,7 +164,7 @@ let settleActiveSpeech: (() => void) | undefined
 let activeRecordedAudio: HTMLAudioElement | undefined
 let settleActiveRecording: (() => void) | undefined
 
-const recordedMandarinAudio: Readonly<Record<string, string>> = {
+const recordedLearningAudio: Readonly<Record<string, string>> = {
   '猫': `${import.meta.env.BASE_URL}audio/mandarin/cat.wav?v=2`,
   '水': `${import.meta.env.BASE_URL}audio/mandarin/water.wav?v=2`,
   '大': `${import.meta.env.BASE_URL}audio/mandarin/big.wav?v=2`,
@@ -166,15 +176,47 @@ const recordedMandarinAudio: Readonly<Record<string, string>> = {
   '人': `${import.meta.env.BASE_URL}audio/mandarin/person.wav?v=2`,
   '好': `${import.meta.env.BASE_URL}audio/mandarin/good.wav?v=2`,
   '不好！': `${import.meta.env.BASE_URL}audio/mandarin/bu-hao.wav?v=2`,
+  '牛奶': `${import.meta.env.BASE_URL}audio/context-gap/words/milk.wav?v=1`,
+  '茶': `${import.meta.env.BASE_URL}audio/context-gap/words/tea.wav?v=1`,
+  '公园': `${import.meta.env.BASE_URL}audio/context-gap/words/park.wav?v=1`,
+  '商店': `${import.meta.env.BASE_URL}audio/context-gap/words/store.wav?v=1`,
+  '学校': `${import.meta.env.BASE_URL}audio/context-gap/words/school.wav?v=1`,
+  '苹果': `${import.meta.env.BASE_URL}audio/context-gap/words/apple.wav?v=1`,
+  '橙子': `${import.meta.env.BASE_URL}audio/context-gap/words/orange.wav?v=1`,
+  '香蕉': `${import.meta.env.BASE_URL}audio/context-gap/words/banana.wav?v=1`,
+  '菜单': `${import.meta.env.BASE_URL}audio/context-gap/words/menu.wav?v=1`,
+  '书': `${import.meta.env.BASE_URL}audio/context-gap/words/book.wav?v=1`,
+  '地图': `${import.meta.env.BASE_URL}audio/context-gap/words/map.wav?v=1`,
+  '医生': `${import.meta.env.BASE_URL}audio/context-gap/words/doctor.wav?v=1`,
+  '老师': `${import.meta.env.BASE_URL}audio/context-gap/words/teacher.wav?v=1`,
+  '朋友': `${import.meta.env.BASE_URL}audio/context-gap/words/friend.wav?v=1`,
+  '学生': `${import.meta.env.BASE_URL}audio/context-gap/words/student.wav?v=1`,
+  '家': `${import.meta.env.BASE_URL}audio/context-gap/words/home.wav?v=1`,
+  '昨天': `${import.meta.env.BASE_URL}audio/context-gap/words/yesterday.wav?v=1`,
+  '明天': `${import.meta.env.BASE_URL}audio/context-gap/words/tomorrow.wav?v=1`,
+  '今天': `${import.meta.env.BASE_URL}audio/context-gap/words/today.wav?v=1`,
+  '中文': `${import.meta.env.BASE_URL}audio/context-gap/words/chinese.wav?v=1`,
+  '英文': `${import.meta.env.BASE_URL}audio/context-gap/words/english.wav?v=1`,
+  '法文': `${import.meta.env.BASE_URL}audio/context-gap/words/french.wav?v=1`,
+  '跑步后，美美打开水瓶喝____。': `${import.meta.env.BASE_URL}audio/context-gap/clues/water.wav?v=2`,
+  '丽丽背着书包去____上课。': `${import.meta.env.BASE_URL}audio/context-gap/clues/school.wav?v=2`,
+  '爸爸给小明一个红色的____。': `${import.meta.env.BASE_URL}audio/context-gap/clues/apple.wav?v=2`,
+  '睡觉前，我打开____读故事。': `${import.meta.env.BASE_URL}audio/context-gap/clues/book.wav?v=2`,
+  '乐乐每天跟我玩。他是我的好____。': `${import.meta.env.BASE_URL}audio/context-gap/clues/friend.wav?v=2`,
+  '王女士教我们中文。她是____。': `${import.meta.env.BASE_URL}audio/context-gap/clues/teacher.wav?v=2`,
+  '放学了，我们回____吃晚饭。': `${import.meta.env.BASE_URL}audio/context-gap/clues/home.wav?v=2`,
+  '现在太阳出来了，____天气很好。': `${import.meta.env.BASE_URL}audio/context-gap/clues/today.wav?v=2`,
+  '美美在北京长大，她跟奶奶说____。': `${import.meta.env.BASE_URL}audio/context-gap/clues/chinese.wav?v=2`,
+  '爷爷把____倒进茶杯。': `${import.meta.env.BASE_URL}audio/context-gap/clues/tea.wav?v=2`,
 }
 
-function playAudio(text: string, language = 'zh-CN'): Promise<void> {
+function playAudio(text: string, language = 'zh-CN', playbackRate = 1): Promise<void> {
   activeRecordedAudio?.pause()
   settleActiveRecording?.()
   activeRecordedAudio = undefined
   settleActiveRecording = undefined
 
-  const recordingUrl = recordedMandarinAudio[text]
+  const recordingUrl = recordedLearningAudio[text]
   if (recordingUrl) {
     speechRequestId += 1
     if (speechStartTimer !== undefined) window.clearTimeout(speechStartTimer)
@@ -199,6 +241,7 @@ function playAudio(text: string, language = 'zh-CN'): Promise<void> {
       settleActiveRecording = cancelThisRecording
       audio.preload = 'auto'
       audio.volume = 1
+      audio.playbackRate = playbackRate
       audio.onended = () => finish()
       audio.onerror = () => finish(new Error('Recorded audio could not be loaded.'))
       void audio.play().catch((error: unknown) => finish(error instanceof Error ? error : new Error('Recorded audio could not be played.')))
@@ -248,7 +291,7 @@ function playAudio(text: string, language = 'zh-CN'): Promise<void> {
       })
       utterance.voice = matchingVoices.find((voice) => /ting|eddy|flo|sandy|shelley/i.test(voice.name)) || matchingVoices[0] || null
       utterance.lang = language
-      utterance.rate = 0.75
+      utterance.rate = 0.75 * playbackRate
       utterance.volume = 1
       utterance.onend = () => finish()
       utterance.onerror = (event) => {

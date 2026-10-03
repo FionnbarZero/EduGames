@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "generate:context-audio": "node scripts/generateContextGapAudio.mjs",
     "generate:lantern-audio": "node scripts/generateLanternSounds.mjs",
     "test": "npm run test:audio && npm run build",
-    "test:audio": "node scripts/testLanternSounds.mjs && node scripts/testMandarinAudio.mjs",
+    "test:audio": "node scripts/testLanternSounds.mjs && node scripts/testMandarinAudio.mjs && node scripts/testContextGapAudio.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

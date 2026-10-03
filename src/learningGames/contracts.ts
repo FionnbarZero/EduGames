@@ -93,7 +93,7 @@ export type LearningGameBaseProps = {
   readonly onComplete: (summary: LearningGameSummary) => void
 }
 
-export type PlayLearningAudio = (text: string, language?: string) => void | Promise<void>
+export type PlayLearningAudio = (text: string, language?: string, playbackRate?: number) => void | Promise<void>
 
 export type ReadingCaptureControls = {
   readonly onReady: () => void

@@ -48,7 +48,7 @@ export const LEARNING_GAME_CATALOG = [
   {
     id: 'context-gap-dash',
     title: 'Context Gap Dash',
-    description: 'Choose the word that completes each sentence, then watch Kai race through the correct gate.',
+    description: 'Listen to the Mandarin sentence, hear each choice, then send Kai racing through the correct word gate.',
     activityLabel: 'Complete sentences',
     channels: ['tier-2-reading'],
     skills: ['reading', 'receptive'],

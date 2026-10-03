@@ -44,6 +44,7 @@ type DashSceneOptions = {
   readonly onProgress: (completed: number, correct: number, streak: number, bestStreak: number) => void
   readonly onRoundChange: (roundIndex: number) => void
   readonly onFeedback: (feedback: FeedbackState) => void
+  readonly onChoicePreview: (choiceLabel: string) => void
   readonly onFinish: () => void
   readonly registerChoiceHandler: (handler: ((choiceIndex: number) => void) | null) => void
 }
@@ -128,7 +129,7 @@ class ContextDashScene extends Phaser.Scene {
     this.options.registerChoiceHandler((choiceIndex) => this.chooseGate(choiceIndex))
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.options.registerChoiceHandler(null))
 
-    this.game.canvas.setAttribute('aria-label', 'Context Gap Dash. Complete ten sentences by guiding Kai through one of three answer gates.')
+    this.game.canvas.setAttribute('aria-label', 'Context Gap Dash. Listen to the Mandarin sentence, hover over a gate to hear its word, then guide Kai through the best answer.')
     this.game.canvas.setAttribute('tabindex', '0')
     this.renderRound()
   }
@@ -182,7 +183,7 @@ class ContextDashScene extends Phaser.Scene {
     this.areaText.setText('CHECKPOINT ' + (this.roundIndex + 1) + '  ·  ' + AREA_NAMES[this.roundIndex])
     this.scoreText.setText(this.correctCount + ' FIRST-TRY  ·  ' + this.results.length + '/' + this.options.rounds.length + ' GATES')
     this.sentenceText.setText(round.sentenceBefore + '____' + round.sentenceAfter)
-    this.instructionText.setText('COMPLETE THE SENTENCE  ·  KAI RUNS ON AUTOMATICALLY')
+    this.instructionText.setText('HOVER TO HEAR EACH WORD  ·  CHOOSE THE BEST FIT')
     this.options.onRoundChange(this.roundIndex)
     this.options.onFeedback(null)
     this.drawRouteProgress()
@@ -243,6 +244,7 @@ class ContextDashScene extends Phaser.Scene {
     container.add([ground, glow, barrier, frame, panel, shine, label, key, chevrons])
     container.setSize(222, 194).setInteractive({ useHandCursor: true })
     container.on('pointerover', () => {
+      this.options.onChoicePreview(choiceLabel)
       if (!this.acceptingInput) return
       glow.setFillStyle(0xa4ffe9, 0.34)
       this.tweens.add({ targets: container, scale: 1.065, duration: 140, ease: 'Back.easeOut' })
@@ -659,6 +661,8 @@ export function ContextGapDash({
   const hostRef = useRef<HTMLDivElement>(null)
   const attemptsRef = useRef<LearningGameAttempt[]>([])
   const choiceHandlerRef = useRef<((choiceIndex: number) => void) | null>(null)
+  const playAudioRef = useRef(playAudio)
+  const lastChoicePreviewRef = useRef({ label: '', time: 0 })
   const [completed, setCompleted] = useState(0)
   const [correct, setCorrect] = useState(0)
   const [streak, setStreak] = useState(0)
@@ -667,6 +671,39 @@ export function ContextGapDash({
   const [feedback, setFeedback] = useState<FeedbackState>(null)
   const [finished, setFinished] = useState(false)
   const valid = validContextRounds(playableRounds) && playableRounds.every((round) => round.choices.length >= 3)
+  const currentRound = playableRounds[Math.min(roundIndex, playableRounds.length - 1)]
+  const contextAudioText = currentRound?.audioText || currentRound?.cueText || ''
+
+  useEffect(() => {
+    playAudioRef.current = playAudio
+  }, [playAudio])
+
+  const playLearningText = useCallback((text: string, language: string, playbackRate = 1) => {
+    if (!text || !playAudioRef.current) return
+    try {
+      void Promise.resolve(playAudioRef.current(text, language, playbackRate)).catch(() => undefined)
+    } catch {
+      // Audio is enrichment; a playback failure should never stop the race.
+    }
+  }, [])
+
+  const previewChoice = useCallback((choiceLabel: string) => {
+    const now = performance.now()
+    const lastPreview = lastChoicePreviewRef.current
+    if (lastPreview.label === choiceLabel && now - lastPreview.time < 400) return
+    lastChoicePreviewRef.current = { label: choiceLabel, time: now }
+    playLearningText(choiceLabel, 'zh-CN')
+  }, [playLearningText])
+
+  const replayContext = useCallback(() => {
+    playLearningText(contextAudioText, 'zh-CN', 0.5)
+  }, [contextAudioText, playLearningText])
+
+  useEffect(() => {
+    if (!contextAudioText || !playAudio || finished) return
+    const timer = window.setTimeout(() => playLearningText(contextAudioText, 'zh-CN', 0.5), 350)
+    return () => window.clearTimeout(timer)
+  }, [contextAudioText, finished, playAudio, playLearningText])
 
   const handleAttempt = useCallback((index: number, choiceId: string, wasCorrect: boolean) => {
     const round = playableRounds[index]
@@ -692,6 +729,7 @@ export function ContextGapDash({
       },
       onRoundChange: setRoundIndex,
       onFeedback: setFeedback,
+      onChoicePreview: previewChoice,
       onFinish: () => setFinished(true),
       registerChoiceHandler: (handler) => { choiceHandlerRef.current = handler },
     })
@@ -701,14 +739,12 @@ export function ContextGapDash({
       scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH }, scene: [scene],
     })
     return () => game.destroy(true)
-  }, [handleAttempt, playableRounds, valid])
+  }, [handleAttempt, playableRounds, previewChoice, valid])
 
   const finish = useCallback(() => {
     onComplete(summarizeLearningGame('context-gap-dash', attemptsRef.current))
   }, [onComplete])
 
-  const currentRound = playableRounds[Math.min(roundIndex, playableRounds.length - 1)]
-  const audioText = currentRound ? currentRound.sentenceBefore + currentRound.targetText + currentRound.sentenceAfter : ''
   const busy = Boolean(feedback) || finished
   const stageStyle = { '--dash-progress': (playableRounds.length ? (completed / playableRounds.length) * 100 : 0) + '%' } as CSSProperties
 
@@ -724,25 +760,29 @@ export function ContextGapDash({
         <span><strong>{correct}</strong> first-try gates</span>
         <span><strong>{streak}</strong> momentum</span>
         <span><strong>{bestStreak}</strong> best run</span>
-        <button type="button" onClick={() => audioText && void playAudio?.(audioText)} disabled={finished || !audioText || !playAudio}>
-          <Volume2 size={17} /> Hear sentence
+      </div>
+      <div className="lg-dash-context-clue">
+        <span><Volume2 size={18} aria-hidden="true" /> Chinese sentence</span>
+        <strong>{currentRound?.cueText}</strong>
+        <button type="button" onClick={replayContext} disabled={finished || !contextAudioText || !playAudio}>
+          <Volume2 size={16} aria-hidden="true" /> Replay sentence
         </button>
       </div>
       <div className="lg-phaser-stage-wrap lg-dash-stage-wrap">
         <div ref={hostRef} className="lg-phaser-stage" />
       </div>
       {!finished && <div className="lg-mobile-gate-choices" role="group" aria-label="Touch-friendly answer gates">
-        {currentRound?.choices.slice(0, 3).map((choice, index) => <button key={choice.id} type="button" disabled={busy} onClick={() => choiceHandlerRef.current?.(index)}><small>{index + 1}</small><strong>{choice.label}</strong></button>)}
+        {currentRound?.choices.slice(0, 3).map((choice, index) => <button key={choice.id} type="button" disabled={busy} onPointerEnter={() => previewChoice(choice.label)} onFocus={() => previewChoice(choice.label)} onClick={() => choiceHandlerRef.current?.(index)}><small>{index + 1}</small><strong>{choice.label}</strong></button>)}
       </div>}
       <div className="lg-canvas-access" role="group" aria-label="Context-gap answer choices">
         <span role="status">{feedback?.message}</span>
-        {!finished && currentRound?.choices.slice(0, 3).map((choice, index) => <button key={choice.id} type="button" disabled={busy} onClick={() => choiceHandlerRef.current?.(index)}>{choice.accessibleLabel || choice.label}</button>)}
+        {!finished && currentRound?.choices.slice(0, 3).map((choice, index) => <button key={choice.id} type="button" disabled={busy} onFocus={() => previewChoice(choice.label)} onClick={() => choiceHandlerRef.current?.(index)}>{choice.accessibleLabel || choice.label}</button>)}
       </div>
       {finished ? <div className="lg-phaser-finish-actions lg-dash-finish-actions" aria-live="polite">
         <span><Flag size={18} /> Victory Stadium reached</span>
         <strong>{correct}/{playableRounds.length} first-try gates</strong>
         <button type="button" onClick={finish}>Celebrate and finish</button>
-      </div> : <p className="lg-phaser-help"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> choose a sentence gate · the race continues automatically</p>}
+      </div> : <p className="lg-phaser-help">Hover a gate to hear its word · <kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> choose · the race continues automatically</p>}
     </section>}
   </LearningGameShell>
 }
