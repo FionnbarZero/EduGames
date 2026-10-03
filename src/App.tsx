@@ -155,17 +155,17 @@ let activeRecordedAudio: HTMLAudioElement | undefined
 let settleActiveRecording: (() => void) | undefined
 
 const recordedMandarinAudio: Readonly<Record<string, string>> = {
-  '猫': `${import.meta.env.BASE_URL}audio/mandarin/cat.wav`,
-  '水': `${import.meta.env.BASE_URL}audio/mandarin/water.wav`,
-  '大': `${import.meta.env.BASE_URL}audio/mandarin/big.wav`,
-  '日': `${import.meta.env.BASE_URL}audio/mandarin/sun.wav`,
-  '口': `${import.meta.env.BASE_URL}audio/mandarin/mouth.wav`,
-  '山': `${import.meta.env.BASE_URL}audio/mandarin/mountain.wav`,
-  '月': `${import.meta.env.BASE_URL}audio/mandarin/moon.wav`,
-  '一': `${import.meta.env.BASE_URL}audio/mandarin/one.wav`,
-  '人': `${import.meta.env.BASE_URL}audio/mandarin/person.wav`,
-  '好': `${import.meta.env.BASE_URL}audio/mandarin/good.wav`,
-  '不好！': `${import.meta.env.BASE_URL}audio/mandarin/bu-hao.wav`,
+  '猫': `${import.meta.env.BASE_URL}audio/mandarin/cat.wav?v=2`,
+  '水': `${import.meta.env.BASE_URL}audio/mandarin/water.wav?v=2`,
+  '大': `${import.meta.env.BASE_URL}audio/mandarin/big.wav?v=2`,
+  '日': `${import.meta.env.BASE_URL}audio/mandarin/sun.wav?v=2`,
+  '口': `${import.meta.env.BASE_URL}audio/mandarin/mouth.wav?v=2`,
+  '山': `${import.meta.env.BASE_URL}audio/mandarin/mountain.wav?v=2`,
+  '月': `${import.meta.env.BASE_URL}audio/mandarin/moon.wav?v=2`,
+  '一': `${import.meta.env.BASE_URL}audio/mandarin/one.wav?v=2`,
+  '人': `${import.meta.env.BASE_URL}audio/mandarin/person.wav?v=2`,
+  '好': `${import.meta.env.BASE_URL}audio/mandarin/good.wav?v=2`,
+  '不好！': `${import.meta.env.BASE_URL}audio/mandarin/bu-hao.wav?v=2`,
 }
 
 function playAudio(text: string, language = 'zh-CN'): Promise<void> {

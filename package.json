@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "generate:lantern-audio": "node scripts/generateLanternSounds.mjs",
     "test": "npm run test:audio && npm run build",
-    "test:audio": "node scripts/testLanternSounds.mjs",
+    "test:audio": "node scripts/testLanternSounds.mjs && node scripts/testMandarinAudio.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
