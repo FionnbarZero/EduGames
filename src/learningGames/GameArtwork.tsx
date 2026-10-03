@@ -16,29 +16,40 @@ function ProgressBeacons({ progress, total }: { readonly progress: number, reado
 
 function SpeedArt() {
   return <svg viewBox="0 0 420 150" role="presentation">
-    <path className="art-speed-rail" d="M82 75H338" />
-    <g className="art-speed-node art-speed-left"><circle cx="82" cy="75" r="34" /><path d="m67 76 12 12 22-27" /></g>
-    <g className="art-speed-node art-speed-right"><circle cx="338" cy="75" r="34" /><path d="M322 64h32M322 76h24M322 88h28" /></g>
-    <path className="art-speed-bolt" d="m225 28-38 51h29l-22 45 51-62h-31z" />
-    <circle className="art-spark s1" cx="143" cy="49" r="4" /><circle className="art-spark s2" cx="282" cy="105" r="3" />
+    <circle className="art-ninja-moon" cx="315" cy="58" r="43" />
+    <path className="art-ninja-roofs" d="M0 124h77l36-30 24 18 52-45 57 48 38-24 52 33h84v26H0z" />
+    <g className="art-ninja-hero">
+      <path d="M104 40c32 0 51 19 51 47v34H53V87c0-28 19-47 51-47Z" />
+      <path className="art-ninja-mask" d="M60 73c25-17 65-17 89 0l-12 28H72Z" />
+      <path className="art-ninja-eye" d="M76 81h24m10 0h23" />
+      <path className="art-ninja-scarf" d="m142 58 58-19-35 37 44 7-64 12" />
+    </g>
+    <g className="art-ninja-star star-one"><path d="m239 34 8 15 17-4-9 15 12 12-18-1-5 17-7-16-17 5 10-15-12-12 18 2z" /></g>
+    <g className="art-ninja-star star-two"><path d="m362 83 6 11 13-3-7 11 9 9-13-1-4 12-5-12-13 4 7-12-9-8 13 1z" /></g>
+    <path className="art-ninja-slash" d="M181 109 286 25" />
   </svg>
 }
 
 function BlastArt() {
   return <svg viewBox="0 0 420 150" role="presentation">
-    <g className="art-stars"><circle cx="74" cy="25" r="2" /><circle cx="181" cy="31" r="3" /><circle cx="292" cy="18" r="2" /><circle cx="367" cy="53" r="3" /><circle cx="242" cy="126" r="2" /></g>
-    <g className="art-ship">
-      <path className="art-ship-flame" d="M86 78 42 60l19 19-19 20z" />
-      <path className="art-ship-body" d="M62 79c27-45 70-50 112-20l20 20-20 20c-42 30-85 25-112-20Z" />
-      <circle className="art-ship-window" cx="137" cy="69" r="16" />
-      <path className="art-ship-fin" d="m105 99 25 34 18-42z" />
+    <circle className="art-strike-moon" cx="346" cy="34" r="27" />
+    <path className="art-strike-ground" d="M0 126h420v24H0z" />
+    <g className="art-strike-ninja">
+      <circle cx="96" cy="56" r="31" />
+      <path d="M63 53h66v20H63z" />
+      <path className="art-strike-eyes" d="M77 62h14m10 0h14" />
+      <path d="M76 84h40l19 43H56z" />
+      <path className="art-strike-arm" d="m117 91 48-17" />
+      <path className="art-strike-scarf" d="m124 44 55-20-35 33 42 5-60 11" />
     </g>
-    <g className="art-asteroid">
-      <path d="m298 39 42-7 35 25 2 42-34 25-45-11-20-34z" />
-      <circle cx="328" cy="61" r="8" /><circle cx="350" cy="92" r="12" /><circle cx="309" cy="96" r="6" />
-      <path className="art-target-ring" d="M327 31a52 52 0 1 1 0 96 52 52 0 1 1 0-96Z" />
+    <g className="art-training-dummy">
+      <circle cx="324" cy="64" r="35" />
+      <path d="M324 99v32m-38 0h76" />
+      <circle className="art-dummy-ring" cx="324" cy="64" r="18" />
+      <circle className="art-dummy-center" cx="324" cy="64" r="6" />
     </g>
-    <path className="art-laser" d="M186 79H298" />
+    <path className="art-flying-shuriken" d="m218 48 9 17 19-5-11 17 14 14-20-2-6 19-8-18-19 6 11-17-14-13 20 2z" />
+    <path className="art-strike-trail" d="M161 76c35-15 53-18 72-13" />
   </svg>
 }
 

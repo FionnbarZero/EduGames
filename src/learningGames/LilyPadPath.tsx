@@ -976,7 +976,7 @@ class LilyPondScene extends Phaser.Scene {
   }
 }
 
-export function LilyPadPhaserGame({
+export function LilyPadPath({
   rounds,
   playAudio,
   title = 'Lily-Pad Path',

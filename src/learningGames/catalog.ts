@@ -8,7 +8,8 @@ export const LEARNING_GAME_CATALOG = [
   {
     id: 'speed-match',
     title: 'Speed Match',
-    description: 'Match each target with its paired word, meaning, image, or sound cue.',
+    description: 'Pick one Mandarin tile and its English match. Keep going until every pair is connected.',
+    activityLabel: 'Match pairs',
     channels: ['tier-1-writing', 'tier-2-reading'],
     skills: ['receptive'],
     inputKind: 'pairs',
@@ -16,8 +17,9 @@ export const LEARNING_GAME_CATALOG = [
   },
   {
     id: 'target-blast',
-    title: 'Target Blast',
-    description: 'Blast ten correct targets to pilot your ship safely into Star Harbor.',
+    title: 'Shadow Strike Dojo',
+    description: 'Read or hear the prompt, then help a ninja strike the matching practice target.',
+    activityLabel: 'Choose answers',
     channels: ['tier-1-writing', 'tier-2-reading'],
     skills: ['receptive'],
     inputKind: 'selection',
@@ -26,7 +28,8 @@ export const LEARNING_GAME_CATALOG = [
   {
     id: 'lily-pad-path',
     title: 'Lily-Pad Path',
-    description: 'Guide Scout across ten changing pond regions to reach Celebration Shore.',
+    description: 'Read or hear the prompt, then choose the correct lily pad to move Scout across the pond.',
+    activityLabel: 'Choose answers',
     channels: ['tier-1-writing', 'tier-2-reading'],
     skills: ['receptive'],
     inputKind: 'selection',
@@ -35,7 +38,8 @@ export const LEARNING_GAME_CATALOG = [
   {
     id: 'memory-flip',
     title: 'Memory Flip',
-    description: 'Reveal tiles and remember where each matching pair is located.',
+    description: 'Turn over two tiles at a time. Find every Mandarin–English pair.',
+    activityLabel: 'Find pairs',
     channels: ['tier-1-writing', 'tier-2-reading'],
     skills: ['receptive'],
     inputKind: 'pairs',
@@ -44,7 +48,8 @@ export const LEARNING_GAME_CATALOG = [
   {
     id: 'context-gap-dash',
     title: 'Context Gap Dash',
-    description: 'Complete ten sentences to race through every gate into Victory Stadium.',
+    description: 'Choose the word that completes each sentence, then watch Kai race through the correct gate.',
+    activityLabel: 'Complete sentences',
     channels: ['tier-2-reading'],
     skills: ['reading', 'receptive'],
     inputKind: 'context',
@@ -53,7 +58,8 @@ export const LEARNING_GAME_CATALOG = [
   {
     id: 'sentence-scramble',
     title: 'Sentence Scramble',
-    description: 'Reorder approved sentence chunks into the correct reading order.',
+    description: 'Tap the Mandarin word tiles in the order shown by the English sentence.',
+    activityLabel: 'Build sentences',
     channels: ['tier-2-reading'],
     skills: ['reading', 'receptive'],
     inputKind: 'sequence',
@@ -62,7 +68,8 @@ export const LEARNING_GAME_CATALOG = [
   {
     id: 'read-aloud-boss-rush',
     title: 'Read-Aloud Boss Rush',
-    description: 'Read, compare with the model, and self-assess each target.',
+    description: 'Read each Mandarin word aloud, hear the model, then mark how you did.',
+    activityLabel: 'Speak aloud',
     channels: ['tier-2-reading'],
     skills: ['reading'],
     inputKind: 'production',
@@ -71,7 +78,8 @@ export const LEARNING_GAME_CATALOG = [
   {
     id: 'dictation-streak',
     title: 'Dictation Streak',
-    description: 'Decode each spoken transmission by typing the word you hear.',
+    description: 'Listen to a Mandarin word, type exactly what you hear, and build a streak.',
+    activityLabel: 'Listen and type',
     channels: ['tier-1-writing'],
     skills: ['writing'],
     inputKind: 'production',
@@ -80,7 +88,8 @@ export const LEARNING_GAME_CATALOG = [
   {
     id: 'copy-hide-write-combo',
     title: 'Copy–Hide–Write Combo',
-    description: 'Copy a visible target, hide it, then write it from memory.',
+    description: 'Copy the visible word once. When it disappears, type it again from memory.',
+    activityLabel: 'Copy and recall',
     channels: ['tier-1-writing'],
     skills: ['writing'],
     inputKind: 'production',
@@ -89,7 +98,8 @@ export const LEARNING_GAME_CATALOG = [
   {
     id: 'correction-rescue',
     title: 'Correction Rescue',
-    description: 'Repair a missed target through visible copies and a hidden attempt.',
+    description: 'Copy the visible word three times, then type it once from memory.',
+    activityLabel: 'Correct and recall',
     channels: ['tier-1-writing'],
     skills: ['writing'],
     inputKind: 'production',
