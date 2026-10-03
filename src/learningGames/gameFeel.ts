@@ -1,6 +1,47 @@
-export type GameSound = 'select' | 'flip' | 'correct' | 'incorrect' | 'progress' | 'victory'
+export type GameSound = 'select' | 'flip' | 'correct' | 'incorrect' | 'progress' | 'victory' | 'lantern-flip' | 'lantern-match' | 'lantern-miss' | 'lantern-victory'
 
 let audioContext: AudioContext | null = null
+type LanternSound = Extract<GameSound, `lantern-${string}`>
+
+const lanternSoundUrls: Readonly<Record<LanternSound, string>> = {
+  'lantern-flip': `${import.meta.env.BASE_URL}audio/lanterns/flip.wav`,
+  'lantern-match': `${import.meta.env.BASE_URL}audio/lanterns/match.wav`,
+  'lantern-miss': `${import.meta.env.BASE_URL}audio/lanterns/miss.wav`,
+  'lantern-victory': `${import.meta.env.BASE_URL}audio/lanterns/victory.wav`,
+}
+const lanternAudio = new Map<LanternSound, HTMLAudioElement>()
+let activeLanternAudio: HTMLAudioElement | null = null
+
+function getLanternAudio(sound: LanternSound) {
+  const cached = lanternAudio.get(sound)
+  if (cached) return cached
+  const audio = new Audio(lanternSoundUrls[sound])
+  audio.preload = 'auto'
+  audio.volume = .68
+  lanternAudio.set(sound, audio)
+  return audio
+}
+
+export function preloadLanternSounds() {
+  if (typeof Audio === 'undefined') return
+  ;(Object.keys(lanternSoundUrls) as LanternSound[]).forEach((sound) => getLanternAudio(sound).load())
+}
+
+function playLanternRecording(sound: LanternSound) {
+  const audio = getLanternAudio(sound)
+  if (activeLanternAudio && activeLanternAudio !== audio) {
+    activeLanternAudio.pause()
+    activeLanternAudio.currentTime = 0
+  }
+  audio.currentTime = 0
+  activeLanternAudio = audio
+  audio.onended = () => {
+    if (activeLanternAudio === audio) activeLanternAudio = null
+  }
+  void audio.play().catch(() => {
+    if (activeLanternAudio === audio) activeLanternAudio = null
+  })
+}
 
 function tone(context: AudioContext, frequency: number, startsAt: number, duration: number, gainValue: number, type: OscillatorType = 'sine') {
   const oscillator = context.createOscillator()
@@ -12,12 +53,20 @@ function tone(context: AudioContext, frequency: number, startsAt: number, durati
   gain.gain.exponentialRampToValueAtTime(0.0001, startsAt + duration)
   oscillator.connect(gain)
   gain.connect(context.destination)
+  oscillator.onended = () => {
+    oscillator.disconnect()
+    gain.disconnect()
+  }
   oscillator.start(startsAt)
   oscillator.stop(startsAt + duration + .02)
 }
 
 export function playGameSound(sound: GameSound) {
   if (typeof window === 'undefined') return
+  if (sound in lanternSoundUrls) {
+    playLanternRecording(sound as LanternSound)
+    return
+  }
   const AudioContextClass = window.AudioContext
   if (!AudioContextClass) return
 
@@ -43,7 +92,6 @@ export function playGameSound(sound: GameSound) {
     if (sound === 'victory') {
       ;[523, 659, 784, 1047].forEach((frequency, index) => tone(audioContext!, frequency, now + index * .08, .28, .038, index === 3 ? 'sine' : 'triangle'))
     }
-
     if ('vibrate' in navigator) {
       if (sound === 'incorrect') navigator.vibrate?.([35, 45, 35])
       else if (sound === 'correct' || sound === 'progress') navigator.vibrate?.(25)

@@ -69,11 +69,16 @@ function LilyArt() {
 
 function MemoryArt() {
   return <svg viewBox="0 0 420 150" role="presentation">
-    <path className="art-vault-ring" d="M210 16a59 59 0 1 1 0 118 59 59 0 1 1 0-118Z" />
-    <path className="art-vault-ring inner" d="M210 39a36 36 0 1 1 0 72 36 36 0 1 1 0-72Z" />
-    <path className="art-vault-spoke" d="M210 45v60M180 75h60m-51-22 42 44m0-44-42 44" />
-    <g className="art-memory-card c1"><rect x="53" y="42" width="72" height="88" rx="12" /><path d="m89 62 7 14 16 2-12 11 4 16-15-8-15 8 4-16-12-11 16-2z" /></g>
-    <g className="art-memory-card c2"><rect x="295" y="27" width="72" height="88" rx="12" /><path d="m331 47 7 14 16 2-12 11 4 16-15-8-15 8 4-16-12-11 16-2z" /></g>
+    <circle className="art-lantern-sun" cx="210" cy="55" r="39" />
+    <path className="art-lantern-hills" d="M0 119 61 73l50 34 68-63 58 58 63-45 53 54 67-32v71H0Z" />
+    <path className="art-pergola-roof" d="M23 45h374l-33-19H56Zm26 8h322v11H49Z" />
+    <path className="art-pergola-post" d="M61 59v82m298-82v82M43 141h334" />
+    <path className="art-lantern-wire" d="M64 69q146 45 292 0" />
+    {[102, 156, 210, 264, 318].map((x, index) => <g key={x} className={`art-hanging-lantern l${index + 1}`}>
+      <path d={`M${x} ${82 + Math.abs(2 - index) * 5}v13`} />
+      <rect x={x - 13} y={94 + Math.abs(2 - index) * 5} width="26" height="33" rx="11" />
+      <path d={`M${x - 9} ${130 + Math.abs(2 - index) * 5}h18m-9-3v13`} />
+    </g>)}
   </svg>
 }
 

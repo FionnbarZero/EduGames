@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import { Trophy, Volume2 } from 'lucide-react'
 import type {
   LearningGameAttempt,
@@ -16,6 +16,7 @@ type TargetBlastProps = LearningGameBaseProps & {
 }
 
 type TargetBlastPhase = 'idle' | 'throwing' | 'impact' | 'teacher-entering' | 'bonk' | 'feedback' | 'resetting'
+type TargetBlastAudioState = 'waiting' | 'playing' | 'played' | 'error'
 
 function TargetBlastPlayfield({ round, selectedChoiceId, phase, onChoose }: {
   readonly round: SelectionGameRound
@@ -84,23 +85,39 @@ function TargetBlastPlayfield({ round, selectedChoiceId, phase, onChoose }: {
   </div>
 }
 
-function TargetBlastJourneyActor() {
-  return <span className="lg-journey-actor is-target-blast" aria-hidden="true"><i /><b /><em /></span>
+function TargetBlastJourneyActor({ className = '' }: { readonly className?: string }) {
+  return <span className={`lg-journey-actor is-target-blast${className ? ` ${className}` : ''}`} aria-hidden="true"><i /><b /><em /></span>
 }
 
 function TargetBlastJourney({ mastered, total }: { readonly mastered: number; readonly total: number }) {
-  const journeyStyle = { '--journey-progress': `${total ? (mastered / total) * 100 : 0}%` } as CSSProperties
-  return <section className="lg-journey-map is-target-blast" style={journeyStyle} aria-label={`${mastered} of ${total} checkpoints reached`}>
+  const progress = total ? mastered / total : 0
+  const journeyStyle = {
+    '--journey-progress': `${progress * 100}%`,
+    '--training-ninja-x': `${6 + progress * 88}%`,
+    '--training-field-scroll': `${progress * -58}%`,
+  } as CSSProperties
+  return <section className="lg-journey-map is-target-blast lg-training-field" style={journeyStyle} aria-label={`${mastered} of ${total} training posts reached`}>
     <div className="lg-journey-copy">
-      <span>Dojo gate</span>
-      <strong>{mastered === total ? 'Master trial unlocked' : 'Advancing through the training grounds'}</strong>
-      <span>Master rank</span>
+      <span>Training field</span>
+      <strong>{mastered === total ? 'Master dojo reached' : `Training post ${mastered} of ${total}`}</strong>
+      <span>Master dojo</span>
     </div>
-    <div className="lg-journey-route" aria-hidden="true">
-      <i className="lg-journey-fill" />
-      {Array.from({ length: total + 1 }, (_, checkpoint) => <i key={checkpoint} className={`lg-route-checkpoint${checkpoint <= mastered ? ' is-cleared' : ''}`} />)}
-      <TargetBlastJourneyActor />
-      <span className="lg-journey-destination"><i /><b /></span>
+    <div className="lg-training-viewport" aria-hidden="true">
+      <div className="lg-training-world">
+        <span className="lg-training-moon" />
+        <span className="lg-training-mountains" />
+        <span className="lg-training-bamboo"><i /><i /><i /><i /><i /></span>
+        <span className="lg-training-path" />
+        <span className="lg-training-posts">
+          {Array.from({ length: total + 1 }, (_, checkpoint) => <i
+            key={checkpoint}
+            className={checkpoint <= mastered ? 'is-cleared' : ''}
+            style={{ '--training-post-x': `${6 + (checkpoint / Math.max(1, total)) * 88}%` } as CSSProperties}
+          ><b>{checkpoint}</b></i>)}
+        </span>
+        <TargetBlastJourneyActor className="lg-training-ninja" />
+        <span className="lg-training-dojo"><i /><b /><em /></span>
+      </div>
     </div>
   </section>
 }
@@ -146,9 +163,11 @@ export function TargetBlast({
   const [attempts, setAttempts] = useState<readonly LearningGameAttempt[]>([])
   const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null)
   const [phase, setPhase] = useState<TargetBlastPhase>('idle')
+  const [audioState, setAudioState] = useState<TargetBlastAudioState>('waiting')
   const [streak, setStreak] = useState(0)
   const [bestStreak, setBestStreak] = useState(0)
   const playAudioRef = useRef(playAudio)
+  const audioCycleRef = useRef(0)
   const round = rounds[index]
   const valid = validSelectionRounds(rounds)
   const complete = valid && index >= rounds.length
@@ -157,6 +176,31 @@ export function TargetBlast({
   useEffect(() => {
     playAudioRef.current = playAudio
   }, [playAudio])
+
+  const speakPrompt = useCallback(async () => {
+    const audioText = round?.audioText
+    const play = playAudioRef.current
+    if (!audioText || !play) return
+    const cycle = ++audioCycleRef.current
+    setAudioState('playing')
+    try {
+      await play(audioText)
+      if (cycle === audioCycleRef.current) setAudioState('played')
+    } catch {
+      if (cycle === audioCycleRef.current) setAudioState('error')
+    }
+  }, [round?.audioText, round?.id])
+
+  useEffect(() => {
+    if (!round?.audioText || !playAudioRef.current) return
+    setAudioState('waiting')
+    const timer = window.setTimeout(() => void speakPrompt(), 320)
+    return () => {
+      audioCycleRef.current += 1
+      window.clearTimeout(timer)
+      window.speechSynthesis?.cancel()
+    }
+  }, [round?.id, round?.audioText, speakPrompt])
 
   useEffect(() => {
     if (!selectedChoiceId || !round) return
@@ -233,7 +277,11 @@ export function TargetBlast({
       <p className="lg-round-label">Training strike {index + 1} of {rounds.length}</p>
       <h2>{round.cueText || 'Strike the correct practice target'}</h2>
       <TargetBlastJourney mastered={index} total={rounds.length} />
-      {round.audioText && playAudio && <button className="lg-audio" type="button" onClick={() => void playAudio(round.audioText!)}><Volume2 size={20} /> Hear the prompt</button>}
+      {round.audioText && playAudio && <div className={`lg-auto-prompt-status is-${audioState}`} role="status">
+        <Volume2 size={18} aria-hidden="true" />
+        <span>{audioState === 'playing' ? 'Playing the word…' : audioState === 'played' ? 'Word played automatically' : audioState === 'error' ? 'Audio needs another try' : 'Get ready — the word will play automatically'}</span>
+        <button type="button" onClick={() => void speakPrompt()}>Replay word</button>
+      </div>}
       <div className="lg-stat-row">
         <span><strong>{streak}</strong> momentum</span>
         <span><strong>{bestStreak}</strong> best run</span>

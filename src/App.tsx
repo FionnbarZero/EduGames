@@ -148,12 +148,122 @@ const productionRounds: readonly ProductionGameRound[] = [
   { id: 'production-3', targetId: 'goodbye', targetText: '再见', audioText: '再见' },
 ]
 
-function playAudio(text: string, language = 'zh-CN') {
-  window.speechSynthesis.cancel()
-  const utterance = new SpeechSynthesisUtterance(text)
-  utterance.lang = language
-  utterance.rate = 0.75
-  window.speechSynthesis.speak(utterance)
+let speechRequestId = 0
+let speechStartTimer: number | undefined
+let settleActiveSpeech: (() => void) | undefined
+let activeRecordedAudio: HTMLAudioElement | undefined
+let settleActiveRecording: (() => void) | undefined
+
+const recordedMandarinAudio: Readonly<Record<string, string>> = {
+  '猫': `${import.meta.env.BASE_URL}audio/mandarin/cat.wav?v=2`,
+  '水': `${import.meta.env.BASE_URL}audio/mandarin/water.wav?v=2`,
+  '大': `${import.meta.env.BASE_URL}audio/mandarin/big.wav?v=2`,
+  '日': `${import.meta.env.BASE_URL}audio/mandarin/sun.wav?v=2`,
+  '口': `${import.meta.env.BASE_URL}audio/mandarin/mouth.wav?v=2`,
+  '山': `${import.meta.env.BASE_URL}audio/mandarin/mountain.wav?v=2`,
+  '月': `${import.meta.env.BASE_URL}audio/mandarin/moon.wav?v=2`,
+  '一': `${import.meta.env.BASE_URL}audio/mandarin/one.wav?v=2`,
+  '人': `${import.meta.env.BASE_URL}audio/mandarin/person.wav?v=2`,
+  '好': `${import.meta.env.BASE_URL}audio/mandarin/good.wav?v=2`,
+  '不好！': `${import.meta.env.BASE_URL}audio/mandarin/bu-hao.wav?v=2`,
+}
+
+function playAudio(text: string, language = 'zh-CN'): Promise<void> {
+  activeRecordedAudio?.pause()
+  settleActiveRecording?.()
+  activeRecordedAudio = undefined
+  settleActiveRecording = undefined
+
+  const recordingUrl = recordedMandarinAudio[text]
+  if (recordingUrl) {
+    speechRequestId += 1
+    if (speechStartTimer !== undefined) window.clearTimeout(speechStartTimer)
+    settleActiveSpeech?.()
+    window.speechSynthesis?.cancel()
+
+    return new Promise((resolve, reject) => {
+      const audio = new Audio(recordingUrl)
+      let settled = false
+      const finish = (error?: Error) => {
+        if (settled) return
+        settled = true
+        audio.onended = null
+        audio.onerror = null
+        if (activeRecordedAudio === audio) activeRecordedAudio = undefined
+        if (settleActiveRecording === cancelThisRecording) settleActiveRecording = undefined
+        if (error) reject(error)
+        else resolve()
+      }
+      const cancelThisRecording = () => finish()
+      activeRecordedAudio = audio
+      settleActiveRecording = cancelThisRecording
+      audio.preload = 'auto'
+      audio.volume = 1
+      audio.onended = () => finish()
+      audio.onerror = () => finish(new Error('Recorded audio could not be loaded.'))
+      void audio.play().catch((error: unknown) => finish(error instanceof Error ? error : new Error('Recorded audio could not be played.')))
+    })
+  }
+
+  const synth = window.speechSynthesis
+  if (!synth || typeof SpeechSynthesisUtterance === 'undefined') {
+    return Promise.reject(new Error('Speech playback is not supported in this browser.'))
+  }
+
+  const requestId = ++speechRequestId
+  if (speechStartTimer !== undefined) window.clearTimeout(speechStartTimer)
+  settleActiveSpeech?.()
+  synth.cancel()
+
+  return new Promise((resolve, reject) => {
+    let watchdog: number | undefined
+    let settled = false
+
+    const finish = (error?: Error) => {
+      if (settled) return
+      settled = true
+      if (watchdog !== undefined) window.clearTimeout(watchdog)
+      if (settleActiveSpeech === cancelThisSpeech) settleActiveSpeech = undefined
+      if (error) reject(error)
+      else resolve()
+    }
+    const cancelThisSpeech = () => finish()
+    settleActiveSpeech = cancelThisSpeech
+
+    // Chrome can leave an utterance silently stuck when cancel() and speak()
+    // happen in the same task. Let the engine reset before starting the word.
+    speechStartTimer = window.setTimeout(() => {
+      speechStartTimer = undefined
+      if (requestId !== speechRequestId) {
+        finish()
+        return
+      }
+
+      const utterance = new SpeechSynthesisUtterance(text)
+      const normalizedLanguage = language.toLowerCase()
+      const languageRoot = normalizedLanguage.split('-')[0]
+      const matchingVoices = synth.getVoices().filter((voice) => {
+        const voiceLanguage = voice.lang.toLowerCase()
+        return voiceLanguage === normalizedLanguage || voiceLanguage.startsWith(`${languageRoot}-`)
+      })
+      utterance.voice = matchingVoices.find((voice) => /ting|eddy|flo|sandy|shelley/i.test(voice.name)) || matchingVoices[0] || null
+      utterance.lang = language
+      utterance.rate = 0.75
+      utterance.volume = 1
+      utterance.onend = () => finish()
+      utterance.onerror = (event) => {
+        if (event.error === 'canceled' || event.error === 'interrupted') finish()
+        else finish(new Error(`Speech playback failed: ${event.error}`))
+      }
+
+      synth.resume()
+      synth.speak(utterance)
+      watchdog = window.setTimeout(() => {
+        synth.cancel()
+        finish(new Error('Speech playback did not start.'))
+      }, Math.max(4000, text.length * 900))
+    }, 100)
+  })
 }
 
 function channelLabel(channels: readonly ('tier-1-writing' | 'tier-2-reading')[]) {
