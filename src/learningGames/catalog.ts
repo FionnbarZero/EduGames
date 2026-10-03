@@ -37,9 +37,9 @@ export const LEARNING_GAME_CATALOG = [
   },
   {
     id: 'memory-flip',
-    title: 'Memory Flip',
-    description: 'Turn over two tiles at a time. Find every Mandarin–English pair.',
-    activityLabel: 'Find pairs',
+    title: 'Memory Lanterns',
+    description: 'Light ten lanterns beneath a sunset pergola and find all five Mandarin–English pairs.',
+    activityLabel: 'Match lanterns',
     channels: ['tier-1-writing', 'tier-2-reading'],
     skills: ['receptive'],
     inputKind: 'pairs',
