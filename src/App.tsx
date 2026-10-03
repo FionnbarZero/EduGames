@@ -27,6 +27,10 @@ const pairs: readonly GamePair[] = [
   { id: 'pair-2', targetId: 'thanks', left: { id: 'left-xiexie', label: '谢谢' }, right: { id: 'right-thanks', label: 'thank you' } },
   { id: 'pair-3', targetId: 'goodbye', left: { id: 'left-zaijian', label: '再见' }, right: { id: 'right-goodbye', label: 'goodbye' } },
   { id: 'pair-4', targetId: 'friend', left: { id: 'left-pengyou', label: '朋友' }, right: { id: 'right-friend', label: 'friend' } },
+  { id: 'pair-5', targetId: 'water', left: { id: 'left-shui', label: '水' }, right: { id: 'right-water', label: 'water' } },
+  { id: 'pair-6', targetId: 'cat', left: { id: 'left-mao', label: '猫' }, right: { id: 'right-cat', label: 'cat' } },
+  { id: 'pair-7', targetId: 'tea', left: { id: 'left-cha', label: '茶' }, right: { id: 'right-tea', label: 'tea' } },
+  { id: 'pair-8', targetId: 'book', left: { id: 'left-shu', label: '书' }, right: { id: 'right-book', label: 'book' } },
 ]
 
 const selectionRounds: readonly SelectionGameRound[] = [
@@ -144,12 +148,19 @@ const productionRounds: readonly ProductionGameRound[] = [
   { id: 'production-3', targetId: 'goodbye', targetText: '再见', audioText: '再见' },
 ]
 
-function playAudio(text: string) {
+function playAudio(text: string, language = 'zh-CN') {
   window.speechSynthesis.cancel()
   const utterance = new SpeechSynthesisUtterance(text)
-  utterance.lang = 'zh-CN'
+  utterance.lang = language
   utterance.rate = 0.75
   window.speechSynthesis.speak(utterance)
+}
+
+function channelLabel(channels: readonly ('tier-1-writing' | 'tier-2-reading')[]) {
+  const labels = []
+  if (channels.includes('tier-2-reading')) labels.push('Reading')
+  if (channels.includes('tier-1-writing')) labels.push('Writing')
+  return labels.join(' + ')
 }
 
 function GamePreview({ gameId, onExit, onComplete }: {
@@ -160,7 +171,7 @@ function GamePreview({ gameId, onExit, onComplete }: {
   const shared = { onExit, onComplete }
 
   switch (gameId) {
-    case 'speed-match': return <SpeedMatch {...shared} pairs={pairs} />
+    case 'speed-match': return <SpeedMatch {...shared} pairs={pairs} playAudio={playAudio} />
     case 'target-blast': return <TargetBlast {...shared} rounds={selectionRounds} playAudio={playAudio} />
     case 'lily-pad-path': return <LilyPadPath {...shared} rounds={selectionRounds} playAudio={playAudio} />
     case 'memory-flip': return <MemoryFlip {...shared} pairs={pairs} />
@@ -201,9 +212,9 @@ export function App() {
 
     <header id="top" className="hero">
       <div className="hero-copy">
-        <p className="eyebrow"><Sparkles size={14} /> Interactive component lab</p>
+        <p className="eyebrow"><Sparkles size={14} /> Mandarin practice arcade</p>
         <h1>Pick a game.<br /><em>Start playing.</em></h1>
-        <p className="hero-description">Ten bite-sized learning games are loaded with sample Mandarin vocabulary. Test the flows, feedback, audio, and completion states.</p>
+        <p className="hero-description">Practice Mandarin through matching, reading, listening, speaking, and writing. Every game gives you instant feedback as you play.</p>
         <div className="hero-meta">
           <span><Gamepad2 size={16} /> 10 games</span>
           <span><BookOpen size={16} /> Reading</span>
@@ -227,8 +238,8 @@ export function App() {
 
     <section className="catalog" aria-labelledby="catalog-title">
       <div className="section-heading">
-        <div><p className="eyebrow">Game catalog</p><h2 id="catalog-title">Choose your challenge</h2></div>
-        <p>Sample content is for interaction testing only.</p>
+        <div><p className="eyebrow">10 ways to practice</p><h2 id="catalog-title">Choose your challenge</h2></div>
+        <p>Pick any game. Each one shows you what to do.</p>
       </div>
       <div className="game-grid">
         {LEARNING_GAME_CATALOG.map((game, index) => <article className={`game-card tone-${(index % 5) + 1}`} key={game.id}>
@@ -237,11 +248,11 @@ export function App() {
             <span className="game-time">{game.estimatedSeconds[0]}–{game.estimatedSeconds[1]} sec</span>
           </div>
           <div className="card-copy">
-            <p>{game.channels.some((channel) => channel === 'tier-1-writing') ? 'Writing' : 'Reading'} · {game.inputKind}</p>
+            <p>{channelLabel(game.channels)} · {game.activityLabel}</p>
             <h3>{game.title}</h3>
             <p>{game.description}</p>
           </div>
-          <button type="button" onClick={() => openGame(game.id)}>Play test <ArrowRight size={17} /></button>
+          <button type="button" onClick={() => openGame(game.id)}>Play game <ArrowRight size={17} /></button>
         </article>)}
       </div>
     </section>

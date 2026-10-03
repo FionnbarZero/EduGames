@@ -36,16 +36,15 @@ export {
   validSelectionRounds,
   validSequenceRounds,
 } from './model.ts'
-export { MemoryFlip, SpeedMatch } from './PairGames.tsx'
-export { ContextGapDash, LilyPadPath, TargetBlast } from './SelectionGames.tsx'
+export { SpeedMatch } from './SpeedMatch.tsx'
+export { TargetBlast } from './TargetBlast.tsx'
+export { LilyPadPath, LilyPadPath as LilyPadPhaserGame } from './LilyPadPath.tsx'
+export { MemoryFlip } from './MemoryFlip.tsx'
+export { ContextGapDash, ContextGapDash as ContextGapPhaserGame } from './ContextGapDash.tsx'
 export { SentenceScramble } from './SentenceScramble.tsx'
 export { GameArtwork } from './GameArtwork.tsx'
 export { LilyPadConstructGame } from './LilyPadConstructGame.tsx'
-export { ContextGapPhaserGame } from './ContextGapPhaserGame.tsx'
-export { LilyPadPhaserGame } from './LilyPadPhaserGame.tsx'
-export {
-  CopyHideWriteCombo,
-  CorrectionRescue,
-  DictationStreak,
-  ReadAloudBossRush,
-} from './ProductionGames.tsx'
+export { ReadAloudBossRush } from './ReadAloudBossRush.tsx'
+export { DictationStreak } from './DictationStreak.tsx'
+export { CopyHideWriteCombo } from './CopyHideWriteCombo.tsx'
+export { CorrectionRescue } from './CorrectionRescue.tsx'

@@ -20,6 +20,7 @@ export type LearningGameDefinition = {
   readonly id: LearningGameId
   readonly title: string
   readonly description: string
+  readonly activityLabel: string
   readonly channels: readonly LearningGameChannel[]
   readonly skills: readonly LearningGameSkill[]
   readonly inputKind: LearningGameInputKind
@@ -92,7 +93,7 @@ export type LearningGameBaseProps = {
   readonly onComplete: (summary: LearningGameSummary) => void
 }
 
-export type PlayLearningAudio = (text: string) => void | Promise<void>
+export type PlayLearningAudio = (text: string, language?: string) => void | Promise<void>
 
 export type ReadingCaptureControls = {
   readonly onReady: () => void

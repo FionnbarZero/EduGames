@@ -643,7 +643,7 @@ class ContextDashScene extends Phaser.Scene {
   }
 }
 
-export function ContextGapPhaserGame({
+export function ContextGapDash({
   rounds,
   playAudio,
   title = 'Context Gap Dash',
