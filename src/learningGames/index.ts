@@ -39,6 +39,10 @@ export {
 export { MemoryFlip, SpeedMatch } from './PairGames.tsx'
 export { ContextGapDash, LilyPadPath, TargetBlast } from './SelectionGames.tsx'
 export { SentenceScramble } from './SentenceScramble.tsx'
+export { GameArtwork } from './GameArtwork.tsx'
+export { LilyPadConstructGame } from './LilyPadConstructGame.tsx'
+export { ContextGapPhaserGame } from './ContextGapPhaserGame.tsx'
+export { LilyPadPhaserGame } from './LilyPadPhaserGame.tsx'
 export {
   CopyHideWriteCombo,
   CorrectionRescue,

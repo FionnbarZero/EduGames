@@ -11,6 +11,7 @@
   "dependencies": {
     "@vitejs/plugin-react": "latest",
     "lucide-react": "latest",
+    "phaser": "^4.2.1",
     "react": "latest",
     "react-dom": "latest",
     "vite": "latest"

@@ -1,0 +1,20 @@
+{
+	"name": "StartPad",
+	"plugin-id": "Sprite",
+	"sid": 650001200000020,
+	"isGlobal": false,
+	"editorNewInstanceIsReplica": true,
+	"instanceVariables": [],
+	"behaviorTypes": [],
+	"effectTypes": [],
+	"animations": { "items": [{
+		"frames": [{
+			"width": 620, "height": 413, "originX": 0.5, "originY": 0.5,
+			"originalSource": "", "exportFormat": "lossless", "exportQuality": 0.9,
+			"fileType": "image/png", "imageSpriteId": 12000020,
+			"useCollisionPoly": false, "duration": 1, "tag": ""
+		}],
+		"sid": 650001200000021, "name": "Default", "isLooping": false,
+		"isPingPong": false, "repeatCount": 1, "repeatTo": 0, "speed": 5
+	}], "subfolders": [] }
+}

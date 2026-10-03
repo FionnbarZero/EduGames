@@ -17,20 +17,20 @@ export const LEARNING_GAME_CATALOG = [
   {
     id: 'target-blast',
     title: 'Target Blast',
-    description: 'Select the correct moving target before the next prompt appears.',
+    description: 'Blast ten correct targets to pilot your ship safely into Star Harbor.',
     channels: ['tier-1-writing', 'tier-2-reading'],
     skills: ['receptive'],
     inputKind: 'selection',
-    estimatedSeconds: [45, 75],
+    estimatedSeconds: [90, 150],
   },
   {
     id: 'lily-pad-path',
     title: 'Lily-Pad Path',
-    description: 'Move a character across a short path by selecting correct answers.',
+    description: 'Guide Scout across ten changing pond regions to reach Celebration Shore.',
     channels: ['tier-1-writing', 'tier-2-reading'],
     skills: ['receptive'],
     inputKind: 'selection',
-    estimatedSeconds: [60, 90],
+    estimatedSeconds: [90, 150],
   },
   {
     id: 'memory-flip',
@@ -44,11 +44,11 @@ export const LEARNING_GAME_CATALOG = [
   {
     id: 'context-gap-dash',
     title: 'Context Gap Dash',
-    description: 'Read an approved sentence and select the missing word.',
+    description: 'Complete ten sentences to race through every gate into Victory Stadium.',
     channels: ['tier-2-reading'],
     skills: ['reading', 'receptive'],
     inputKind: 'context',
-    estimatedSeconds: [60, 90],
+    estimatedSeconds: [90, 150],
   },
   {
     id: 'sentence-scramble',
@@ -71,7 +71,7 @@ export const LEARNING_GAME_CATALOG = [
   {
     id: 'dictation-streak',
     title: 'Dictation Streak',
-    description: 'Listen, write, reveal, and self-assess while building a streak.',
+    description: 'Decode each spoken transmission by typing the word you hear.',
     channels: ['tier-1-writing'],
     skills: ['writing'],
     inputKind: 'production',

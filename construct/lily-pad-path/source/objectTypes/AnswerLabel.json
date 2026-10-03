@@ -1,0 +1,6 @@
+{
+	"name": "AnswerLabel", "plugin-id": "Text", "sid": 650001300000003,
+	"isGlobal": false, "editorNewInstanceIsReplica": true,
+	"instanceVariables": [{ "name": "ChoiceIndex", "type": "number", "desc": "", "initialValue": "0", "sid": 650001300000013 }],
+	"behaviorTypes": [], "effectTypes": []
+}

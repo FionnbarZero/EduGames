@@ -1,0 +1,21 @@
+{
+	"name": "LilyPad",
+	"plugin-id": "Sprite",
+	"sid": 650001200000030,
+	"isGlobal": false,
+	"editorNewInstanceIsReplica": true,
+	"instanceVariables": [{ "name": "ChoiceIndex", "type": "number", "desc": "", "initialValue": "0", "sid": 650001200000031 }],
+	"behaviorTypes": [],
+	"effectTypes": [],
+	"animations": { "items": [{
+		"frames": [{
+			"width": 620, "height": 413, "originX": 0.5, "originY": 0.5,
+			"originalSource": "", "exportFormat": "lossless", "exportQuality": 0.9,
+			"fileType": "image/png", "imageSpriteId": 12000030,
+			"collisionPoly": { "points": [0.06,0.42, 0.18,0.24, 0.5,0.16, 0.84,0.24, 0.96,0.46, 0.86,0.68, 0.5,0.78, 0.16,0.68] },
+			"useCollisionPoly": true, "duration": 1, "tag": ""
+		}],
+		"sid": 650001200000032, "name": "Default", "isLooping": false,
+		"isPingPong": false, "repeatCount": 1, "repeatTo": 0, "speed": 5
+	}], "subfolders": [] }
+}

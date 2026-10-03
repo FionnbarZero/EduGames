@@ -5,6 +5,7 @@ import {
   CopyHideWriteCombo,
   CorrectionRescue,
   DictationStreak,
+  GameArtwork,
   LEARNING_GAME_CATALOG,
   LilyPadPath,
   MemoryFlip,
@@ -41,6 +42,34 @@ const selectionRounds: readonly SelectionGameRound[] = [
     id: 'select-3', targetId: 'big', targetText: '大', cueText: 'Which character means big?', audioText: '大',
     choices: [{ id: 'small', label: '小' }, { id: 'person', label: '人' }, { id: 'big', label: '大' }], correctChoiceId: 'big',
   },
+  {
+    id: 'select-4', targetId: 'sun', targetText: '日', cueText: 'Find the character for sun', audioText: '日',
+    choices: [{ id: 'moon', label: '月' }, { id: 'sun', label: '日' }, { id: 'mountain', label: '山' }], correctChoiceId: 'sun',
+  },
+  {
+    id: 'select-5', targetId: 'mouth', targetText: '口', cueText: 'Which character means mouth?', audioText: '口',
+    choices: [{ id: 'eye', label: '目' }, { id: 'hand', label: '手' }, { id: 'mouth', label: '口' }], correctChoiceId: 'mouth',
+  },
+  {
+    id: 'select-6', targetId: 'mountain', targetText: '山', cueText: 'Find the word for mountain', audioText: '山',
+    choices: [{ id: 'mountain', label: '山' }, { id: 'river', label: '河' }, { id: 'field', label: '田' }], correctChoiceId: 'mountain',
+  },
+  {
+    id: 'select-7', targetId: 'moon', targetText: '月', cueText: 'Which character means moon?', audioText: '月',
+    choices: [{ id: 'rain', label: '雨' }, { id: 'moon', label: '月' }, { id: 'cloud', label: '云' }], correctChoiceId: 'moon',
+  },
+  {
+    id: 'select-8', targetId: 'one', targetText: '一', cueText: 'Find the number one', audioText: '一',
+    choices: [{ id: 'three', label: '三' }, { id: 'two', label: '二' }, { id: 'one', label: '一' }], correctChoiceId: 'one',
+  },
+  {
+    id: 'select-9', targetId: 'person', targetText: '人', cueText: 'Which character means person?', audioText: '人',
+    choices: [{ id: 'person', label: '人' }, { id: 'woman', label: '女' }, { id: 'child', label: '子' }], correctChoiceId: 'person',
+  },
+  {
+    id: 'select-10', targetId: 'good', targetText: '好', cueText: 'Find the character for good', audioText: '好',
+    choices: [{ id: 'come', label: '来' }, { id: 'go', label: '去' }, { id: 'good', label: '好' }], correctChoiceId: 'good',
+  },
 ]
 
 const contextRounds: readonly ContextGameRound[] = [
@@ -53,6 +82,46 @@ const contextRounds: readonly ContextGameRound[] = [
     id: 'context-2', targetId: 'school', targetText: '学校', cueText: 'Complete the sentence',
     sentenceBefore: '她去', sentenceAfter: '。',
     choices: [{ id: 'book', label: '书' }, { id: 'school', label: '学校' }, { id: 'tea', label: '茶' }], correctChoiceId: 'school',
+  },
+  {
+    id: 'context-3', targetId: 'tea', targetText: '茶', cueText: 'Complete the sentence',
+    sentenceBefore: '爸爸喝', sentenceAfter: '。',
+    choices: [{ id: 'tea', label: '茶' }, { id: 'book', label: '书' }, { id: 'school', label: '学校' }], correctChoiceId: 'tea',
+  },
+  {
+    id: 'context-4', targetId: 'book', targetText: '书', cueText: 'Complete the sentence',
+    sentenceBefore: '我看', sentenceAfter: '。',
+    choices: [{ id: 'water', label: '水' }, { id: 'cat', label: '猫' }, { id: 'book', label: '书' }], correctChoiceId: 'book',
+  },
+  {
+    id: 'context-5', targetId: 'friend', targetText: '朋友', cueText: 'Complete the sentence',
+    sentenceBefore: '他是我的', sentenceAfter: '。',
+    choices: [{ id: 'teacher', label: '老师' }, { id: 'friend', label: '朋友' }, { id: 'student', label: '学生' }], correctChoiceId: 'friend',
+  },
+  {
+    id: 'context-6', targetId: 'apple', targetText: '苹果', cueText: 'Complete the sentence',
+    sentenceBefore: '妈妈买', sentenceAfter: '。',
+    choices: [{ id: 'apple', label: '苹果' }, { id: 'rain', label: '雨' }, { id: 'car', label: '车' }], correctChoiceId: 'apple',
+  },
+  {
+    id: 'context-7', targetId: 'home', targetText: '家', cueText: 'Complete the sentence',
+    sentenceBefore: '我们回', sentenceAfter: '。',
+    choices: [{ id: 'store', label: '商店' }, { id: 'park', label: '公园' }, { id: 'home', label: '家' }], correctChoiceId: 'home',
+  },
+  {
+    id: 'context-8', targetId: 'teacher', targetText: '老师', cueText: 'Complete the sentence',
+    sentenceBefore: '她是中文', sentenceAfter: '。',
+    choices: [{ id: 'friend', label: '朋友' }, { id: 'teacher', label: '老师' }, { id: 'doctor', label: '医生' }], correctChoiceId: 'teacher',
+  },
+  {
+    id: 'context-9', targetId: 'today', targetText: '今天', cueText: 'Complete the sentence',
+    sentenceBefore: '', sentenceAfter: '天气很好。',
+    choices: [{ id: 'today', label: '今天' }, { id: 'yesterday', label: '昨天' }, { id: 'tomorrow', label: '明天' }], correctChoiceId: 'today',
+  },
+  {
+    id: 'context-10', targetId: 'chinese', targetText: '中文', cueText: 'Complete the sentence',
+    sentenceBefore: '我会说', sentenceAfter: '。',
+    choices: [{ id: 'english', label: '英文' }, { id: 'chinese', label: '中文' }, { id: 'name', label: '名字' }], correctChoiceId: 'chinese',
   },
 ]
 
@@ -74,19 +143,6 @@ const productionRounds: readonly ProductionGameRound[] = [
   { id: 'production-2', targetId: 'thanks', targetText: '谢谢', audioText: '谢谢' },
   { id: 'production-3', targetId: 'goodbye', targetText: '再见', audioText: '再见' },
 ]
-
-const gameIcons: Record<LearningGameId, string> = {
-  'speed-match': '⚡',
-  'target-blast': '☄️',
-  'lily-pad-path': '🐸',
-  'memory-flip': '✦',
-  'context-gap-dash': '◫',
-  'sentence-scramble': '🧩',
-  'read-aloud-boss-rush': '🎙️',
-  'dictation-streak': '🔥',
-  'copy-hide-write-combo': '✍️',
-  'correction-rescue': '★',
-}
 
 function playAudio(text: string) {
   window.speechSynthesis.cancel()
@@ -177,7 +233,7 @@ export function App() {
       <div className="game-grid">
         {LEARNING_GAME_CATALOG.map((game, index) => <article className={`game-card tone-${(index % 5) + 1}`} key={game.id}>
           <div className="card-top">
-            <span className="game-icon" aria-hidden="true">{gameIcons[game.id]}</span>
+            <GameArtwork gameId={game.id} compact />
             <span className="game-time">{game.estimatedSeconds[0]}–{game.estimatedSeconds[1]} sec</span>
           </div>
           <div className="card-copy">

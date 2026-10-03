@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type CSSProperties, type FormEvent } from 'react'
 import { Headphones, Mic, PencilLine, Sparkles, Volume2 } from 'lucide-react'
 import type {
   LearningGameAttempt,
@@ -16,6 +16,8 @@ import {
   LearningGameShell,
   SelfAssessmentButtons,
 } from './GameShell.tsx'
+import { GameArtwork } from './GameArtwork.tsx'
+import { playGameSound } from './gameFeel.ts'
 
 function validProductionRounds(rounds: readonly ProductionGameRound[]) {
   return rounds.length > 0
@@ -30,8 +32,11 @@ function AutoAssessmentFeedback({ feedback, lastRound }: {
   readonly lastRound: boolean
 }) {
   return <div className={`lg-feedback is-${feedback} is-auto lg-assessment-feedback`} role="status">
-    <strong>{feedback === 'correct' ? 'Nice work!' : 'Marked for more practice.'}</strong>
-    <span className="lg-auto-status">{lastRound ? 'Preparing your result…' : 'Next prompt coming up…'}</span>
+    <div className="lg-feedback-energy" aria-hidden="true">{Array.from({ length: 10 }, (_, index) => <i key={index} />)}</div>
+    <span className="lg-feedback-emblem" aria-hidden="true">{feedback === 'correct' ? '✓' : '↻'}</span>
+    <strong>{feedback === 'correct' ? 'Target mastered!' : 'Learning moment — one more try.'}</strong>
+    <span className="lg-feedback-detail">{feedback === 'correct' ? 'Mastery +1' : 'This target stays in practice until it feels solid.'}</span>
+    <span className="lg-auto-status">{feedback === 'correct' ? lastRound ? 'Preparing your result…' : 'Next challenge coming up…' : 'Resetting for your retry…'}</span>
   </div>
 }
 
@@ -48,6 +53,7 @@ type ProductionRunnerProps = LearningGameBaseProps & {
     total: number
     streak: number
     bestStreak: number
+    assess: (correct: boolean, response?: string) => void
   }) => React.ReactNode
   readonly directResponse?: RenderReadingResponse
   readonly completionMessage: string
@@ -81,33 +87,34 @@ function ProductionRunner({
   useEffect(() => {
     if (!feedback) return
     const timer = window.setTimeout(() => {
-      setIndex((current) => current + 1)
+      if (feedback === 'correct') setIndex((current) => current + 1)
       setRevealed(false)
       setFeedback(null)
-    }, 1100)
+    }, feedback === 'correct' ? 1000 : 1900)
     return () => window.clearTimeout(timer)
   }, [feedback])
 
-  function assess(correct: boolean) {
+  function assess(correct: boolean, response = correct ? 'correct' : 'practice-again') {
     if (!round || feedback) return
     const attempt: LearningGameAttempt = {
       gameId,
       promptId: round.id,
       targetId: round.targetId,
       correct,
-      response: correct ? 'correct' : 'practice-again',
-      assessmentMode: 'self-assessment',
+      response,
+      assessmentMode: gameId === 'dictation-streak' ? 'automatic' : 'self-assessment',
     }
     setAttempts((current) => [...current, attempt])
     const nextStreak = correct ? streak + 1 : 0
     setStreak(nextStreak)
     setBestStreak((current) => Math.max(current, nextStreak))
     onAttempt?.(attempt)
+    playGameSound(correct ? 'correct' : 'incorrect')
     setFeedback(correct ? 'correct' : 'incorrect')
   }
 
   const summary = summarizeLearningGame(gameId, attempts)
-  return <LearningGameShell title={title || defaultTitle} eyebrow={eyebrow || defaultEyebrow} progress={`${Math.min(index, rounds.length)}/${rounds.length}`} onExit={onExit}>
+  return <LearningGameShell gameId={gameId} title={title || defaultTitle} eyebrow={eyebrow || defaultEyebrow} progress={`${Math.min(index + (feedback === 'correct' ? 1 : 0), rounds.length)}/${rounds.length} mastered`} onExit={onExit}>
     {!valid ? <LearningGameEmpty onExit={onExit} /> : complete ? <LearningGameComplete
       summary={summary}
       message={completionMessage}
@@ -115,9 +122,10 @@ function ProductionRunner({
     /> : round ? <section className={`lg-card lg-production-card lg-${gameId}`}>
       <p className="lg-round-label">Prompt {index + 1} of {rounds.length}</p>
       <div className="lg-stat-row">
-        <span><strong>{streak}</strong> streak</span>
-        <span><strong>{bestStreak}</strong> best</span>
+        <span><strong>{streak}</strong> momentum</span>
+        <span><strong>{bestStreak}</strong> best run</span>
       </div>
+      {gameId === 'read-aloud-boss-rush' && <GameArtwork gameId={gameId} progress={index + (feedback === 'correct' ? 1 : 0)} total={rounds.length} />}
       {feedback ? <AutoAssessmentFeedback feedback={feedback} lastRound={index + 1 === rounds.length} /> : directResponse ? directResponse(round, { onAssess: assess, index, total: rounds.length }) : !revealed ? prompt(round, {
         reveal: () => setRevealed(true),
         playAudio,
@@ -125,6 +133,7 @@ function ProductionRunner({
         total: rounds.length,
         streak,
         bestStreak,
+        assess,
       }) : <>
         <p className="lg-kicker">Compare with the target</p>
         <div className="lg-reveal-word" lang="zh-Hans">{round.targetText}</div>
@@ -255,10 +264,16 @@ function TimedReadAloudCapture({ round, onReady, onRecording }: {
     }
   }, [onReady, onRecording, retryKey, round])
 
-  return <>
-    <Mic className={`lg-production-icon${state === 'recording' ? ' is-recording' : ''}`} size={42} aria-hidden="true" />
+  const captureStyle = { '--capture-progress': `${((4 - remainingSeconds) / 4) * 100}%` } as CSSProperties
+  return <div className={`lg-voice-combat is-${state}`} style={captureStyle}>
+    <div className="lg-record-orb">
+      <Mic className={`lg-production-icon${state === 'recording' ? ' is-recording' : ''}`} size={34} aria-hidden="true" />
+      <i aria-hidden="true" />
+    </div>
+    <div className="lg-live-wave" aria-hidden="true">{Array.from({ length: 19 }, (_, index) => <i key={index} style={{ '--wave-index': index } as CSSProperties} />)}</div>
+    <p className="lg-kicker">Voice attack charging</p>
     <h2>Read this word aloud</h2>
-    <div className="lg-prompt-word" lang="zh-Hans">{round.targetText}</div>
+    <div className="lg-prompt-word lg-combat-word" lang="zh-Hans">{round.targetText}</div>
     {state === 'requesting' && <div className="lg-recording-status is-requesting" role="status">
       <span aria-hidden="true" /> Preparing the microphone…
     </div>}
@@ -270,7 +285,7 @@ function TimedReadAloudCapture({ round, onReady, onRecording }: {
       <p>Allow microphone access, then try again.</p>
       <button className="lg-primary" type="button" onClick={() => setRetryKey((current) => current + 1)}>Try microphone again</button>
     </div>}
-  </>
+  </div>
 }
 
 export function ReadAloudBossRush({
@@ -296,7 +311,7 @@ export function ReadAloudBossRush({
     gameId="read-aloud-boss-rush"
     defaultTitle="Read-Aloud Boss Rush"
     defaultEyebrow="Tier 2 · Reading"
-    completionMessage="Every reading response has been compared."
+    completionMessage="Every reading target is now mastered."
     directResponse={renderResponse}
     prompt={(round, controls) => briefingComplete ? <>
       <div className="lg-boss-meter" aria-label={`${controls.total - controls.index} boss power segments remaining`}><span style={{ width: `${((controls.total - controls.index) / controls.total) * 100}%` }} /></div>
@@ -322,18 +337,45 @@ export function DictationStreak({
     gameId="dictation-streak"
     defaultTitle="Dictation Streak"
     defaultEyebrow="Tier 1 · Writing"
-    completionMessage="You finished the writing streak."
-    prompt={(round, controls) => <>
-      <PencilLine className="lg-production-icon" size={42} aria-hidden="true" />
-      <h2>{round.instruction || 'Listen, then write the word'}</h2>
-      <div className="lg-streak-flames" aria-label={`${controls.streak} correct-answer streak`}>
-        {Array.from({ length: Math.min(Math.max(controls.streak, 1), 5) }, (_, index) => <span key={index} className={index < controls.streak ? 'is-lit' : ''}>🔥</span>)}
-      </div>
-      <p>Write on the response surface selected by the activity.</p>
-      <button className="lg-audio" type="button" onClick={() => void controls.playAudio?.(round.audioText || round.targetText)}><Headphones size={20} /> Hear the word</button>
-      <button className="lg-primary" type="button" onClick={controls.reveal}>Reveal and check</button>
-    </>}
+    completionMessage="Every writing target is now mastered."
+    prompt={(round, controls) => <DictationConsole round={round} playAudio={controls.playAudio!} streak={controls.streak} onAssess={controls.assess} />}
   />
+}
+
+function DictationConsole({ round, playAudio, streak, onAssess }: {
+  readonly round: ProductionGameRound
+  readonly playAudio: PlayLearningAudio
+  readonly streak: number
+  readonly onAssess: (correct: boolean, response?: string) => void
+}) {
+  const [answer, setAnswer] = useState('')
+
+  useEffect(() => {
+    void playAudio(round.audioText || round.targetText)
+  }, [playAudio, round.audioText, round.id, round.targetText])
+
+  function submit(event: FormEvent) {
+    event.preventDefault()
+    const response = answer.trim()
+    if (!response) return
+    onAssess(response === round.targetText.trim(), response)
+  }
+
+  return <form className="lg-dictation-console" onSubmit={submit}>
+    <div className="lg-sonic-display" aria-hidden="true">
+      <i /><i /><i /><i /><i /><i /><i /><i /><i />
+      <span>{streak ? `${streak}×` : 'GO'}</span>
+    </div>
+    <p className="lg-kicker">Incoming transmission</p>
+    <h2>{round.instruction || 'Hear it. Type it. Lock it in.'}</h2>
+    <button className="lg-audio" type="button" onClick={() => void playAudio(round.audioText || round.targetText)}><Headphones size={20} /> Replay transmission</button>
+    <label className="lg-answer-terminal">
+      <span>Your answer</span>
+      <input value={answer} onChange={(event) => setAnswer(event.target.value)} autoFocus autoComplete="off" spellCheck={false} lang="zh-Hans" placeholder="Type what you heard" />
+      <i aria-hidden="true" />
+    </label>
+    <button className="lg-primary lg-launch-answer" type="submit" disabled={!answer.trim()}><PencilLine size={18} /> Launch answer</button>
+  </form>
 }
 
 type StructuredWritingProps = LearningGameBaseProps & {
@@ -351,7 +393,9 @@ export function CopyHideWriteCombo({
   onComplete,
 }: StructuredWritingProps) {
   const [index, setIndex] = useState(0)
-  const [phase, setPhase] = useState<'copy' | 'write' | 'assess'>('copy')
+  const [phase, setPhase] = useState<'copy' | 'write'>('copy')
+  const [entry, setEntry] = useState('')
+  const [copyConfirmed, setCopyConfirmed] = useState(false)
   const [attempts, setAttempts] = useState<readonly LearningGameAttempt[]>([])
   const [feedback, setFeedback] = useState<AssessmentFeedback | null>(null)
   const round = rounds[index]
@@ -361,56 +405,85 @@ export function CopyHideWriteCombo({
   useEffect(() => {
     if (!feedback) return
     const timer = window.setTimeout(() => {
-      setIndex((current) => current + 1)
+      if (feedback === 'correct') setIndex((current) => current + 1)
       setPhase('copy')
+      setEntry('')
+      setCopyConfirmed(false)
       setFeedback(null)
-    }, 1100)
+    }, feedback === 'correct' ? 1000 : 1900)
     return () => window.clearTimeout(timer)
   }, [feedback])
 
-  function assess(correct: boolean) {
+  function assess(correct: boolean, response: string) {
     if (!round || feedback) return
     const attempt: LearningGameAttempt = {
       gameId: 'copy-hide-write-combo',
       promptId: round.id,
       targetId: round.targetId,
       correct,
-      response: correct ? 'correct' : 'practice-again',
-      assessmentMode: 'self-assessment',
+      response,
+      assessmentMode: 'automatic',
     }
     setAttempts((current) => [...current, attempt])
     onAttempt?.(attempt)
+    playGameSound(correct ? 'correct' : 'incorrect')
     setFeedback(correct ? 'correct' : 'incorrect')
   }
 
+  function updateEntry(value: string) {
+    if (!round || feedback || copyConfirmed) return
+    setEntry(value)
+    if (value.trim() !== round.targetText.trim()) return
+    if (phase === 'copy') {
+      setCopyConfirmed(true)
+      playGameSound('progress')
+      window.setTimeout(() => {
+        setPhase('write')
+        setEntry('')
+        setCopyConfirmed(false)
+      }, 650)
+    } else {
+      assess(true, value.trim())
+    }
+  }
+
+  function checkMemoryAttempt() {
+    if (!round || phase !== 'write' || !entry.trim()) return
+    assess(entry.trim() === round.targetText.trim(), entry.trim())
+  }
+
   const summary = summarizeLearningGame('copy-hide-write-combo', attempts)
-  const phases = ['copy', 'write', 'assess'] as const
-  return <LearningGameShell title={title} eyebrow={eyebrow} progress={`${Math.min(index, rounds.length)}/${rounds.length}`} onExit={onExit}>
+  return <LearningGameShell gameId="copy-hide-write-combo" title={title} eyebrow={eyebrow} progress={`${Math.min(index + (feedback === 'correct' ? 1 : 0), rounds.length)}/${rounds.length} mastered`} onExit={onExit}>
     {!valid ? <LearningGameEmpty onExit={onExit} /> : complete ? <LearningGameComplete summary={summary} message="Every copy-and-memory combo is complete." onDone={() => onComplete(summary)} /> : round ? <section className="lg-card lg-production-card lg-copy-card">
       <p className="lg-round-label">Combo {index + 1} of {rounds.length}</p>
       <div className="lg-phase-steps" aria-label={`Current step: ${phase}`}>
-        {phases.map((step, stepIndex) => <span key={step} className={step === phase ? 'is-current' : phases.indexOf(phase) > stepIndex ? 'is-complete' : ''}>
-          <b>{stepIndex + 1}</b>{step === 'copy' ? 'Look & copy' : step === 'write' ? 'Hide & write' : 'Check'}
-        </span>)}
+        <span className={phase === 'copy' ? 'is-current' : 'is-complete'}><b>1</b>Trace signal</span>
+        <span className={phase === 'write' && !feedback ? 'is-current' : feedback ? 'is-complete' : ''}><b>2</b>Memory input</span>
+        <span className={feedback ? 'is-current' : ''}><b>3</b>Verify</span>
       </div>
       {feedback ? <AutoAssessmentFeedback feedback={feedback} lastRound={index + 1 === rounds.length} /> : <>
       {phase === 'copy' && <>
-        <Sparkles className="lg-production-icon" size={42} aria-hidden="true" />
-        <h2>Look carefully and copy</h2>
-        <div className="lg-reveal-word" lang="zh-Hans">{round.targetText}</div>
+        <h2>Trace the glowing target</h2>
+        <div className={`lg-hologram-copy${copyConfirmed ? ' is-locked' : ''}`}>
+          <div className="lg-reveal-word" lang="zh-Hans">{round.targetText}</div>
+          <span aria-hidden="true" />
+        </div>
         {playAudio && <button className="lg-audio" type="button" onClick={() => void playAudio(round.audioText || round.targetText)}><Volume2 size={20} /> Hear the word</button>}
-        <button className="lg-primary" type="button" onClick={() => setPhase('write')}>Hide the word</button>
+        <label className="lg-writing-console">
+          <span>Copy it exactly — the target hides automatically</span>
+          <input value={entry} onChange={(event) => updateEntry(event.target.value)} autoFocus autoComplete="off" spellCheck={false} lang="zh-Hans" placeholder="Start copying…" />
+          <i aria-hidden="true" />
+        </label>
       </>}
       {phase === 'write' && <>
-        <PencilLine className="lg-production-icon" size={42} aria-hidden="true" />
-        <h2>Now write it from memory</h2>
-        <p>The target stays hidden until the response is finished.</p>
-        <button className="lg-primary" type="button" onClick={() => setPhase('assess')}>Reveal and compare</button>
-      </>}
-      {phase === 'assess' && <>
-        <p className="lg-kicker">The target was</p>
-        <div className="lg-reveal-word" lang="zh-Hans">{round.targetText}</div>
-        <SelfAssessmentButtons onAnswer={assess} />
+        <div className="lg-hidden-glyph" aria-hidden="true"><Sparkles size={28} /><span>Target encrypted</span></div>
+        <h2>Rebuild it from memory</h2>
+        <label className="lg-writing-console is-memory">
+          <span>Press Enter or launch when ready</span>
+          <input value={entry} onChange={(event) => updateEntry(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') checkMemoryAttempt() }} autoFocus autoComplete="off" spellCheck={false} lang="zh-Hans" placeholder="Type from memory…" />
+          <i aria-hidden="true" />
+        </label>
+        <button className="lg-primary" type="button" disabled={!entry.trim()} onClick={checkMemoryAttempt}><PencilLine size={18} /> Verify memory</button>
       </>}
       </>}
     </section> : null}
@@ -430,7 +503,9 @@ export function CorrectionRescue({
   const requiredCopies = Math.max(1, Math.floor(copyCount))
   const [index, setIndex] = useState(0)
   const [copiesFinished, setCopiesFinished] = useState(0)
-  const [phase, setPhase] = useState<'copy' | 'hidden' | 'assess'>('copy')
+  const [phase, setPhase] = useState<'copy' | 'hidden'>('copy')
+  const [entry, setEntry] = useState('')
+  const [barrierHit, setBarrierHit] = useState(false)
   const [attempts, setAttempts] = useState<readonly LearningGameAttempt[]>([])
   const [feedback, setFeedback] = useState<AssessmentFeedback | null>(null)
   const round = rounds[index]
@@ -440,62 +515,83 @@ export function CorrectionRescue({
   useEffect(() => {
     if (!feedback) return
     const timer = window.setTimeout(() => {
-      setIndex((current) => current + 1)
+      if (feedback === 'correct') setIndex((current) => current + 1)
       setCopiesFinished(0)
       setPhase('copy')
+      setEntry('')
+      setBarrierHit(false)
       setFeedback(null)
-    }, 1100)
+    }, feedback === 'correct' ? 1000 : 1900)
     return () => window.clearTimeout(timer)
   }, [feedback])
 
-  function finishCopy() {
-    const next = copiesFinished + 1
-    setCopiesFinished(next)
-    if (next >= requiredCopies) setPhase('hidden')
-  }
-
-  function assess(correct: boolean) {
+  function assess(correct: boolean, response: string) {
     if (!round || feedback) return
     const attempt: LearningGameAttempt = {
       gameId: 'correction-rescue',
       promptId: round.id,
       targetId: round.targetId,
       correct,
-      response: correct ? 'correct' : 'practice-again',
-      assessmentMode: 'self-assessment',
+      response,
+      assessmentMode: 'automatic',
     }
     setAttempts((current) => [...current, attempt])
     onAttempt?.(attempt)
+    playGameSound(correct ? 'correct' : 'incorrect')
     setFeedback(correct ? 'correct' : 'incorrect')
   }
 
+  function updateCopy(value: string) {
+    if (!round || feedback || barrierHit) return
+    setEntry(value)
+    if (value.trim() !== round.targetText.trim()) return
+    const next = copiesFinished + 1
+    setBarrierHit(true)
+    setCopiesFinished(next)
+    playGameSound('progress')
+    window.setTimeout(() => {
+      setEntry('')
+      setBarrierHit(false)
+      if (next >= requiredCopies) setPhase('hidden')
+    }, 560)
+  }
+
+  function checkRescue() {
+    if (!round || phase !== 'hidden' || !entry.trim()) return
+    assess(entry.trim() === round.targetText.trim(), entry.trim())
+  }
+
   const summary = summarizeLearningGame('correction-rescue', attempts)
-  return <LearningGameShell title={title} eyebrow={eyebrow} progress={`${Math.min(index, rounds.length)}/${rounds.length}`} onExit={onExit}>
+  return <LearningGameShell gameId="correction-rescue" title={title} eyebrow={eyebrow} progress={`${Math.min(index + (feedback === 'correct' ? 1 : 0), rounds.length)}/${rounds.length} mastered`} onExit={onExit}>
     {!valid ? <LearningGameEmpty onExit={onExit} /> : complete ? <LearningGameComplete summary={summary} message="The correction targets have been rescued." onDone={() => onComplete(summary)} /> : round ? <section className="lg-card lg-production-card lg-rescue-card">
       <p className="lg-round-label">Rescue {index + 1} of {rounds.length}</p>
       <div className="lg-rescue-scene" aria-hidden="true">
-        <span className={phase === 'assess' ? 'is-rescued' : ''}>★</span>
-        <div>{Array.from({ length: requiredCopies }, (_, step) => <i key={step} className={step < copiesFinished ? 'is-cleared' : ''} />)}</div>
+        <span className={phase === 'hidden' ? 'is-rescued' : ''}>★</span>
+        <div>{Array.from({ length: requiredCopies }, (_, step) => <i key={step} className={`${step < copiesFinished ? 'is-cleared' : ''}${barrierHit && step === copiesFinished - 1 ? ' is-breaking' : ''}`} />)}</div>
       </div>
       {feedback ? <AutoAssessmentFeedback feedback={feedback} lastRound={index + 1 === rounds.length} /> : <>
       {phase === 'copy' && <>
         <div className="lg-rescue-meter" aria-label={`${copiesFinished} of ${requiredCopies} copies complete`}>
           {Array.from({ length: requiredCopies }, (_, step) => <span key={step} className={step < copiesFinished ? 'is-complete' : ''} />)}
         </div>
-        <h2>Copy this target</h2>
+        <h2>Type the target to break each barrier</h2>
         <div className="lg-reveal-word" lang="zh-Hans">{round.targetText}</div>
         {playAudio && <button className="lg-audio" type="button" onClick={() => void playAudio(round.audioText || round.targetText)}><Volume2 size={20} /> Hear the word</button>}
-        <button className="lg-primary" type="button" onClick={finishCopy}>Copy {copiesFinished + 1} finished</button>
+        <label className={`lg-writing-console is-rescue${barrierHit ? ' is-hit' : ''}`}>
+          <span>Barrier {Math.min(copiesFinished + 1, requiredCopies)} of {requiredCopies}</span>
+          <input value={entry} onChange={(event) => updateCopy(event.target.value)} autoFocus autoComplete="off" spellCheck={false} lang="zh-Hans" placeholder="Copy to strike…" />
+          <i aria-hidden="true" />
+        </label>
       </>}
       {phase === 'hidden' && <>
-        <PencilLine className="lg-production-icon" size={42} aria-hidden="true" />
-        <h2>Write it once with the target hidden</h2>
-        <button className="lg-primary" type="button" onClick={() => setPhase('assess')}>Reveal and compare</button>
-      </>}
-      {phase === 'assess' && <>
-        <p className="lg-kicker">The target was</p>
-        <div className="lg-reveal-word" lang="zh-Hans">{round.targetText}</div>
-        <SelfAssessmentButtons onAnswer={assess} />
+        <div className="lg-rescue-ready" aria-hidden="true"><Sparkles size={28} /><span>Path clear</span></div>
+        <h2>Final rescue: type it from memory</h2>
+        <label className="lg-writing-console is-rescue-final">
+          <span>The target is hidden</span>
+          <input value={entry} onChange={(event) => setEntry(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter') checkRescue() }} autoFocus autoComplete="off" spellCheck={false} lang="zh-Hans" placeholder="Type from memory…" />
+          <i aria-hidden="true" />
+        </label>
+        <button className="lg-primary" type="button" disabled={!entry.trim()} onClick={checkRescue}><PencilLine size={18} /> Complete rescue</button>
       </>}
       </>}
     </section> : null}
