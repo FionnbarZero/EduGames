@@ -15,6 +15,7 @@ import {
   LearningGameEmpty,
   LearningGameShell,
 } from './GameShell.tsx'
+import { playGameSound } from './gameFeel.ts'
 
 export function SentenceScramble({
   rounds,
@@ -39,13 +40,16 @@ export function SentenceScramble({
       if (correct) setIndex((current) => current + 1)
       setSelectedIds([])
       setChecked(false)
-    }, 1100)
+    }, correct ? 1000 : 2400)
     return () => window.clearTimeout(timer)
   }, [checked, correct])
 
   function select(tokenId: string) {
     if (checked || selectedIds.includes(tokenId)) return
-    setSelectedIds((current) => [...current, tokenId])
+    const next = [...selectedIds, tokenId]
+    setSelectedIds(next)
+    playGameSound('select')
+    if (round && next.length === round.tokens.length) resolve(next)
   }
 
   function remove(tokenId: string) {
@@ -63,42 +67,47 @@ export function SentenceScramble({
     setSelectedIds([])
   }
 
-  function check() {
-    if (!round || selectedIds.length !== round.tokens.length) return
-    const isCorrect = sequenceIsCorrect(round, selectedIds)
+  function resolve(response: readonly string[]) {
+    if (!round || response.length !== round.tokens.length) return
+    const isCorrect = sequenceIsCorrect(round, response)
     const attempt: LearningGameAttempt = {
       gameId: 'sentence-scramble',
       promptId: round.id,
       targetId: round.targetId,
       correct: isCorrect,
-      response: selectedIds,
+      response,
       assessmentMode: 'automatic',
     }
     setAttempts((current) => [...current, attempt])
     setChecked(true)
+    playGameSound(isCorrect ? 'correct' : 'incorrect')
     onAttempt?.(attempt)
   }
 
   const summary = summarizeLearningGame('sentence-scramble', attempts)
-  return <LearningGameShell title={title} eyebrow={eyebrow} progress={`${Math.min(index, rounds.length)}/${rounds.length}`} onExit={onExit}>
+  return <LearningGameShell gameId="sentence-scramble" title={title} eyebrow={eyebrow} progress={`${Math.min(index + (correct ? 1 : 0), rounds.length)}/${rounds.length} mastered`} onExit={onExit}>
     {!valid ? <LearningGameEmpty onExit={onExit} /> : complete ? <LearningGameComplete
       summary={summary}
       message="You rebuilt every approved sentence."
       onDone={() => onComplete(summary)}
     /> : round ? <section className="lg-card lg-scramble-card">
       <p className="lg-round-label">Sentence {index + 1} of {rounds.length}</p>
-      <h2>{round.cueText || 'Put the sentence in reading order'}</h2>
+      <div className="lg-mission-banner"><span>Sentence forge</span><strong>{round.cueText || 'Build the sentence in reading order'}</strong></div>
+      <div className={`lg-sentence-forge${checked ? correct ? ' is-complete' : ' is-jammed' : ''}`}>
+      <div className="lg-forge-arm" aria-hidden="true"><i /><b /></div>
       <div className="lg-sequence-answer" aria-label="Your sentence">
         {selectedIds.length ? selectedIds.map((id) => {
           const token = round.tokens.find((candidate) => candidate.id === id)
           return token ? <button key={id} type="button" disabled={checked} onClick={() => remove(id)}>{token.label}</button> : null
-        }) : <span>Choose the first part below</span>}
+        }) : <span>Tap a tile to start the assembly line</span>}
+        {Array.from({ length: Math.max(0, round.tokens.length - selectedIds.length) }, (_, slot) => <i className="lg-empty-slot" key={slot} aria-hidden="true" />)}
       </div>
       <div className="lg-sequence-tools">
         <button type="button" disabled={checked || selectedIds.length === 0} onClick={undo}><Undo2 size={15} /> Undo</button>
         <button type="button" disabled={checked || selectedIds.length === 0} onClick={reset}><RotateCcw size={15} /> Reset</button>
       </div>
-      <div className="lg-token-bank" aria-label="Available sentence parts">
+      <div className="lg-token-bank lg-conveyor-bank" aria-label="Available sentence parts">
+        <span className="lg-conveyor-track" aria-hidden="true" />
         {round.tokens.map((token) => <button
           key={token.id}
           type="button"
@@ -106,10 +115,13 @@ export function SentenceScramble({
           onClick={() => select(token.id)}
         >{token.label}</button>)}
       </div>
-      {!checked && <button className="lg-primary" type="button" disabled={selectedIds.length !== round.tokens.length} onClick={check}>Check sentence</button>}
+      {!checked && <p className="lg-auto-lock-note"><strong>{selectedIds.length}/{round.tokens.length}</strong> tiles loaded · checks automatically</p>}
+      </div>
       {checked && <div className={`lg-feedback is-${correct ? 'correct' : 'incorrect'} is-auto`} role="status">
-        <strong>{correct ? 'That sentence is in order!' : 'Not quite. Reset the pieces and try again.'}</strong>
-        <span className="lg-auto-status">{correct ? 'Next sentence coming up…' : <><RotateCcw size={14} /> Resetting the pieces…</>}</span>
+        <strong>{correct ? 'Sentence mastered!' : 'Learning moment — check the reading order.'}</strong>
+        {!correct && <span className="lg-correction-line" lang="zh-Hans">{round.correctTokenIds.map((id) => round.tokens.find((token) => token.id === id)?.label).join(' ')}</span>}
+        <span className="lg-feedback-detail">{correct ? 'Mastery +1' : 'You’ll rebuild this same sentence next.'}</span>
+        <span className="lg-auto-status">{correct ? 'Next sentence coming up…' : <><RotateCcw size={14} /> Resetting for your retry…</>}</span>
       </div>}
     </section> : null}
   </LearningGameShell>

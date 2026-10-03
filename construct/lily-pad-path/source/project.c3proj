@@ -1,0 +1,100 @@
+{
+	"projectFormatVersion": 1,
+	"savedWithRelease": 44002,
+	"name": "Lily-Pad Path",
+	"runtime": "c3",
+	"useWorker": "dom",
+	"bundleAddons": false,
+	"usedAddons": [
+		{ "type": "plugin", "id": "Mouse", "name": "Mouse", "author": "Scirra", "bundled": false },
+		{ "type": "plugin", "id": "Touch", "name": "Touch", "author": "Scirra", "bundled": false },
+		{ "type": "plugin", "id": "Sprite", "name": "Sprite", "author": "Scirra", "bundled": false },
+		{ "type": "plugin", "id": "Text", "name": "Text", "author": "Scirra", "bundled": false }
+	],
+	"uniqueId": "edugameslilypad",
+	"objectTypes": {
+		"items": [
+			"PondBackdrop", "Scout", "StartPad", "LilyPad",
+			"PromptText", "InstructionText", "AnswerLabel", "ProgressText",
+			"FeedbackText", "Sparkle", "Mouse", "Touch"
+		],
+		"subfolders": []
+	},
+	"functionsName": "Functions",
+	"autosaveData": null,
+	"containers": [],
+	"families": { "items": [], "subfolders": [] },
+	"layouts": { "items": ["Pond Journey"], "subfolders": [] },
+	"eventSheets": { "items": ["Pond Journey Events"], "subfolders": [] },
+	"rootFileFolders": {
+		"script": {
+			"items": [{
+				"name": "main.js",
+				"type": "application/javascript",
+				"sid": 650001100001001,
+				"script-info": { "purpose": "main" }
+			}],
+			"subfolders": []
+		},
+		"sound": { "items": [], "subfolders": [] },
+		"music": { "items": [], "subfolders": [] },
+		"video": { "items": [], "subfolders": [] },
+		"font": { "items": [], "subfolders": [] },
+		"icon": {
+			"items": [
+				{ "name": "icon-16.png", "type": "image/png", "sid": 650001100001016, "icon-info": { "purpose": "app-icon" } },
+				{ "name": "icon-32.png", "type": "image/png", "sid": 650001100001032, "icon-info": { "purpose": "app-icon" } },
+				{ "name": "icon-64.png", "type": "image/png", "sid": 650001100001064, "icon-info": { "purpose": "app-icon" } },
+				{ "name": "icon-128.png", "type": "image/png", "sid": 650001100001128, "icon-info": { "purpose": "app-icon" } },
+				{ "name": "icon-256.png", "type": "image/png", "sid": 650001100001256, "icon-info": { "purpose": "app-icon" } },
+				{ "name": "icon-512.png", "type": "image/png", "sid": 650001100001512, "icon-info": { "purpose": "app-icon" } },
+				{ "name": "loading-logo.png", "type": "image/png", "sid": 650001100001999, "icon-info": { "purpose": "loading-logo" } }
+			],
+			"subfolders": []
+		},
+		"general": { "items": [], "subfolders": [] }
+	},
+	"timelines": { "items": [], "subfolders": [] },
+	"flowcharts": { "items": [], "subfolders": [] },
+	"properties": {
+		"description": "A ten-step vocabulary adventure for EduGames.",
+		"version": "1.0.0.0",
+		"autoIncrementVersion": false,
+		"author": "EduGames",
+		"authorEmail": "",
+		"authorWebsite": "",
+		"appId": "com.edugames.lilypadpath",
+		"pixelRounding": false,
+		"zAxisScale": "normalized",
+		"fov": 0.7853981633974483,
+		"useLoaderLayout": false,
+		"fullscreenMode": "letterbox-scale",
+		"fullscreenQuality": "high",
+		"viewportFit": "auto",
+		"backgroundColor": [0.011, 0.067, 0.094, 1],
+		"splashColor": [0.011, 0.067, 0.094, 1],
+		"useThemeColor": true,
+		"themeColor": [0.011, 0.067, 0.094, 1],
+		"orientations": "landscape",
+		"webgpu": "auto",
+		"gpuPreference": "high-performance",
+		"scriptsType": "module",
+		"framerateMode": "vsync",
+		"sampling": "trilinear",
+		"downscaling": "medium",
+		"renderingMode": "auto",
+		"anisotropicFiltering": "auto",
+		"zNear": 1,
+		"zFar": 10000,
+		"maxSpriteSheetSize": 2048,
+		"loaderStyle": "progress-logo",
+		"preloadSounds": true,
+		"cordovaiOSScheme": "app",
+		"cordovaAndroidScheme": "https",
+		"exportFileStructure": "folders",
+		"uidAllocationMode": "increment"
+	},
+	"viewportWidth": 1280,
+	"viewportHeight": 720,
+	"firstLayout": "Pond Journey"
+}

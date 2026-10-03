@@ -1,0 +1,7 @@
+{
+	"name": "Pond Journey Events",
+	"events": [
+		{ "eventType": "comment", "text": "The scene is visually authored in Construct. main.js runs the round data bridge, pointer input, character movement, feedback pauses, sound, and finale." }
+	],
+	"sid": 650001400000001
+}
