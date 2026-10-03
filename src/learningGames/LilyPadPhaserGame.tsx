@@ -30,6 +30,7 @@ const AREA_NAMES = [
   'Celebration Shore',
 ]
 const START_Y = 582
+const ASSET_BASE = import.meta.env.BASE_URL
 
 type FeedbackState = null | {
   readonly correct: boolean
@@ -86,12 +87,12 @@ class LilyPondScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('pond-night', '/assets/lily-pad/moonlit-marsh-v2.png')
-    this.load.image('pond-waterfall', '/assets/lily-pad/waterfall-gardens-v2.png')
-    this.load.image('pond-sunset', '/assets/lily-pad/enchanted-pond.png')
-    this.load.image('scout-idle', '/assets/lily-pad/scout-frog.png')
-    this.load.image('scout-crouch', '/assets/lily-pad/scout-crouch-v2.png')
-    this.load.image('scout-celebrate', '/assets/lily-pad/scout-celebrate-v2.png')
+    this.load.image('pond-night', ASSET_BASE + 'assets/lily-pad/moonlit-marsh-v2.png')
+    this.load.image('pond-waterfall', ASSET_BASE + 'assets/lily-pad/waterfall-gardens-v2.png')
+    this.load.image('pond-sunset', ASSET_BASE + 'assets/lily-pad/enchanted-pond.png')
+    this.load.image('scout-idle', ASSET_BASE + 'assets/lily-pad/scout-frog.png')
+    this.load.image('scout-crouch', ASSET_BASE + 'assets/lily-pad/scout-crouch-v2.png')
+    this.load.image('scout-celebrate', ASSET_BASE + 'assets/lily-pad/scout-celebrate-v2.png')
   }
 
   create() {

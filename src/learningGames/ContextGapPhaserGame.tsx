@@ -30,6 +30,7 @@ const AREA_NAMES = [
   'Victory Stadium',
 ]
 const START_Y = 606
+const ASSET_BASE = import.meta.env.BASE_URL
 
 type FeedbackState = null | {
   readonly correct: boolean
@@ -87,12 +88,12 @@ class ContextDashScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('dash-riverfront', '/assets/context-gap-dash/riverfront-dawn-v1.png')
-    this.load.image('dash-skybridge', '/assets/context-gap-dash/rain-skybridge-v1.png')
-    this.load.image('dash-stadium', '/assets/context-gap-dash/victory-stadium-v1.png')
-    this.load.image('kai-ready', '/assets/context-gap-dash/kai-ready-v1.png')
-    this.load.image('kai-sprint', '/assets/context-gap-dash/kai-sprint-v1.png')
-    this.load.image('kai-celebrate', '/assets/context-gap-dash/kai-celebrate-v1.png')
+    this.load.image('dash-riverfront', ASSET_BASE + 'assets/context-gap-dash/riverfront-dawn-v1.png')
+    this.load.image('dash-skybridge', ASSET_BASE + 'assets/context-gap-dash/rain-skybridge-v1.png')
+    this.load.image('dash-stadium', ASSET_BASE + 'assets/context-gap-dash/victory-stadium-v1.png')
+    this.load.image('kai-ready', ASSET_BASE + 'assets/context-gap-dash/kai-ready-v1.png')
+    this.load.image('kai-sprint', ASSET_BASE + 'assets/context-gap-dash/kai-sprint-v1.png')
+    this.load.image('kai-celebrate', ASSET_BASE + 'assets/context-gap-dash/kai-celebrate-v1.png')
   }
 
   create() {

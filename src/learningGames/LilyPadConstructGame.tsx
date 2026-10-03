@@ -9,7 +9,7 @@ import { LearningGameEmpty, LearningGameShell } from './GameShell.tsx'
 import { summarizeLearningGame, validSelectionRounds } from './model.ts'
 
 const GAME_ID = 'lily-pad-path'
-const CONSTRUCT_GAME_URL = '/construct/lily-pad-path/index.html'
+const CONSTRUCT_GAME_URL = import.meta.env.BASE_URL + 'construct/lily-pad-path/index.html'
 
 type ConstructMessage = {
   readonly type?: string
