@@ -141,12 +141,12 @@ const contextRounds: readonly ContextGameRound[] = [
 
 const sequenceRounds: readonly SequenceGameRound[] = [
   {
-    id: 'sequence-1', targetId: 'i-like-tea', targetText: '我喜欢喝茶', cueText: 'Build: I like drinking tea',
+    id: 'sequence-1', targetId: 'i-like-tea', targetText: '我喜欢喝茶', cueText: 'I like drinking tea', audioText: '我喜欢喝茶。',
     tokens: [{ id: 'tea', label: '茶' }, { id: 'i', label: '我' }, { id: 'drink', label: '喝' }, { id: 'like', label: '喜欢' }],
     correctTokenIds: ['i', 'like', 'drink', 'tea'],
   },
   {
-    id: 'sequence-2', targetId: 'she-is-my-friend', targetText: '她是我的朋友', cueText: 'Build: She is my friend',
+    id: 'sequence-2', targetId: 'she-is-my-friend', targetText: '她是我的朋友', cueText: 'She is my friend', audioText: '她是我的朋友。',
     tokens: [{ id: 'friend', label: '朋友' }, { id: 'she', label: '她' }, { id: 'my', label: '我的' }, { id: 'is', label: '是' }],
     correctTokenIds: ['she', 'is', 'my', 'friend'],
   },
@@ -208,6 +208,8 @@ const recordedLearningAudio: Readonly<Record<string, string>> = {
   '现在太阳出来了，____天气很好。': `${import.meta.env.BASE_URL}audio/context-gap/clues/today.wav?v=2`,
   '美美在北京长大，她跟奶奶说____。': `${import.meta.env.BASE_URL}audio/context-gap/clues/chinese.wav?v=2`,
   '爷爷把____倒进茶杯。': `${import.meta.env.BASE_URL}audio/context-gap/clues/tea.wav?v=2`,
+  '我喜欢喝茶。': `${import.meta.env.BASE_URL}audio/sentence-scramble/i-like-tea.wav?v=1`,
+  '她是我的朋友。': `${import.meta.env.BASE_URL}audio/sentence-scramble/she-is-my-friend.wav?v=1`,
 }
 
 function playAudio(text: string, language = 'zh-CN', playbackRate = 1): Promise<void> {
@@ -329,7 +331,7 @@ function GamePreview({ gameId, onExit, onComplete }: {
     case 'lily-pad-path': return <LilyPadPath {...shared} rounds={selectionRounds} playAudio={playAudio} />
     case 'memory-flip': return <MemoryFlip {...shared} pairs={pairs} />
     case 'context-gap-dash': return <ContextGapDash {...shared} rounds={contextRounds} playAudio={playAudio} />
-    case 'sentence-scramble': return <SentenceScramble {...shared} rounds={sequenceRounds} />
+    case 'sentence-scramble': return <SentenceScramble {...shared} rounds={sequenceRounds} playAudio={playAudio} />
     case 'read-aloud-boss-rush': return <ReadAloudBossRush {...shared} rounds={productionRounds} playAudio={playAudio} />
     case 'dictation-streak': return <DictationStreak {...shared} rounds={productionRounds} playAudio={playAudio} />
     case 'copy-hide-write-combo': return <CopyHideWriteCombo {...shared} rounds={productionRounds} playAudio={playAudio} />

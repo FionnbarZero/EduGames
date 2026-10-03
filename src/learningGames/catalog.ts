@@ -57,8 +57,8 @@ export const LEARNING_GAME_CATALOG = [
   },
   {
     id: 'sentence-scramble',
-    title: 'Sentence Scramble',
-    description: 'Tap the Mandarin word tiles in the order shown by the English sentence.',
+    title: 'Sushi Scramble',
+    description: 'Listen to the Mandarin sentence, then use chopsticks to serve its sushi words in the correct order.',
     activityLabel: 'Build sentences',
     channels: ['tier-2-reading'],
     skills: ['reading', 'receptive'],

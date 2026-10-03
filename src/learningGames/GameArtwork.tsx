@@ -93,11 +93,11 @@ function ContextArt() {
 
 function ScrambleArt() {
   return <svg viewBox="0 0 420 150" role="presentation">
-    <path className="art-conveyor" d="M34 106h352v24H34z" /><circle cx="72" cy="118" r="16" /><circle cx="348" cy="118" r="16" />
-    <g className="art-tile t1"><rect x="75" y="51" width="69" height="52" rx="10" /><path d="M92 77h35" /></g>
-    <g className="art-tile t2"><rect x="164" y="38" width="69" height="65" rx="10" /><path d="M181 69h35" /></g>
-    <g className="art-tile t3"><rect x="253" y="55" width="69" height="48" rx="10" /><path d="M270 79h35" /></g>
-    <path className="art-claw" d="M198 0v32m-17 0h34l-5 17h-24z" />
+    <ellipse className="art-sushi-plate" cx="210" cy="117" rx="172" ry="27" />
+    <g className="art-sushi-piece is-salmon" transform="translate(79 54)"><rect className="rice" width="76" height="58" rx="23" /><path className="topping" d="M-5 13Q38-9 81 13v25Q38 19-5 38z" /><rect className="nori" x="25" y="5" width="26" height="50" rx="4" /><path className="word" d="M31 29h14m-7-9v19" /></g>
+    <g className="art-sushi-piece is-tuna" transform="translate(172 45)"><rect className="rice" width="76" height="67" rx="23" /><path className="topping" d="M-5 15Q38-8 81 15v26Q38 21-5 41z" /><rect className="nori" x="23" y="7" width="30" height="54" rx="4" /><path className="word" d="M30 29h16m-8-9v26m-9-7h18" /></g>
+    <g className="art-sushi-piece is-egg" transform="translate(265 57)"><rect className="rice" width="76" height="55" rx="23" /><path className="topping" d="M-4 7h84v31H-4z" /><rect className="nori" x="25" y="3" width="26" height="48" rx="4" /><path className="word" d="M31 26h14m-7-8v17" /></g>
+    <path className="art-chopsticks" d="M124 4 315 71M134-2l187 57" />
   </svg>
 }
 

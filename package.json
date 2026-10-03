@@ -8,8 +8,9 @@
     "build": "tsc -b && vite build",
     "generate:context-audio": "node scripts/generateContextGapAudio.mjs",
     "generate:lantern-audio": "node scripts/generateLanternSounds.mjs",
+    "generate:scramble-audio": "node scripts/generateSentenceScrambleAudio.mjs",
     "test": "npm run test:audio && npm run build",
-    "test:audio": "node scripts/testLanternSounds.mjs && node scripts/testMandarinAudio.mjs && node scripts/testContextGapAudio.mjs",
+    "test:audio": "node scripts/testLanternSounds.mjs && node scripts/testMandarinAudio.mjs && node scripts/testContextGapAudio.mjs && node scripts/testSentenceScrambleAudio.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
