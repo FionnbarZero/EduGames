@@ -109,6 +109,7 @@ export function MemoryFlip({
             const visible = flippedIds.includes(card.id) || matchedPairIds.includes(card.pairId)
             return <button
               key={card.id}
+              data-card-id={card.id}
               type="button"
               className={`lg-memory-card lg-lantern-card${visible ? ' is-visible' : ''}${matchedPairIds.includes(card.pairId) ? ' is-matched' : ''}`}
               style={{ '--lantern-index': cardIndex, '--lantern-delay': `${-(cardIndex % 5) * .23}s` } as CSSProperties}

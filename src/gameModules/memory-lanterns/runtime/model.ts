@@ -28,13 +28,21 @@ export function summarizeLearningGame(
   }
 }
 
-export function memoryDeck(pairs: readonly GamePair[]) {
+export function memoryDeck(
+  pairs: readonly GamePair[],
+  random: () => number = Math.random,
+) {
   const cards = pairs.flatMap((pair) => [
     { id: `${pair.id}:left`, pairId: pair.id, targetId: pair.targetId, face: pair.left },
     { id: `${pair.id}:right`, pairId: pair.id, targetId: pair.targetId, face: pair.right },
   ])
-  if (cards.length < 4) return cards
-  const left = cards.filter((_, index) => index % 2 === 0)
-  const right = cards.filter((_, index) => index % 2 === 1).reverse()
-  return left.flatMap((card, index) => right[index] ? [card, right[index]] : [card])
+
+  // Fisher-Yates gives every layout an equal chance instead of arranging the
+  // two copies in a predictable pattern. This runs once for every game mount.
+  for (let index = cards.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(random() * (index + 1))
+    ;[cards[index], cards[swapIndex]] = [cards[swapIndex], cards[index]]
+  }
+
+  return cards
 }
