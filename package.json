@@ -16,7 +16,7 @@
     "generate:speller-bee-audio": "node scripts/generateSpellerBeeAudio.mjs",
     "generate:scramble-audio": "node scripts/generateSentenceScrambleAudio.mjs",
     "test": "npm run test:modules && npm run test:hygiene && npm run test:audio && npm run build",
-    "test:modules": "node scripts/testModuleIsolation.mjs && node scripts/testMemoryLanternDeck.mjs",
+    "test:modules": "node scripts/testModuleIsolation.mjs && node scripts/testMemoryLanternDeck.mjs && node scripts/testDictationPinyin.mjs",
     "test:hygiene": "node scripts/testSourceHygiene.mjs",
     "test:audio": "node scripts/testLanternSounds.mjs && node scripts/testMandarinAudio.mjs && node scripts/testContextGapAudio.mjs && node scripts/testSentenceScrambleAudio.mjs && node scripts/testReadAloudAudio.mjs && node scripts/testSpellerBeeAudio.mjs && node scripts/testSpeedMatchAudio.mjs",
     "preview": "vite preview"

@@ -206,7 +206,7 @@
 .lg-reading-comparison .lg-audio { margin: 0; padding: 7px 10px; font-size: .7rem; }
 .lg-read-aloud-briefing .lg-audio { color: #f2dba7; }
 .lg-scroll-reading-stage .lg-kicker { color: #d9b767; }
-.lg-dictation-console { display: flex; flex-direction: column; align-items: center; width: min(640px,100%); padding: 19px 25px 25px; border: 1px solid rgb(255 149 80 / 24%); border-radius: 27px; background: radial-gradient(circle at 50% 0,rgb(255 129 52 / 18%),transparent 170px),#0d0d1c; }
+.lg-dictation-console { position: relative; display: flex; flex-direction: column; align-items: center; width: min(640px,100%); padding: 19px 25px 25px; overflow: hidden; border: 1px solid rgb(255 149 80 / 24%); border-radius: 27px; background: radial-gradient(circle at 50% 0,rgb(255 129 52 / 18%),transparent 170px),#0d0d1c; }
 .lg-speller-console .lg-sonic-display i { background: #ffd44f; box-shadow: 0 0 9px rgb(255 212 79 / 50%); }
 .lg-speller-console .lg-sonic-display span { border-color: #a98aff; color: #1d1332; background: #ffd44f; }
 .lg-speller-console .lg-answer-terminal input:focus { border-color: #ffd44f; box-shadow: inset 0 6px 16px rgb(0 0 0 / 28%),0 0 0 4px rgb(255 212 79 / 10%),0 0 24px rgb(255 212 79 / 15%); }
@@ -223,6 +223,36 @@
 .lg-answer-terminal input { width: 100%; min-height: 68px; padding: 11px 19px; border: 2px solid #39445e; border-radius: 15px; outline: none; color: white; background: #080c18; box-shadow: inset 0 6px 16px rgb(0 0 0 / 28%); font: 850 clamp(1.25rem,3vw,2rem)/1.2 Inter,system-ui,sans-serif; text-align: center; transition: border-color 150ms ease,box-shadow 150ms ease; }
 .lg-answer-terminal input:focus { border-color: #ff9550; box-shadow: inset 0 6px 16px rgb(0 0 0 / 28%),0 0 0 4px rgb(255 149 80 / 10%),0 0 24px rgb(255 149 80 / 15%); }
 .lg-answer-terminal > i { position: absolute; right: 14px; bottom: 12px; left: 14px; height: 3px; border-radius: 99px; background: linear-gradient(90deg,transparent,#ff9550,transparent); }
+.lg-pinyin-hint { max-width: 510px; margin: -5px auto 12px; color: #aab3c8; font-size: .72rem; line-height: 1.4; }
+.lg-pinyin-hint.is-complete { color: #9ff0bf; }
+.lg-spelling-alert { width: min(510px,100%); margin: -4px auto 12px; padding: 9px 12px; border: 1px solid rgb(255 194 92 / 45%); border-radius: 12px; color: #ffe3a1; background: rgb(95 48 23 / 72%); font-size: .82rem; font-weight: 850; }
+.lg-pinyin-candidates { width: min(510px,100%); margin: -4px auto 13px; padding: 10px 12px 12px; border: 1px solid rgb(255 172 96 / 30%); border-radius: 15px; background: rgb(7 10 23 / 92%); box-shadow: 0 15px 35px rgb(0 0 0 / 24%); }
+.lg-pinyin-candidates > span { display: block; margin-bottom: 8px; color: #aab3c8; font-size: .62rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.lg-pinyin-candidates > div { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+.lg-pinyin-candidates button { min-height: 53px; border: 1px solid rgb(255 183 112 / 38%); border-radius: 11px; color: #fff4df; background: linear-gradient(145deg,#352019,#1a1420); cursor: pointer; font-size: clamp(1.35rem,3vw,1.8rem); font-weight: 800; transition: border-color 140ms ease,background 140ms ease,transform 140ms ease; }
+.lg-pinyin-candidates button:hover,.lg-pinyin-candidates button:focus-visible { border-color: #ffc16f; background: linear-gradient(145deg,#61321d,#261724); transform: translateY(-2px); }
+.lg-pinyin-correction-backdrop { position: absolute; z-index: 20; display: grid; place-items: center; inset: 0; padding: 22px; background: rgb(4 6 16 / 82%); backdrop-filter: blur(7px); }
+.lg-pinyin-correction-card { display: grid; place-items: center; width: min(360px,100%); padding: 27px 24px; border: 2px solid #ffc467; border-radius: 24px; color: #fff5df; background: radial-gradient(circle at 50% 0,rgb(255 179 79 / 22%),transparent 130px),linear-gradient(145deg,#3c211c,#161326); box-shadow: 0 24px 70px rgb(0 0 0 / 55%),0 0 35px rgb(255 167 67 / 18%); }
+.lg-pinyin-correction-card > span { color: #ffc96f; font-size: .7rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.lg-pinyin-correction-card > strong { margin: 10px 0 1px; color: white; font-size: clamp(2.8rem,9vw,4.5rem); line-height: 1; }
+.lg-pinyin-correction-card > small { color: #bec7dc; font-size: .9rem; letter-spacing: .13em; }
+.lg-pinyin-correction-card > b { margin-top: 18px; padding: 7px 13px; border-radius: 999px; color: #2b180a; background: #ffc467; font-size: .82rem; }
+.lg-character-correction-card > strong { font-family: "Kaiti SC",KaiTi,STKaiti,serif; font-size: clamp(4rem,14vw,7rem); font-weight: 400; }
+.lg-character-correction-card > small { letter-spacing: .08em; text-transform: uppercase; }
+.lg-dictation-answer-key { display: inline-flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 8px; margin: 2px auto; color: #d8def0; font-size: 1rem; }
+.lg-dictation-answer-key b { color: #fff0b8; font-size: 1.55rem; }
+.lg-dictation-answer-key i { color: #737f99; font-style: normal; }
+.lg-dictation-wrong-feedback { display: grid; place-items: center; min-height: 285px; padding: 17px; border-radius: 25px; background: radial-gradient(circle at 50% 15%,rgb(255 155 72 / 15%),transparent 190px),rgb(7 9 21 / 84%); }
+.lg-dictation-wrong-card { display: grid; place-items: center; width: min(480px,100%); padding: 23px 22px 20px; border: 2px solid #ffb35f; border-radius: 23px; background: linear-gradient(145deg,#3b211e,#151326); box-shadow: 0 20px 60px rgb(0 0 0 / 48%),0 0 32px rgb(255 151 65 / 15%); }
+.lg-dictation-wrong-card > span { color: #ffc36e; font-size: .76rem; font-weight: 950; letter-spacing: .12em; text-transform: uppercase; }
+.lg-dictation-wrong-card > b { margin-top: 16px; color: #d3d9e8; font-size: .78rem; font-weight: 750; }
+.lg-character-corrections { display: grid; gap: 10px; width: 100%; margin-top: 13px; }
+.lg-character-correction { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; }
+.lg-character-correction > span { display: grid; place-items: center; gap: 3px; min-height: 92px; padding: 8px; border: 1px solid rgb(255 126 93 / 30%); border-radius: 15px; color: #ffb09e; background: rgb(74 29 31 / 48%); }
+.lg-character-correction > span.is-correct { border-color: rgb(112 233 170 / 45%); color: #9df1c2; background: rgb(22 67 53 / 58%); box-shadow: 0 0 24px rgb(85 222 155 / 10%); }
+.lg-character-correction small { color: #aeb6ca; font-size: .58rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.lg-character-correction s,.lg-character-correction strong { font-family: "Kaiti SC",KaiTi,STKaiti,serif; font-size: clamp(2rem,7vw,3.25rem); font-weight: 400; line-height: 1; }
+.lg-character-correction > i { color: #ffc269; font-size: 1.4rem; font-style: normal; }
 .lg-launch-answer { margin-top: 1px; }
 .lg-stroke-heading .lg-audio { flex: 0 0 auto; min-height: 42px; margin: 0; padding: 8px 13px; border-color: rgb(255 116 119 / 38%); color: #ffc6c7; background: rgb(255 89 94 / 8%); font-size: .72rem; }
 .lg-stroke-actions .lg-primary { min-height: 43px; margin: 0; color: #291012; background: linear-gradient(135deg,#ffdb72,#ff7c68); }
@@ -255,6 +285,8 @@
   .lg-sonic-display i:nth-child(even) { animation-delay: -.35s; }
   .lg-feedback-emblem { animation: play-emblem 750ms cubic-bezier(.12,.85,.2,1) both; }
   .lg-feedback-energy i { animation: play-energy 1.3s ease-out infinite; }
+  .lg-pinyin-correction-card { animation: lg-card-enter 260ms cubic-bezier(.18,.85,.22,1) both; }
+  .lg-dictation-wrong-card { animation: lg-card-enter 280ms cubic-bezier(.18,.85,.22,1) both; }
 }
 .lg-finale-copy > p:not(.lg-kicker) { max-width: 35ch; color: #9ba7c0; line-height: 1.55; }
 .lg-finale-copy .lg-complete-stats { margin: 10px 0 22px; }
