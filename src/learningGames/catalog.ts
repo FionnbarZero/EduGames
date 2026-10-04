@@ -7,9 +7,9 @@ import type {
 export const LEARNING_GAME_CATALOG = [
   {
     id: 'speed-match',
-    title: 'Speed Match',
-    description: 'Pick one Mandarin tile and its English match. Keep going until every pair is connected.',
-    activityLabel: 'Match pairs',
+    title: 'Shuriken Match',
+    description: 'Hear and match Mandarin word seals with their English shadows before the ninja reaches the moon gate.',
+    activityLabel: 'Ninja fluency',
     channels: ['tier-1-writing', 'tier-2-reading'],
     skills: ['receptive'],
     inputKind: 'pairs',
