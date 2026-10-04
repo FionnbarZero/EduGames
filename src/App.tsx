@@ -1,26 +1,28 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { ArrowRight, BookOpen, Gamepad2, Headphones, Keyboard, RotateCcw, Sparkles } from 'lucide-react'
-import {
-  ContextGapDash,
-  CopyHideWriteCombo,
-  CorrectionRescue,
-  DictationStreak,
-  GameArtwork,
-  LEARNING_GAME_CATALOG,
-  LilyPadPath,
-  MemoryFlip,
-  ReadAloudBossRush,
-  SentenceScramble,
-  SpeedMatch,
-  TargetBlast,
-  type ContextGameRound,
-  type GamePair,
-  type LearningGameId,
-  type LearningGameSummary,
-  type ProductionGameRound,
-  type SelectionGameRound,
-  type SequenceGameRound,
-} from './learningGames/index.ts'
+import { GameArtwork } from './gameCatalog/GameArtwork.tsx'
+import { LEARNING_GAME_CATALOG } from './gameCatalog/catalog.ts'
+import type {
+  ContextGameRound,
+  GamePair,
+  LearningGameId,
+  LearningGameSummary,
+  ProductionGameRound,
+  SelectionGameRound,
+  SequenceGameRound,
+  StrokeOrderGameRound,
+} from './gameCatalog/contracts.ts'
+
+const SpeedMatch = lazy(() => import('./gameModules/speed-match/index.ts').then((module) => ({ default: module.SpeedMatch })))
+const TargetBlast = lazy(() => import('./gameModules/target-blast/index.ts').then((module) => ({ default: module.TargetBlast })))
+const LilyPadPath = lazy(() => import('./gameModules/lily-pad-path/index.ts').then((module) => ({ default: module.LilyPadPath })))
+const MemoryFlip = lazy(() => import('./gameModules/memory-lanterns/index.ts').then((module) => ({ default: module.MemoryFlip })))
+const ContextGapDash = lazy(() => import('./gameModules/context-gap-dash/index.ts').then((module) => ({ default: module.ContextGapDash })))
+const SentenceScramble = lazy(() => import('./gameModules/sushi-scramble/index.ts').then((module) => ({ default: module.SentenceScramble })))
+const ReadAloudBossRush = lazy(() => import('./gameModules/whispering-scrolls/index.ts').then((module) => ({ default: module.ReadAloudBossRush })))
+const DictationStreak = lazy(() => import('./gameModules/dictation-streak/index.ts').then((module) => ({ default: module.DictationStreak })))
+const SpellerBee = lazy(() => import('./gameModules/speller-bee/index.ts').then((module) => ({ default: module.SpellerBee })))
+const StrokeOrderSlay = lazy(() => import('./gameModules/stroke-order-slay/index.ts').then((module) => ({ default: module.StrokeOrderSlay })))
 
 const pairs: readonly GamePair[] = [
   { id: 'pair-1', targetId: 'hello', left: { id: 'left-nihao', label: '你好' }, right: { id: 'right-hello', label: 'hello' } },
@@ -78,65 +80,75 @@ const selectionRounds: readonly SelectionGameRound[] = [
 
 const contextRounds: readonly ContextGameRound[] = [
   {
-    id: 'context-1', targetId: 'like', targetText: '喜欢', cueText: 'Complete the sentence',
-    sentenceBefore: '我', sentenceAfter: '学习中文。',
-    choices: [{ id: 'like', label: '喜欢' }, { id: 'eat', label: '吃' }, { id: 'see', label: '看' }], correctChoiceId: 'like',
+    id: 'context-1', targetId: 'water', targetText: '水',
+    cueText: '跑步后，美美打开水瓶喝____。', audioText: '跑步后，美美打开水瓶喝____。',
+    sentenceBefore: '跑步后，美美打开水瓶喝', sentenceAfter: '。',
+    choices: [{ id: 'milk', label: '牛奶' }, { id: 'water', label: '水' }, { id: 'tea', label: '茶' }], correctChoiceId: 'water',
   },
   {
-    id: 'context-2', targetId: 'school', targetText: '学校', cueText: 'Complete the sentence',
-    sentenceBefore: '她去', sentenceAfter: '。',
-    choices: [{ id: 'book', label: '书' }, { id: 'school', label: '学校' }, { id: 'tea', label: '茶' }], correctChoiceId: 'school',
+    id: 'context-2', targetId: 'school', targetText: '学校',
+    cueText: '丽丽背着书包去____上课。', audioText: '丽丽背着书包去____上课。',
+    sentenceBefore: '丽丽背着书包去', sentenceAfter: '上课。',
+    choices: [{ id: 'park', label: '公园' }, { id: 'store', label: '商店' }, { id: 'school', label: '学校' }], correctChoiceId: 'school',
   },
   {
-    id: 'context-3', targetId: 'tea', targetText: '茶', cueText: 'Complete the sentence',
-    sentenceBefore: '爸爸喝', sentenceAfter: '。',
-    choices: [{ id: 'tea', label: '茶' }, { id: 'book', label: '书' }, { id: 'school', label: '学校' }], correctChoiceId: 'tea',
+    id: 'context-3', targetId: 'apple', targetText: '苹果',
+    cueText: '爸爸给小明一个红色的____。', audioText: '爸爸给小明一个红色的____。',
+    sentenceBefore: '爸爸给小明一个红色的', sentenceAfter: '。',
+    choices: [{ id: 'apple', label: '苹果' }, { id: 'orange', label: '橙子' }, { id: 'banana', label: '香蕉' }], correctChoiceId: 'apple',
   },
   {
-    id: 'context-4', targetId: 'book', targetText: '书', cueText: 'Complete the sentence',
-    sentenceBefore: '我看', sentenceAfter: '。',
-    choices: [{ id: 'water', label: '水' }, { id: 'cat', label: '猫' }, { id: 'book', label: '书' }], correctChoiceId: 'book',
+    id: 'context-4', targetId: 'book', targetText: '书',
+    cueText: '睡觉前，我打开____读故事。', audioText: '睡觉前，我打开____读故事。',
+    sentenceBefore: '睡觉前，我打开', sentenceAfter: '读故事。',
+    choices: [{ id: 'menu', label: '菜单' }, { id: 'book', label: '书' }, { id: 'map', label: '地图' }], correctChoiceId: 'book',
   },
   {
-    id: 'context-5', targetId: 'friend', targetText: '朋友', cueText: 'Complete the sentence',
-    sentenceBefore: '他是我的', sentenceAfter: '。',
-    choices: [{ id: 'teacher', label: '老师' }, { id: 'friend', label: '朋友' }, { id: 'student', label: '学生' }], correctChoiceId: 'friend',
+    id: 'context-5', targetId: 'friend', targetText: '朋友',
+    cueText: '乐乐每天跟我玩。他是我的好____。', audioText: '乐乐每天跟我玩。他是我的好____。',
+    sentenceBefore: '乐乐每天跟我玩。他是我的好', sentenceAfter: '。',
+    choices: [{ id: 'doctor', label: '医生' }, { id: 'teacher', label: '老师' }, { id: 'friend', label: '朋友' }], correctChoiceId: 'friend',
   },
   {
-    id: 'context-6', targetId: 'apple', targetText: '苹果', cueText: 'Complete the sentence',
-    sentenceBefore: '妈妈买', sentenceAfter: '。',
-    choices: [{ id: 'apple', label: '苹果' }, { id: 'rain', label: '雨' }, { id: 'car', label: '车' }], correctChoiceId: 'apple',
+    id: 'context-6', targetId: 'teacher', targetText: '老师',
+    cueText: '王女士教我们中文。她是____。', audioText: '王女士教我们中文。她是____。',
+    sentenceBefore: '王女士教我们中文。她是', sentenceAfter: '。',
+    choices: [{ id: 'teacher', label: '老师' }, { id: 'student', label: '学生' }, { id: 'friend', label: '朋友' }], correctChoiceId: 'teacher',
   },
   {
-    id: 'context-7', targetId: 'home', targetText: '家', cueText: 'Complete the sentence',
-    sentenceBefore: '我们回', sentenceAfter: '。',
-    choices: [{ id: 'store', label: '商店' }, { id: 'park', label: '公园' }, { id: 'home', label: '家' }], correctChoiceId: 'home',
+    id: 'context-7', targetId: 'home', targetText: '家',
+    cueText: '放学了，我们回____吃晚饭。', audioText: '放学了，我们回____吃晚饭。',
+    sentenceBefore: '放学了，我们回', sentenceAfter: '吃晚饭。',
+    choices: [{ id: 'park', label: '公园' }, { id: 'home', label: '家' }, { id: 'store', label: '商店' }], correctChoiceId: 'home',
   },
   {
-    id: 'context-8', targetId: 'teacher', targetText: '老师', cueText: 'Complete the sentence',
-    sentenceBefore: '她是中文', sentenceAfter: '。',
-    choices: [{ id: 'friend', label: '朋友' }, { id: 'teacher', label: '老师' }, { id: 'doctor', label: '医生' }], correctChoiceId: 'teacher',
+    id: 'context-8', targetId: 'today', targetText: '今天',
+    cueText: '现在太阳出来了，____天气很好。', audioText: '现在太阳出来了，____天气很好。',
+    sentenceBefore: '现在太阳出来了，', sentenceAfter: '天气很好。',
+    choices: [{ id: 'yesterday', label: '昨天' }, { id: 'tomorrow', label: '明天' }, { id: 'today', label: '今天' }], correctChoiceId: 'today',
   },
   {
-    id: 'context-9', targetId: 'today', targetText: '今天', cueText: 'Complete the sentence',
-    sentenceBefore: '', sentenceAfter: '天气很好。',
-    choices: [{ id: 'today', label: '今天' }, { id: 'yesterday', label: '昨天' }, { id: 'tomorrow', label: '明天' }], correctChoiceId: 'today',
+    id: 'context-9', targetId: 'chinese', targetText: '中文',
+    cueText: '美美在北京长大，她跟奶奶说____。', audioText: '美美在北京长大，她跟奶奶说____。',
+    sentenceBefore: '美美在北京长大，她跟奶奶说', sentenceAfter: '。',
+    choices: [{ id: 'chinese', label: '中文' }, { id: 'english', label: '英文' }, { id: 'french', label: '法文' }], correctChoiceId: 'chinese',
   },
   {
-    id: 'context-10', targetId: 'chinese', targetText: '中文', cueText: 'Complete the sentence',
-    sentenceBefore: '我会说', sentenceAfter: '。',
-    choices: [{ id: 'english', label: '英文' }, { id: 'chinese', label: '中文' }, { id: 'name', label: '名字' }], correctChoiceId: 'chinese',
+    id: 'context-10', targetId: 'tea', targetText: '茶',
+    cueText: '爷爷把____倒进茶杯。', audioText: '爷爷把____倒进茶杯。',
+    sentenceBefore: '爷爷把', sentenceAfter: '倒进茶杯。',
+    choices: [{ id: 'water', label: '水' }, { id: 'tea', label: '茶' }, { id: 'milk', label: '牛奶' }], correctChoiceId: 'tea',
   },
 ]
 
 const sequenceRounds: readonly SequenceGameRound[] = [
   {
-    id: 'sequence-1', targetId: 'i-like-tea', targetText: '我喜欢喝茶', cueText: 'Build: I like drinking tea',
+    id: 'sequence-1', targetId: 'i-like-tea', targetText: '我喜欢喝茶', cueText: 'I like drinking tea', audioText: '我喜欢喝茶。',
     tokens: [{ id: 'tea', label: '茶' }, { id: 'i', label: '我' }, { id: 'drink', label: '喝' }, { id: 'like', label: '喜欢' }],
     correctTokenIds: ['i', 'like', 'drink', 'tea'],
   },
   {
-    id: 'sequence-2', targetId: 'she-is-my-friend', targetText: '她是我的朋友', cueText: 'Build: She is my friend',
+    id: 'sequence-2', targetId: 'she-is-my-friend', targetText: '她是我的朋友', cueText: 'She is my friend', audioText: '她是我的朋友。',
     tokens: [{ id: 'friend', label: '朋友' }, { id: 'she', label: '她' }, { id: 'my', label: '我的' }, { id: 'is', label: '是' }],
     correctTokenIds: ['she', 'is', 'my', 'friend'],
   },
@@ -148,13 +160,70 @@ const productionRounds: readonly ProductionGameRound[] = [
   { id: 'production-3', targetId: 'goodbye', targetText: '再见', audioText: '再见' },
 ]
 
+const spellingRounds: readonly ProductionGameRound[] = [
+  { id: 'spelling-1', targetId: 'cat', targetText: 'cat', audioText: 'cat' },
+  { id: 'spelling-2', targetId: 'water', targetText: 'water', audioText: 'water' },
+  { id: 'spelling-3', targetId: 'friend', targetText: 'friend', audioText: 'friend' },
+  { id: 'spelling-4', targetId: 'school', targetText: 'school', audioText: 'school' },
+  { id: 'spelling-5', targetId: 'apple', targetText: 'apple', audioText: 'apple' },
+  { id: 'spelling-6', targetId: 'teacher', targetText: 'teacher', audioText: 'teacher' },
+  { id: 'spelling-7', targetId: 'family', targetText: 'family', audioText: 'family' },
+  { id: 'spelling-8', targetId: 'morning', targetText: 'morning', audioText: 'morning' },
+  { id: 'spelling-9', targetId: 'yellow', targetText: 'yellow', audioText: 'yellow' },
+  { id: 'spelling-10', targetId: 'beautiful', targetText: 'beautiful', audioText: 'beautiful' },
+]
+
+const strokeOrderRounds: readonly StrokeOrderGameRound[] = [
+  {
+    id: 'stroke-one', targetId: 'one', targetText: '一', meaning: 'one', audioText: '一',
+    strokes: [
+      [[18, 52], [32, 51], [48, 49], [66, 47], [82, 49]],
+    ],
+  },
+  {
+    id: 'stroke-two', targetId: 'two', targetText: '二', meaning: 'two', audioText: '二',
+    strokes: [
+      [[27, 35], [43, 34], [58, 32], [73, 33]],
+      [[17, 68], [35, 67], [55, 64], [72, 63], [84, 66]],
+    ],
+  },
+  {
+    id: 'stroke-three', targetId: 'three', targetText: '三', meaning: 'three', audioText: '三',
+    strokes: [
+      [[30, 25], [45, 24], [58, 22], [70, 24]],
+      [[28, 49], [43, 49], [58, 47], [70, 49]],
+      [[17, 73], [34, 73], [53, 70], [70, 69], [83, 73]],
+    ],
+  },
+  {
+    id: 'stroke-person', targetId: 'person', targetText: '人', meaning: 'person', audioText: '人',
+    strokes: [
+      [[53, 20], [52, 34], [47, 49], [38, 65], [27, 78], [18, 84]],
+      [[50, 43], [57, 54], [65, 65], [74, 75], [83, 81]],
+    ],
+  },
+]
+
 let speechRequestId = 0
 let speechStartTimer: number | undefined
 let settleActiveSpeech: (() => void) | undefined
 let activeRecordedAudio: HTMLAudioElement | undefined
 let settleActiveRecording: (() => void) | undefined
 
-const recordedMandarinAudio: Readonly<Record<string, string>> = {
+const recordedLearningAudio: Readonly<Record<string, string>> = {
+  'cat': `${import.meta.env.BASE_URL}audio/speller-bee/cat.wav?v=1`,
+  'water': `${import.meta.env.BASE_URL}audio/speller-bee/water.wav?v=1`,
+  'friend': `${import.meta.env.BASE_URL}audio/speller-bee/friend.wav?v=1`,
+  'school': `${import.meta.env.BASE_URL}audio/speller-bee/school.wav?v=1`,
+  'apple': `${import.meta.env.BASE_URL}audio/speller-bee/apple.wav?v=1`,
+  'teacher': `${import.meta.env.BASE_URL}audio/speller-bee/teacher.wav?v=1`,
+  'family': `${import.meta.env.BASE_URL}audio/speller-bee/family.wav?v=1`,
+  'morning': `${import.meta.env.BASE_URL}audio/speller-bee/morning.wav?v=1`,
+  'yellow': `${import.meta.env.BASE_URL}audio/speller-bee/yellow.wav?v=1`,
+  'beautiful': `${import.meta.env.BASE_URL}audio/speller-bee/beautiful.wav?v=1`,
+  '你好': `${import.meta.env.BASE_URL}audio/read-aloud/hello.wav?v=1`,
+  '谢谢': `${import.meta.env.BASE_URL}audio/read-aloud/thanks.wav?v=1`,
+  '再见': `${import.meta.env.BASE_URL}audio/read-aloud/goodbye.wav?v=1`,
   '猫': `${import.meta.env.BASE_URL}audio/mandarin/cat.wav?v=2`,
   '水': `${import.meta.env.BASE_URL}audio/mandarin/water.wav?v=2`,
   '大': `${import.meta.env.BASE_URL}audio/mandarin/big.wav?v=2`,
@@ -163,18 +232,54 @@ const recordedMandarinAudio: Readonly<Record<string, string>> = {
   '山': `${import.meta.env.BASE_URL}audio/mandarin/mountain.wav?v=2`,
   '月': `${import.meta.env.BASE_URL}audio/mandarin/moon.wav?v=2`,
   '一': `${import.meta.env.BASE_URL}audio/mandarin/one.wav?v=2`,
+  '二': `${import.meta.env.BASE_URL}audio/mandarin/two.wav?v=2`,
+  '三': `${import.meta.env.BASE_URL}audio/mandarin/three.wav?v=2`,
   '人': `${import.meta.env.BASE_URL}audio/mandarin/person.wav?v=2`,
   '好': `${import.meta.env.BASE_URL}audio/mandarin/good.wav?v=2`,
   '不好！': `${import.meta.env.BASE_URL}audio/mandarin/bu-hao.wav?v=2`,
+  '牛奶': `${import.meta.env.BASE_URL}audio/context-gap/words/milk.wav?v=1`,
+  '茶': `${import.meta.env.BASE_URL}audio/context-gap/words/tea.wav?v=1`,
+  '公园': `${import.meta.env.BASE_URL}audio/context-gap/words/park.wav?v=1`,
+  '商店': `${import.meta.env.BASE_URL}audio/context-gap/words/store.wav?v=1`,
+  '学校': `${import.meta.env.BASE_URL}audio/context-gap/words/school.wav?v=1`,
+  '苹果': `${import.meta.env.BASE_URL}audio/context-gap/words/apple.wav?v=1`,
+  '橙子': `${import.meta.env.BASE_URL}audio/context-gap/words/orange.wav?v=1`,
+  '香蕉': `${import.meta.env.BASE_URL}audio/context-gap/words/banana.wav?v=1`,
+  '菜单': `${import.meta.env.BASE_URL}audio/context-gap/words/menu.wav?v=1`,
+  '书': `${import.meta.env.BASE_URL}audio/context-gap/words/book.wav?v=1`,
+  '地图': `${import.meta.env.BASE_URL}audio/context-gap/words/map.wav?v=1`,
+  '医生': `${import.meta.env.BASE_URL}audio/context-gap/words/doctor.wav?v=1`,
+  '老师': `${import.meta.env.BASE_URL}audio/context-gap/words/teacher.wav?v=1`,
+  '朋友': `${import.meta.env.BASE_URL}audio/context-gap/words/friend.wav?v=1`,
+  '学生': `${import.meta.env.BASE_URL}audio/context-gap/words/student.wav?v=1`,
+  '家': `${import.meta.env.BASE_URL}audio/context-gap/words/home.wav?v=1`,
+  '昨天': `${import.meta.env.BASE_URL}audio/context-gap/words/yesterday.wav?v=1`,
+  '明天': `${import.meta.env.BASE_URL}audio/context-gap/words/tomorrow.wav?v=1`,
+  '今天': `${import.meta.env.BASE_URL}audio/context-gap/words/today.wav?v=1`,
+  '中文': `${import.meta.env.BASE_URL}audio/context-gap/words/chinese.wav?v=1`,
+  '英文': `${import.meta.env.BASE_URL}audio/context-gap/words/english.wav?v=1`,
+  '法文': `${import.meta.env.BASE_URL}audio/context-gap/words/french.wav?v=1`,
+  '跑步后，美美打开水瓶喝____。': `${import.meta.env.BASE_URL}audio/context-gap/clues/water.wav?v=2`,
+  '丽丽背着书包去____上课。': `${import.meta.env.BASE_URL}audio/context-gap/clues/school.wav?v=2`,
+  '爸爸给小明一个红色的____。': `${import.meta.env.BASE_URL}audio/context-gap/clues/apple.wav?v=2`,
+  '睡觉前，我打开____读故事。': `${import.meta.env.BASE_URL}audio/context-gap/clues/book.wav?v=2`,
+  '乐乐每天跟我玩。他是我的好____。': `${import.meta.env.BASE_URL}audio/context-gap/clues/friend.wav?v=2`,
+  '王女士教我们中文。她是____。': `${import.meta.env.BASE_URL}audio/context-gap/clues/teacher.wav?v=2`,
+  '放学了，我们回____吃晚饭。': `${import.meta.env.BASE_URL}audio/context-gap/clues/home.wav?v=2`,
+  '现在太阳出来了，____天气很好。': `${import.meta.env.BASE_URL}audio/context-gap/clues/today.wav?v=2`,
+  '美美在北京长大，她跟奶奶说____。': `${import.meta.env.BASE_URL}audio/context-gap/clues/chinese.wav?v=2`,
+  '爷爷把____倒进茶杯。': `${import.meta.env.BASE_URL}audio/context-gap/clues/tea.wav?v=2`,
+  '我喜欢喝茶。': `${import.meta.env.BASE_URL}audio/sentence-scramble/i-like-tea.wav?v=1`,
+  '她是我的朋友。': `${import.meta.env.BASE_URL}audio/sentence-scramble/she-is-my-friend.wav?v=1`,
 }
 
-function playAudio(text: string, language = 'zh-CN'): Promise<void> {
+function playAudio(text: string, language = 'zh-CN', playbackRate = 1): Promise<void> {
   activeRecordedAudio?.pause()
   settleActiveRecording?.()
   activeRecordedAudio = undefined
   settleActiveRecording = undefined
 
-  const recordingUrl = recordedMandarinAudio[text]
+  const recordingUrl = recordedLearningAudio[text]
   if (recordingUrl) {
     speechRequestId += 1
     if (speechStartTimer !== undefined) window.clearTimeout(speechStartTimer)
@@ -199,6 +304,7 @@ function playAudio(text: string, language = 'zh-CN'): Promise<void> {
       settleActiveRecording = cancelThisRecording
       audio.preload = 'auto'
       audio.volume = 1
+      audio.playbackRate = playbackRate
       audio.onended = () => finish()
       audio.onerror = () => finish(new Error('Recorded audio could not be loaded.'))
       void audio.play().catch((error: unknown) => finish(error instanceof Error ? error : new Error('Recorded audio could not be played.')))
@@ -248,7 +354,7 @@ function playAudio(text: string, language = 'zh-CN'): Promise<void> {
       })
       utterance.voice = matchingVoices.find((voice) => /ting|eddy|flo|sandy|shelley/i.test(voice.name)) || matchingVoices[0] || null
       utterance.lang = language
-      utterance.rate = 0.75
+      utterance.rate = 0.75 * playbackRate
       utterance.volume = 1
       utterance.onend = () => finish()
       utterance.onerror = (event) => {
@@ -284,13 +390,13 @@ function GamePreview({ gameId, onExit, onComplete }: {
     case 'speed-match': return <SpeedMatch {...shared} pairs={pairs} playAudio={playAudio} />
     case 'target-blast': return <TargetBlast {...shared} rounds={selectionRounds} playAudio={playAudio} />
     case 'lily-pad-path': return <LilyPadPath {...shared} rounds={selectionRounds} playAudio={playAudio} />
-    case 'memory-flip': return <MemoryFlip {...shared} pairs={pairs} />
+    case 'memory-flip': return <MemoryFlip {...shared} pairs={pairs} playAudio={playAudio} />
     case 'context-gap-dash': return <ContextGapDash {...shared} rounds={contextRounds} playAudio={playAudio} />
-    case 'sentence-scramble': return <SentenceScramble {...shared} rounds={sequenceRounds} />
+    case 'sentence-scramble': return <SentenceScramble {...shared} rounds={sequenceRounds} playAudio={playAudio} />
     case 'read-aloud-boss-rush': return <ReadAloudBossRush {...shared} rounds={productionRounds} playAudio={playAudio} />
     case 'dictation-streak': return <DictationStreak {...shared} rounds={productionRounds} playAudio={playAudio} />
-    case 'copy-hide-write-combo': return <CopyHideWriteCombo {...shared} rounds={productionRounds} playAudio={playAudio} />
-    case 'correction-rescue': return <CorrectionRescue {...shared} rounds={productionRounds} playAudio={playAudio} />
+    case 'speller-bee': return <SpellerBee {...shared} rounds={spellingRounds} playAudio={playAudio} />
+    case 'copy-hide-write-combo': return <StrokeOrderSlay {...shared} rounds={strokeOrderRounds} playAudio={playAudio} />
   }
 }
 
@@ -311,7 +417,9 @@ export function App() {
   }
 
   if (activeGame) {
-    return <GamePreview key={`${activeGame}-${sessionKey}`} gameId={activeGame} onExit={() => setActiveGame(null)} onComplete={finishGame} />
+    return <Suspense fallback={<main className="playground"><p role="status">Loading game module…</p></main>}>
+      <GamePreview key={`${activeGame}-${sessionKey}`} gameId={activeGame} onExit={() => setActiveGame(null)} onComplete={finishGame} />
+    </Suspense>
   }
 
   return <main className="playground">
@@ -322,9 +430,9 @@ export function App() {
 
     <header id="top" className="hero">
       <div className="hero-copy">
-        <p className="eyebrow"><Sparkles size={14} /> Mandarin practice arcade</p>
+        <p className="eyebrow"><Sparkles size={14} /> Language practice arcade</p>
         <h1>Pick a game.<br /><em>Start playing.</em></h1>
-        <p className="hero-description">Practice Mandarin through matching, reading, listening, speaking, and writing. Every game gives you instant feedback as you play.</p>
+        <p className="hero-description">Practice Mandarin and English through matching, reading, listening, speaking, spelling, and writing. Every game gives you instant feedback as you play.</p>
         <div className="hero-meta">
           <span><Gamepad2 size={16} /> 10 games</span>
           <span><BookOpen size={16} /> Reading</span>

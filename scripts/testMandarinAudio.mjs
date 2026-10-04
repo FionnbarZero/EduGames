@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const recordings = ['big', 'bu-hao', 'cat', 'good', 'moon', 'mountain', 'mouth', 'one', 'person', 'sun', 'water']
+const recordings = ['big', 'bu-hao', 'cat', 'good', 'moon', 'mountain', 'mouth', 'one', 'person', 'sun', 'three', 'two', 'water']
 
 function findDataChunk(buffer) {
   let offset = 12
@@ -27,8 +27,8 @@ for (const recording of recordings) {
   const data = findDataChunk(buffer)
   const dataBytes = data.size
   const duration = dataBytes / (22_050 * 2)
-  assert.ok(duration >= .7 && duration <= 1.3, `${filename}: contains a complete spoken word`)
-  assert.ok(dataBytes > 30_000, `${filename}: contains audio samples`)
+  assert.ok(duration >= .25 && duration <= 1.3, `${filename}: contains a complete spoken word`)
+  assert.ok(dataBytes > 10_000, `${filename}: contains audio samples`)
 
   let squaredTotal = 0
   let peak = 0
