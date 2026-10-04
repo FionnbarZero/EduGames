@@ -8,6 +8,10 @@ const recordings = [
   { filename: 'thanks.wav', minimumDuration: .55, maximumDuration: 1.8 },
   { filename: 'goodbye.wav', minimumDuration: .55, maximumDuration: 1.8 },
 ]
+const audioDirectories = [
+  'public/audio/read-aloud',
+  'src/gameModules/whispering-scrolls/assets',
+]
 
 function findChunk(buffer, expectedName) {
   let offset = 12
@@ -20,8 +24,8 @@ function findChunk(buffer, expectedName) {
   throw new Error(`WAV ${expectedName} chunk not found`)
 }
 
-for (const { filename, minimumDuration, maximumDuration } of recordings) {
-  const buffer = readFileSync(resolve('public/audio/read-aloud', filename))
+for (const audioDirectory of audioDirectories) for (const { filename, minimumDuration, maximumDuration } of recordings) {
+  const buffer = readFileSync(resolve(audioDirectory, filename))
   assert.equal(buffer.toString('ascii', 0, 4), 'RIFF', `${filename}: RIFF header`)
   assert.equal(buffer.toString('ascii', 8, 12), 'WAVE', `${filename}: WAVE header`)
   const format = findChunk(buffer, 'fmt ')
@@ -45,4 +49,4 @@ for (const { filename, minimumDuration, maximumDuration } of recordings) {
   assert.ok(peak > .08, `${filename}: has an audible peak`)
 }
 
-console.log(`Validated ${recordings.length} Read-Aloud recordings.`)
+console.log(`Validated ${recordings.length} Read-Aloud recordings in ${audioDirectories.length} locations.`)

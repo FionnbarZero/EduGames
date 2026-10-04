@@ -3,7 +3,7 @@ import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const sampleRate = 44_100
-const outputDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '../public/audio/lanterns')
+const outputDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '../src/gameModules/memory-lanterns/assets')
 
 function smoothstep(value) {
   const clamped = Math.max(0, Math.min(1, value))

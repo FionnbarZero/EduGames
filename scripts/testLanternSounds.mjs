@@ -10,7 +10,7 @@ const expectedDurations = {
 }
 
 for (const [filename, expectedDuration] of Object.entries(expectedDurations)) {
-  const buffer = readFileSync(resolve('public/audio/lanterns', filename))
+  const buffer = readFileSync(resolve('src/gameModules/memory-lanterns/assets', filename))
   assert.equal(buffer.toString('ascii', 0, 4), 'RIFF', `${filename}: RIFF header`)
   assert.equal(buffer.toString('ascii', 8, 12), 'WAVE', `${filename}: WAVE header`)
   assert.equal(buffer.readUInt16LE(22), 2, `${filename}: stereo`)

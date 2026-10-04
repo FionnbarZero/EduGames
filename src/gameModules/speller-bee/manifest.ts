@@ -1,0 +1,1 @@
+export const gameManifest = { id: 'speller-bee', title: 'SpellerBee', description: 'Hear an English word, type its spelling, reveal the answer, and score your attempt.', activityLabel: 'Listen and spell', channels: ['tier-1-writing'], skills: ['writing'], inputKind: 'production', estimatedSeconds: [120, 240] } as const

@@ -1,27 +1,28 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { ArrowRight, BookOpen, Gamepad2, Headphones, Keyboard, RotateCcw, Sparkles } from 'lucide-react'
-import {
-  ContextGapDash,
-  DictationStreak,
-  GameArtwork,
-  LEARNING_GAME_CATALOG,
-  LilyPadPath,
-  MemoryFlip,
-  ReadAloudBossRush,
-  SentenceScramble,
-  SpellerBee,
-  SpeedMatch,
-  StrokeOrderSlay,
-  TargetBlast,
-  type ContextGameRound,
-  type GamePair,
-  type LearningGameId,
-  type LearningGameSummary,
-  type ProductionGameRound,
-  type SelectionGameRound,
-  type SequenceGameRound,
-  type StrokeOrderGameRound,
-} from './learningGames/index.ts'
+import { GameArtwork } from './gameCatalog/GameArtwork.tsx'
+import { LEARNING_GAME_CATALOG } from './gameCatalog/catalog.ts'
+import type {
+  ContextGameRound,
+  GamePair,
+  LearningGameId,
+  LearningGameSummary,
+  ProductionGameRound,
+  SelectionGameRound,
+  SequenceGameRound,
+  StrokeOrderGameRound,
+} from './gameCatalog/contracts.ts'
+
+const SpeedMatch = lazy(() => import('./gameModules/speed-match/index.ts').then((module) => ({ default: module.SpeedMatch })))
+const TargetBlast = lazy(() => import('./gameModules/target-blast/index.ts').then((module) => ({ default: module.TargetBlast })))
+const LilyPadPath = lazy(() => import('./gameModules/lily-pad-path/index.ts').then((module) => ({ default: module.LilyPadPath })))
+const MemoryFlip = lazy(() => import('./gameModules/memory-lanterns/index.ts').then((module) => ({ default: module.MemoryFlip })))
+const ContextGapDash = lazy(() => import('./gameModules/context-gap-dash/index.ts').then((module) => ({ default: module.ContextGapDash })))
+const SentenceScramble = lazy(() => import('./gameModules/sushi-scramble/index.ts').then((module) => ({ default: module.SentenceScramble })))
+const ReadAloudBossRush = lazy(() => import('./gameModules/whispering-scrolls/index.ts').then((module) => ({ default: module.ReadAloudBossRush })))
+const DictationStreak = lazy(() => import('./gameModules/dictation-streak/index.ts').then((module) => ({ default: module.DictationStreak })))
+const SpellerBee = lazy(() => import('./gameModules/speller-bee/index.ts').then((module) => ({ default: module.SpellerBee })))
+const StrokeOrderSlay = lazy(() => import('./gameModules/stroke-order-slay/index.ts').then((module) => ({ default: module.StrokeOrderSlay })))
 
 const pairs: readonly GamePair[] = [
   { id: 'pair-1', targetId: 'hello', left: { id: 'left-nihao', label: '你好' }, right: { id: 'right-hello', label: 'hello' } },
@@ -416,7 +417,9 @@ export function App() {
   }
 
   if (activeGame) {
-    return <GamePreview key={`${activeGame}-${sessionKey}`} gameId={activeGame} onExit={() => setActiveGame(null)} onComplete={finishGame} />
+    return <Suspense fallback={<main className="playground"><p role="status">Loading game module…</p></main>}>
+      <GamePreview key={`${activeGame}-${sessionKey}`} gameId={activeGame} onExit={() => setActiveGame(null)} onComplete={finishGame} />
+    </Suspense>
   }
 
   return <main className="playground">

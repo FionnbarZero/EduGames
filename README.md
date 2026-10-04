@@ -26,8 +26,15 @@ application, and creates a production build in `dist/`.
 
 ## Project layout
 
-- `src/learningGames/` contains the modular React game implementations.
-- `public/assets/` and `public/audio/` contain runtime artwork and recordings.
+- `src/gameModules/` contains the ten independent, copy-ready React game modules.
+- Each game module owns its component, public types, runtime helpers, styles,
+  manifest, documentation, and any game-specific artwork or recordings.
+- `src/gameCatalog/` is the optional host catalog used by this playground; copied
+  game modules do not depend on it.
+- `public/audio/` contains only the host playground's shared sample recordings.
 - `construct/lily-pad-path/` preserves the editable Construct project source;
   the live Lily-Pad Path game is the React/Phaser implementation.
 - `.github/workflows/deploy-pages.yml` builds and deploys `main` to GitHub Pages.
+
+See [`src/gameModules/README.md`](src/gameModules/README.md) for the portability
+contract and the public component exported by each module.
