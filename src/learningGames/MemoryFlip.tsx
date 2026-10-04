@@ -8,22 +8,27 @@ import { playGameSound, preloadLanternSounds } from './gameFeel.ts'
 
 export function MemoryFlip({
   pairs,
+  playAudio,
   title = 'Memory Lanterns',
   eyebrow = 'Sunset lantern challenge',
   onExit,
   onAttempt,
   onComplete,
 }: PairGameProps) {
-  const festivalPairs = useMemo(() => pairs.slice(0, 5), [pairs])
-  const deck = useMemo(() => memoryDeck(festivalPairs), [festivalPairs])
+  const characterPairs = useMemo(() => pairs.slice(0, 5).map((pair) => ({
+    ...pair,
+    left: { ...pair.left, id: `${pair.left.id}:copy-one` },
+    right: { ...pair.left, id: `${pair.left.id}:copy-two` },
+  })), [pairs])
+  const deck = useMemo(() => memoryDeck(characterPairs), [characterPairs])
   const [flippedIds, setFlippedIds] = useState<readonly string[]>([])
   const [matchedPairIds, setMatchedPairIds] = useState<readonly string[]>([])
   const [attempts, setAttempts] = useState<readonly LearningGameAttempt[]>([])
   const twoFlipped = flippedIds.length === 2
   const flippedCards = flippedIds.map((id) => deck.find((card) => card.id === id)).filter((card) => Boolean(card))
   const pairMatch = twoFlipped && flippedCards[0]?.pairId === flippedCards[1]?.pairId
-  const valid = validGamePairs(festivalPairs)
-  const complete = valid && matchedPairIds.length === festivalPairs.length
+  const valid = validGamePairs(characterPairs)
+  const complete = valid && matchedPairIds.length === characterPairs.length
 
   useEffect(() => {
     preloadLanternSounds()
@@ -54,16 +59,16 @@ export function MemoryFlip({
     if (!card || matchedPairIds.includes(card.pairId)) return
     const next = [...flippedIds, cardId]
     setFlippedIds(next)
-    // Paint the character first. Starting media inside the click handler can
-    // make React wait for the browser's audio pipeline before revealing it.
-    if (next.length === 1) window.requestAnimationFrame(() => playGameSound('lantern-flip'))
+    const spoken = new Promise<void>((resolve) => window.requestAnimationFrame(() => {
+      void Promise.resolve(playAudio?.(card.face.label, 'zh-CN')).then(() => resolve(), () => resolve())
+    }))
     if (next.length !== 2) return
     const first = deck.find((candidate) => candidate.id === next[0])
     const second = deck.find((candidate) => candidate.id === next[1])
     if (!first || !second) return
     const correct = first.pairId === second.pairId
-    window.setTimeout(() => playGameSound(correct ? 'lantern-match' : 'lantern-miss'), 180)
-    const pair = festivalPairs.find((candidate) => candidate.id === first.pairId) || festivalPairs.find((candidate) => candidate.id === second.pairId)
+    void spoken.then(() => playGameSound(correct ? 'lantern-match' : 'lantern-miss'))
+    const pair = characterPairs.find((candidate) => candidate.id === first.pairId) || characterPairs.find((candidate) => candidate.id === second.pairId)
     if (!pair) return
     const attempt: LearningGameAttempt = {
       gameId: 'memory-flip',
@@ -78,13 +83,14 @@ export function MemoryFlip({
   }
 
   const summary = summarizeLearningGame('memory-flip', attempts)
-  return <LearningGameShell gameId="memory-flip" title={title} eyebrow={eyebrow} progress={`${matchedPairIds.length}/${festivalPairs.length} pairs lit`} onExit={onExit}>
+  return <LearningGameShell gameId="memory-flip" title={title} eyebrow={eyebrow} progress={`${matchedPairIds.length}/${characterPairs.length} pairs lit`} onExit={onExit}>
     {!valid ? <LearningGameEmpty onExit={onExit} /> : complete ? <LearningGameComplete
       summary={summary}
       message="Every matching lantern is glowing across the sunset courtyard."
       onDone={() => onComplete(summary)}
     /> : <section className="lg-card lg-memory-game">
-      <div className="lg-mission-banner"><span>Lantern festival</span><strong>Light all five matching pairs</strong></div>
+      <div className="lg-mission-banner"><span>Lantern festival</span><strong>Find each character’s exact twin</strong></div>
+      <p className="lg-instruction">Tap a lantern to reveal and hear its character, then find the identical character.</p>
       <div className="lg-stat-row">
         <span><strong>{matchedPairIds.length}/5</strong> pairs glowing</span>
         <span><strong>{attempts.length}</strong> turns</span>
@@ -117,8 +123,8 @@ export function MemoryFlip({
         </div>
       </div>
       {twoFlipped && <div className={`lg-feedback is-${pairMatch ? 'correct' : 'incorrect'} is-auto`} role="status">
-        <strong>{pairMatch ? 'The lanterns glow together!' : 'Keep their places in mind.'}</strong>
-        <span className="lg-feedback-detail">{pairMatch ? 'A matching pair joins the festival.' : 'The lanterns will dim so you can try again.'}</span>
+        <strong>{pairMatch ? 'The characters match exactly!' : 'Keep their places in mind.'}</strong>
+        <span className="lg-feedback-detail">{pairMatch ? 'Two identical characters join the festival.' : 'The lanterns will dim so you can try again.'}</span>
         <span className="lg-auto-status">{pairMatch ? 'Lighting the pair…' : <><RotateCcw size={14} /> Lowering the light…</>}</span>
       </div>}
     </section>}

@@ -38,8 +38,8 @@ export const LEARNING_GAME_CATALOG = [
   {
     id: 'memory-flip',
     title: 'Memory Lanterns',
-    description: 'Light ten lanterns beneath a sunset pergola and find all five Mandarin–English pairs.',
-    activityLabel: 'Match lanterns',
+    description: 'Hear each Mandarin character and find its identical twin among ten lanterns beneath a sunset pergola.',
+    activityLabel: 'Match characters',
     channels: ['tier-1-writing', 'tier-2-reading'],
     skills: ['receptive'],
     inputKind: 'pairs',

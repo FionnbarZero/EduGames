@@ -389,7 +389,7 @@ function GamePreview({ gameId, onExit, onComplete }: {
     case 'speed-match': return <SpeedMatch {...shared} pairs={pairs} playAudio={playAudio} />
     case 'target-blast': return <TargetBlast {...shared} rounds={selectionRounds} playAudio={playAudio} />
     case 'lily-pad-path': return <LilyPadPath {...shared} rounds={selectionRounds} playAudio={playAudio} />
-    case 'memory-flip': return <MemoryFlip {...shared} pairs={pairs} />
+    case 'memory-flip': return <MemoryFlip {...shared} pairs={pairs} playAudio={playAudio} />
     case 'context-gap-dash': return <ContextGapDash {...shared} rounds={contextRounds} playAudio={playAudio} />
     case 'sentence-scramble': return <SentenceScramble {...shared} rounds={sequenceRounds} playAudio={playAudio} />
     case 'read-aloud-boss-rush': return <ReadAloudBossRush {...shared} rounds={productionRounds} playAudio={playAudio} />
