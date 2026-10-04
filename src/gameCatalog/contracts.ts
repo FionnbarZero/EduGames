@@ -63,8 +63,15 @@ export type SequenceGameRound = GamePrompt & {
   readonly correctTokenIds: readonly string[]
 }
 
+export type PinyinInputStep = {
+  readonly pinyin: string
+  readonly candidates: readonly string[]
+}
+
 export type ProductionGameRound = GamePrompt & {
   readonly instruction?: string
+  readonly pinyinText?: string
+  readonly pinyinSteps?: readonly PinyinInputStep[]
 }
 
 export type StrokePoint = readonly [x: number, y: number]

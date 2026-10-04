@@ -155,9 +155,27 @@ const sequenceRounds: readonly SequenceGameRound[] = [
 ]
 
 const productionRounds: readonly ProductionGameRound[] = [
-  { id: 'production-1', targetId: 'hello', targetText: '你好', audioText: '你好' },
-  { id: 'production-2', targetId: 'thanks', targetText: '谢谢', audioText: '谢谢' },
-  { id: 'production-3', targetId: 'goodbye', targetText: '再见', audioText: '再见' },
+  {
+    id: 'production-1', targetId: 'hello', targetText: '你好', pinyinText: 'nǐ hǎo', audioText: '你好',
+    pinyinSteps: [
+      { pinyin: 'nǐ', candidates: ['你', '拟', '尼'] },
+      { pinyin: 'hǎo', candidates: ['好', '号', '浩'] },
+    ],
+  },
+  {
+    id: 'production-2', targetId: 'thanks', targetText: '谢谢', pinyinText: 'xiè xie', audioText: '谢谢',
+    pinyinSteps: [
+      { pinyin: 'xiè', candidates: ['谢', '写', '些'] },
+      { pinyin: 'xie', candidates: ['谢', '写', '歇'] },
+    ],
+  },
+  {
+    id: 'production-3', targetId: 'goodbye', targetText: '再见', pinyinText: 'zài jiàn', audioText: '再见',
+    pinyinSteps: [
+      { pinyin: 'zài', candidates: ['再', '在', '载'] },
+      { pinyin: 'jiàn', candidates: ['见', '建', '件'] },
+    ],
+  },
 ]
 
 const spellingRounds: readonly ProductionGameRound[] = [

@@ -20,15 +20,17 @@ function validProductionRounds(rounds: readonly ProductionGameRound[]) {
 
 type AssessmentFeedback = 'correct' | 'incorrect'
 
-function AutoAssessmentFeedback({ feedback, lastRound }: {
+function AutoAssessmentFeedback({ feedback, lastRound, children }: {
   readonly feedback: AssessmentFeedback
   readonly lastRound: boolean
+  readonly children?: ReactNode
 }) {
   return <div className={`lg-feedback is-${feedback} is-auto lg-assessment-feedback`} role="status">
     <div className="lg-feedback-energy" aria-hidden="true">{Array.from({ length: 10 }, (_, index) => <i key={index} />)}</div>
     <span className="lg-feedback-emblem" aria-hidden="true">{feedback === 'correct' ? '✓' : '↻'}</span>
     <strong>{feedback === 'correct' ? 'Target mastered!' : 'Learning moment — one more try.'}</strong>
     <span className="lg-feedback-detail">{feedback === 'correct' ? 'Mastery +1' : 'This target stays in practice until it feels solid.'}</span>
+    {children}
     <span className="lg-auto-status">{feedback === 'correct' ? lastRound ? 'Preparing your result…' : 'Next challenge coming up…' : 'Resetting for your retry…'}</span>
   </div>
 }
@@ -52,6 +54,9 @@ type ProductionRunnerProps = LearningGameBaseProps & {
   readonly defaultEyebrow: string
   readonly prompt: (round: ProductionGameRound, controls: ProductionRunnerControls) => ReactNode
   readonly directResponse?: RenderReadingResponse
+  readonly feedbackAnswer?: (round: ProductionGameRound) => ReactNode
+  readonly incorrectFeedback?: (round: ProductionGameRound, response: string) => ReactNode
+  readonly incorrectFeedbackDuration?: number
   readonly completionMessage: string
 }
 
@@ -64,6 +69,9 @@ export function ProductionRunner({
   defaultEyebrow,
   prompt,
   directResponse,
+  feedbackAnswer,
+  incorrectFeedback,
+  incorrectFeedbackDuration = 1900,
   completionMessage,
   title,
   eyebrow,
@@ -77,6 +85,7 @@ export function ProductionRunner({
   const [streak, setStreak] = useState(0)
   const [bestStreak, setBestStreak] = useState(0)
   const [feedback, setFeedback] = useState<AssessmentFeedback | null>(null)
+  const [feedbackResponse, setFeedbackResponse] = useState('')
   const round = rounds[index]
   const valid = validProductionRounds(rounds)
   const complete = valid && index >= rounds.length
@@ -87,9 +96,10 @@ export function ProductionRunner({
       if (feedback === 'correct') setIndex((current) => current + 1)
       setRevealed(false)
       setFeedback(null)
-    }, feedback === 'correct' ? 1000 : 1900)
+      setFeedbackResponse('')
+    }, feedback === 'correct' ? 1000 : incorrectFeedbackDuration)
     return () => window.clearTimeout(timer)
-  }, [feedback])
+  }, [feedback, incorrectFeedbackDuration])
 
   function assess(correct: boolean, response = correct ? 'correct' : 'practice-again') {
     if (!round || feedback) return
@@ -107,6 +117,7 @@ export function ProductionRunner({
     setBestStreak((current) => Math.max(current, nextStreak))
     onAttempt?.(attempt)
     playGameSound(correct ? 'correct' : 'incorrect')
+    setFeedbackResponse(response)
     setFeedback(correct ? 'correct' : 'incorrect')
   }
 
@@ -122,7 +133,11 @@ export function ProductionRunner({
         <span><strong>{streak}</strong> momentum</span>
         <span><strong>{bestStreak}</strong> best run</span>
       </div>
-      {feedback ? <AutoAssessmentFeedback feedback={feedback} lastRound={index + 1 === rounds.length} /> : !revealed ? prompt(round, {
+      {feedback === 'incorrect' && incorrectFeedback
+        ? incorrectFeedback(round, feedbackResponse)
+        : feedback
+          ? <AutoAssessmentFeedback feedback={feedback} lastRound={index + 1 === rounds.length}>{feedbackAnswer?.(round)}</AutoAssessmentFeedback>
+          : !revealed ? prompt(round, {
         reveal: () => setRevealed(true),
         playAudio,
         index,

@@ -242,3 +242,10 @@
 @keyframes lg-card-enter { from { opacity: 0; transform: translateY(12px) scale(.985); } }
 @keyframes lg-victory-pulse { to { transform: translateY(-5px) rotate(9deg) scale(1.04); } }
 @keyframes art-atmosphere { to { transform: translate(25px, 18px) scale(1.1); } }
+
+/* Keep the game typography in the requested regular Chinese calligraphy face. */
+main.lg-world-context-gap-dash,
+main.lg-world-context-gap-dash * {
+  font-family: "Kaiti SC", KaiTi, STKaiti, serif;
+  font-weight: 400;
+}
