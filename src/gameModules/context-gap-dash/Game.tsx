@@ -13,6 +13,7 @@ import { summarizeLearningGame, validContextRounds } from './runtime/model'
 
 const GAME_WIDTH = 1280
 const GAME_HEIGHT = 720
+const KAITI_SC_FONT = '"Kaiti SC", KaiTi, STKaiti, serif'
 const REGION_WIDTH = 3000
 const WORLD_WIDTH = REGION_WIDTH * 3
 const JOURNEY_LENGTH = 10
@@ -160,21 +161,21 @@ class ContextDashScene extends Phaser.Scene {
     panel.strokeRoundedRect(28, 22, GAME_WIDTH - 56, 158, 28)
 
     this.areaText = this.add.text(61, 51, '', {
-      fontFamily: 'Inter, Avenir Next, sans-serif', fontSize: '16px', fontStyle: 'bold', color: '#83f1dc', letterSpacing: 2,
+      fontFamily: KAITI_SC_FONT, fontSize: '16px', fontStyle: 'normal', color: '#83f1dc', letterSpacing: 2,
     }).setScrollFactor(0).setDepth(103).setOrigin(0, 0.5)
 
     this.scoreText = this.add.text(GAME_WIDTH - 61, 51, '', {
-      fontFamily: 'Inter, Avenir Next, sans-serif', fontSize: '16px', fontStyle: 'bold', color: '#ffe99b', letterSpacing: 1,
+      fontFamily: KAITI_SC_FONT, fontSize: '16px', fontStyle: 'normal', color: '#ffe99b', letterSpacing: 1,
     }).setScrollFactor(0).setDepth(103).setOrigin(1, 0.5)
 
     this.sentenceText = this.add.text(GAME_WIDTH / 2, 103, '', {
-      fontFamily: 'Arial Rounded MT Bold, PingFang SC, sans-serif',
-      fontSize: '48px', fontStyle: 'bold', color: '#ffffff', align: 'center',
+      fontFamily: KAITI_SC_FONT,
+      fontSize: '48px', fontStyle: 'normal', color: '#ffffff', align: 'center',
       stroke: '#07131c', strokeThickness: 8, wordWrap: { width: 900 },
     }).setOrigin(0.5).setScrollFactor(0).setDepth(103)
 
     this.instructionText = this.add.text(GAME_WIDTH / 2, 143, '', {
-      fontFamily: 'Inter, Avenir Next, sans-serif', fontSize: '13px', fontStyle: 'bold', color: '#b9d0da', letterSpacing: 2,
+      fontFamily: KAITI_SC_FONT, fontSize: '13px', fontStyle: 'normal', color: '#b9d0da', letterSpacing: 2,
     }).setOrigin(0.5).setScrollFactor(0).setDepth(103)
   }
 
@@ -238,14 +239,14 @@ class ContextDashScene extends Phaser.Scene {
     const panel = this.add.rectangle(0, -111, 166, 67, 0x0b3440, 0.95).setStrokeStyle(3, 0x79efda, 0.82)
     const shine = this.add.rectangle(0, -128, 142, 12, 0xffffff, 0.09)
     const label = this.add.text(0, -108, choiceLabel, {
-      fontFamily: 'Arial Rounded MT Bold, PingFang SC, sans-serif', fontSize: '48px', fontStyle: 'bold', color: '#ffffff',
+      fontFamily: KAITI_SC_FONT, fontSize: '48px', fontStyle: 'normal', color: '#ffffff',
       stroke: '#04151d', strokeThickness: 5,
     }).setOrigin(0.5)
     const key = this.add.text(-88, -151, String(index + 1), {
-      fontFamily: 'Inter, sans-serif', fontSize: '15px', fontStyle: 'bold', color: '#0a3636', backgroundColor: '#d7fff1', padding: { x: 8, y: 5 },
+      fontFamily: KAITI_SC_FONT, fontSize: '15px', fontStyle: 'normal', color: '#0a3636', backgroundColor: '#d7fff1', padding: { x: 8, y: 5 },
     }).setOrigin(0.5)
     const chevrons = this.add.text(0, -22, '›  ›  ›', {
-      fontFamily: 'Inter, sans-serif', fontSize: '25px', fontStyle: 'bold', color: '#86f3de', letterSpacing: 4,
+      fontFamily: KAITI_SC_FONT, fontSize: '25px', fontStyle: 'normal', color: '#86f3de', letterSpacing: 4,
     }).setOrigin(0.5).setAlpha(0.62)
 
     container.add([ground, glow, barrier, frame, panel, shine, label, key, chevrons])
@@ -526,8 +527,8 @@ class ContextDashScene extends Phaser.Scene {
     panel.fillRoundedRect(-185, -45, 370, 90, 20)
     panel.lineStyle(3, 0xffffff, 0.75)
     panel.strokeRoundedRect(-185, -45, 370, 90, 20)
-    const heading = this.add.text(0, -14, title, { fontFamily: 'Inter, sans-serif', fontSize: '22px', fontStyle: 'bold', color: '#173328' }).setOrigin(0.5)
-    const detail = this.add.text(0, 18, subtitle, { fontFamily: 'Inter, sans-serif', fontSize: '13px', fontStyle: 'bold', color: '#345144', letterSpacing: 1 }).setOrigin(0.5)
+    const heading = this.add.text(0, -14, title, { fontFamily: KAITI_SC_FONT, fontSize: '22px', fontStyle: 'normal', color: '#173328' }).setOrigin(0.5)
+    const detail = this.add.text(0, 18, subtitle, { fontFamily: KAITI_SC_FONT, fontSize: '13px', fontStyle: 'normal', color: '#345144', letterSpacing: 1 }).setOrigin(0.5)
     container.add([panel, heading, detail]).setAlpha(0).setScale(0.72)
     this.roundObjects.push(container)
     this.tweens.add({ targets: container, alpha: 1, scale: 1, y: safeY - 10, duration: 360, ease: 'Back.easeOut' })
@@ -703,12 +704,12 @@ export function ContextGapDash({
   }, [playLearningText])
 
   const replayContext = useCallback(() => {
-    playLearningText(contextAudioText, 'zh-CN', 0.5)
+    playLearningText(contextAudioText, 'zh-CN', 0.75)
   }, [contextAudioText, playLearningText])
 
   useEffect(() => {
     if (!contextAudioText || !playAudio || finished) return
-    const timer = window.setTimeout(() => playLearningText(contextAudioText, 'zh-CN', 0.5), 350)
+    const timer = window.setTimeout(() => playLearningText(contextAudioText, 'zh-CN', 0.75), 350)
     return () => window.clearTimeout(timer)
   }, [contextAudioText, finished, playAudio, playLearningText])
 
