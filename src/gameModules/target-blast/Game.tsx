@@ -55,10 +55,18 @@ function TargetBlastPlayfield({ round, selectedChoiceId, phase, onChoose }: {
   }, [round.id, selectedChoiceId])
 
   return <div ref={playfieldRef} className={`lg-active-playfield lg-target-blast-playfield phase-${phase}${selectedChoiceId ? ` lane-${Math.max(0, selectedIndex)} ${correct ? 'is-success' : 'is-miss'}` : ''}`} style={stageStyle}>
-    <div className="lg-strike-ninja" aria-hidden="true"><span /><i /><b /><em /></div>
+    <div className="lg-dojo-depth" aria-hidden="true">
+      <span className="lg-dojo-mountains" />
+      <span className="lg-dojo-wall" />
+      <span className="lg-dojo-floor" />
+      <span className="lg-dojo-lantern is-left"><i /></span>
+      <span className="lg-dojo-lantern is-right"><i /></span>
+    </div>
+    <div className="lg-strike-ninja" aria-hidden="true"><span /><i /><b /><em /><small className="lg-ninja-sash" /><u className="lg-ninja-arm-wrap" /></div>
     <div className="lg-shuriken-shot" aria-hidden="true"><i /></div>
     <div className="lg-dojo-scenery" aria-hidden="true"><i /><i /><i /><i /></div>
-    {!correct && ['teacher-entering', 'bonk', 'feedback'].includes(phase) && <div className="lg-ninja-teacher" aria-hidden="true"><span /><i /><b /><em /><strong>Bu Hao!!</strong></div>}
+    {!correct && ['teacher-entering', 'bonk', 'feedback'].includes(phase) && <div className="lg-ninja-teacher" aria-hidden="true"><span /><i /><b /><em /><small className="lg-sensei-beard" /><u className="lg-sensei-sleeve" /><strong>Bu Hao!!</strong></div>}
+    {!correct && phase === 'bonk' && <div className="lg-bonk-impact" aria-hidden="true"><i /><b /><span>WHACK!</span></div>}
     <div className="lg-world-choice-grid" role="group" aria-label="Answer choices">
       {round.choices.map((choice, choiceIndex) => {
         const selected = selectedChoiceId === choice.id
@@ -207,7 +215,7 @@ export function TargetBlast({
     let timer: number | undefined
     if (phase === 'throwing') {
       timer = window.setTimeout(() => {
-        playGameSound(selectedCorrect ? 'correct' : 'incorrect')
+        if (selectedCorrect) playGameSound('correct')
         setPhase(selectedCorrect ? 'impact' : 'teacher-entering')
       }, 460)
     } else if (phase === 'impact') {
@@ -217,7 +225,10 @@ export function TargetBlast({
         setPhase('resetting')
       }, 680)
     } else if (phase === 'teacher-entering') {
-      timer = window.setTimeout(() => setPhase('bonk'), 360)
+      timer = window.setTimeout(() => {
+        playGameSound('incorrect')
+        setPhase('bonk')
+      }, 360)
     } else if (phase === 'bonk') {
       timer = window.setTimeout(() => {
         void Promise.resolve(playAudioRef.current?.('不好！', 'zh-CN')).catch(() => undefined)
