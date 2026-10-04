@@ -232,18 +232,12 @@
 .art-ninja-scarf { fill: #bd304d; stroke: #ff6b80; stroke-width: 2; }
 .art-ninja-star { fill: #e7e9ff; transform-origin: center; filter: drop-shadow(0 0 7px rgb(255 255 255 / 50%)); }.art-ninja-star.star-one { transform-origin: 243px 58px; }.art-ninja-star.star-two { transform-origin: 365px 101px; }
 .art-ninja-slash { fill: none; stroke: #ff5873; stroke-width: 5; stroke-linecap: round; opacity: .8; filter: drop-shadow(0 0 8px #ff4968); }
-.art-speed-rail { fill: none; stroke: #263a58; stroke-width: 13; stroke-linecap: round; }
-.art-speed-node circle { fill: #111a35; stroke: currentColor; stroke-width: 4; }
-.art-speed-node path { fill: none; stroke: currentColor; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
-.art-speed-left { color: #3de5ef; }.art-speed-right { color: #ff6ea0; }
-.art-speed-bolt { fill: #f8e563; filter: drop-shadow(0 0 12px #f4d73a); }
-.art-spark { fill: white; filter: drop-shadow(0 0 6px var(--art-accent)); }
 
 /* Target Blast */
 .lg-art-target-blast { --art-accent: #ffb84f; --art-accent-2: #ff6175; }
 .lg-art-target-blast .lg-art-scene { background: radial-gradient(circle at 82% 22%,rgb(255 232 178 / 18%),transparent 92px),linear-gradient(180deg,#262038,#121321 70%,#19130f); }
 .art-strike-moon { fill: #f9e4ad; opacity: .88; filter: drop-shadow(0 0 15px rgb(255 220 144 / 45%)); }
-.art-strike-ground { fill: #0c0d14; }.art-strike-ninja { fill: #171b2a; stroke: #59627c; stroke-width: 2; transform: translateX(var(--art-ship-shift)); }.art-strike-eyes { fill: none; stroke: #ffd866; stroke-width: 5; stroke-linecap: round; filter: drop-shadow(0 0 5px #ffd866); }.art-strike-arm { fill: none; stroke: #252b3f; stroke-width: 15; stroke-linecap: round; }.art-strike-scarf { fill: #c83b51; stroke: #ff6879; stroke-width: 2; }
+.art-strike-ground { fill: #0c0d14; }.art-strike-ninja { fill: #171b2a; stroke: #59627c; stroke-width: 2; transform: translateX(var(--art-ninja-shift)); }.art-strike-eyes { fill: none; stroke: #ffd866; stroke-width: 5; stroke-linecap: round; filter: drop-shadow(0 0 5px #ffd866); }.art-strike-arm { fill: none; stroke: #252b3f; stroke-width: 15; stroke-linecap: round; }.art-strike-scarf { fill: #c83b51; stroke: #ff6879; stroke-width: 2; }
 .art-training-dummy { fill: #af7037; stroke: #f2bc69; stroke-width: 3; }.art-training-dummy > path { fill: none; stroke: #8e5b30; stroke-width: 8; stroke-linecap: round; }.art-dummy-ring { fill: #75442c; stroke: #f0c16f; stroke-width: 4; }.art-dummy-center { fill: #ff5b67; stroke: #ffdd7b; filter: drop-shadow(0 0 7px #ff785f); }
 .art-flying-shuriken { fill: #e7ebff; stroke: #7f8aa8; stroke-width: 2; transform-origin: 220px 77px; filter: drop-shadow(0 0 7px rgb(226 234 255 / 65%)); }.art-strike-trail { fill: none; stroke: #ffcf6a; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 10 8; opacity: .72; }
 
@@ -293,38 +287,25 @@
 .art-stroke-grid { fill: #fff8ea; stroke: #ef5b5f; stroke-width: 3; }.art-stroke-grid path { fill: none; stroke: #f2a3a1; stroke-width: 1.5; stroke-dasharray: 6 5; }.art-stroke-character { fill: none; stroke: #dc3f48; stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 6px rgb(255 69 79 / 25%)); }.art-stroke-brush { fill: #9f3744; stroke: #ff8d79; stroke-width: 3; }.art-stroke-brush-tip { fill: #ffe4a3; }.art-stroke-sparks { fill: #ffd86b; filter: drop-shadow(0 0 7px #ffd86b); }
 
 @media (prefers-reduced-motion: no-preference) {
-  .art-speed-bolt { animation: art-pulse .8s ease-in-out infinite alternate; }
-  .art-spark.s1 { animation: art-spark 1.7s ease-in-out infinite alternate; }.art-spark.s2 { animation: art-spark 1.2s .3s ease-in-out infinite alternate; }
-  .art-ship { animation: art-ship 1.6s ease-in-out infinite alternate; }.art-ship-flame { animation: art-flame .35s ease-in-out infinite alternate; }.art-laser { animation: art-dash .7s linear infinite; }.art-target-ring { animation: art-spin 8s linear infinite; }
   .art-water-line { animation: art-water 2.3s ease-in-out infinite alternate; }.art-frog { animation: art-hop 1.8s ease-in-out infinite; }
   .art-hanging-lantern { animation: art-lantern-sway 1.8s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: top; }.art-hanging-lantern.l2,.art-hanging-lantern.l4 { animation-delay: -.7s; }.art-hanging-lantern.l3 { animation-delay: -1.2s; }
   .art-context-runner { animation: art-runner .45s ease-in-out infinite alternate; transform-origin: 120px 78px; }.art-context-scan { animation: art-scan 1.4s ease-in-out infinite alternate; }
-  .art-tile.t1 { animation: art-tile 2.8s linear infinite; }.art-tile.t2 { animation: art-tile 2.8s -.9s linear infinite; }.art-tile.t3 { animation: art-tile 2.8s -1.8s linear infinite; }.art-claw { animation: art-claw 1.6s ease-in-out infinite alternate; }
   .art-boss { animation: art-boss 1.3s ease-in-out infinite alternate; transform-origin: 210px 85px; }.art-boss-eye { animation: art-pulse .6s ease-in-out infinite alternate; }.art-mic { animation: art-mic 1.1s ease-in-out infinite alternate; transform-origin: 73px 83px; }
   .art-wave { animation: art-wave .7s ease-in-out infinite alternate; transform-origin: center; }.art-pencil { animation: art-pencil 1.4s ease-in-out infinite alternate; }
-  .art-copy-scan { animation: art-copy-scan 1.4s ease-in-out infinite alternate; }.art-copy-glyph { animation: art-holo 1.1s ease-in-out infinite alternate; }
   .lg-art-beacons i.is-lit { animation: art-beacon 1s ease-in-out infinite alternate; }
   .lg-world-atmosphere i:nth-child(1) { animation: art-atmosphere 8s ease-in-out infinite alternate; }
 }
 @keyframes art-pulse { to { opacity: .65; filter: drop-shadow(0 0 18px currentColor); } }
-@keyframes art-spark { to { opacity: .2; transform: scale(.5); } }
-@keyframes art-ship { to { transform: translateY(-6px) rotate(-1deg); } }
-@keyframes art-flame { to { transform: scaleX(.72); transform-origin: right; } }
-@keyframes art-dash { to { stroke-dashoffset: -28; } }
 @keyframes art-spin { to { transform: rotate(360deg); } }
 @keyframes art-water { to { transform: translateX(8px); } }
 @keyframes art-hop { 45% { transform: translateY(-9px) rotate(-2deg); } }
 @keyframes art-lantern-sway { to { transform: rotate(2.5deg); filter: brightness(1.12); } }
 @keyframes art-runner { to { transform: rotate(2deg) translateY(-3px); } }
 @keyframes art-scan { to { transform: translateY(-46px); opacity: .35; } }
-@keyframes art-tile { 50% { transform: translateX(12px); } }
-@keyframes art-claw { to { transform: translateY(9px); } }
 @keyframes art-boss { to { transform: scale(1.035) translateY(2px); } }
 @keyframes art-mic { to { transform: rotate(-4deg); } }
 @keyframes art-wave { to { transform: scaleY(.72); } }
 @keyframes art-pencil { to { transform: translate(-5px, 4px) rotate(-2deg); } }
-@keyframes art-copy-scan { to { transform: translateY(-55px); opacity: .25; } }
-@keyframes art-holo { to { opacity: .7; transform: translateY(-3px); } }
 @keyframes art-beacon { to { filter: brightness(1.25); } }
 @keyframes art-atmosphere { to { transform: translate(25px, 18px) scale(1.1); } }
 
@@ -681,21 +662,7 @@
   .lg-frog-start-pad { top: 167px; left: 1px; width: 78px; height: 52px; }.lg-play-frog { top: 137px; left: 5px; }
 }
 
-/* Construct-powered Lily-Pad Path -------------------------------------- */
-.lg-construct-card { position: relative; z-index: 2; width: min(1180px,calc(100vw - 32px)); aspect-ratio: 16/9; margin: 0 auto 42px; overflow: hidden; border: 1px solid rgb(190 255 212 / 42%); border-radius: 30px; background: radial-gradient(circle at 50% 45%,#174e59,#061c29 72%); box-shadow: 0 28px 80px rgb(0 0 0 / 42%),0 0 0 8px rgb(119 238 172 / 5%),inset 0 0 0 1px rgb(255 255 255 / 8%); isolation: isolate; }
-.lg-construct-card::after { position: absolute; z-index: 4; inset: 0; border: 1px solid rgb(255 255 255 / 13%); border-radius: inherit; box-shadow: inset 0 0 70px rgb(1 15 25 / 35%); content: ""; pointer-events: none; }
-.lg-construct-frame { position: absolute; z-index: 2; inset: 0; width: 100%; height: 100%; border: 0; opacity: 0; background: #061c29; transition: opacity 420ms ease; }
-.lg-construct-frame.is-ready { opacity: 1; }
-.lg-construct-loading { position: absolute; z-index: 1; inset: 0; display: grid; place-content: center; justify-items: center; gap: 13px; color: #e7fff0; background: radial-gradient(circle at 50% 42%,rgb(102 236 173 / 18%),transparent 33%); text-align: center; }
-.lg-construct-loading span { display: grid; place-items: center; width: 54px; aspect-ratio: 1; border: 1px solid rgb(204 255 221 / 48%); border-radius: 18px; color: #fff0a8; background: rgb(12 48 53 / 68%); box-shadow: 0 0 35px rgb(111 238 166 / 20%); font-size: 1.7rem; }
-.lg-construct-loading strong { font: 850 clamp(.85rem,2vw,1.05rem)/1.2 Inter,system-ui,sans-serif; letter-spacing: -.01em; }
-
-@media (prefers-reduced-motion: no-preference) {
-  .lg-construct-loading span { animation: lg-construct-loading-pulse 1.1s ease-in-out infinite alternate; }
-}
-@keyframes lg-construct-loading-pulse { to { transform: translateY(-8px) rotate(12deg); box-shadow: 0 0 45px rgb(255 230 122 / 34%); } }
-
-/* Legacy Phaser prototype styles --------------------------------------- */
+/* Phaser journey styles ------------------------------------------------- */
 .lg-phaser-lily-card { position: relative; z-index: 2; width: min(1180px,calc(100vw - 32px)); margin: 0 auto 42px; }
 .lg-phaser-loading { display: grid; place-items: center; min-height: 420px; color: #baffcd; font-size: 1.15rem; }
 .lg-phaser-meta { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 9px; margin: -4px auto 12px; }
@@ -736,7 +703,6 @@
 @keyframes phaser-finale-in { from { opacity: 0; transform: translate(45px,-50%) scale(.82); } }
 
 @media (max-width: 700px) {
-  .lg-construct-card { width: calc(100vw - 14px); border-radius: 19px; }
   .lg-phaser-lily-card { width: calc(100vw - 14px); }.lg-phaser-stage-wrap { aspect-ratio: 16/9; border-radius: 19px; }.lg-phaser-stage canvas { position: static !important; width: 100% !important; height: 100% !important; max-width: 100% !important; translate: none; }.lg-phaser-meta { margin-bottom: 8px; }.lg-phaser-meta > span { display: none; }
   .lg-dash-context-clue { grid-template-columns: 1fr auto; gap: 8px 10px; margin-bottom: 9px; padding: 10px 11px; border-radius: 14px; }.lg-dash-context-clue > strong { grid-column: 1/-1; grid-row: 2; font-size: .72rem; }.lg-dash-context-clue > button { min-height: 34px; padding: 7px 10px; }.lg-dash-context-clue > span { font-size: .58rem; }
   .lg-phaser-feedback { bottom: 4%; padding: 9px 13px; }.lg-phaser-feedback span { display: none; }

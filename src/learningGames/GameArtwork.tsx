@@ -153,7 +153,7 @@ export function GameArtwork({ gameId, progress = 0, total = 3, compact = false }
   const style = {
     '--art-progress': `${ratio * 100}%`,
     '--art-ratio': ratio,
-    '--art-ship-shift': `${ratio * 34}px`,
+    '--art-ninja-shift': `${ratio * 34}px`,
     '--art-frog-shift': `${-110 + ratio * 220}px`,
     '--art-runner-shift': `${ratio * 115}px`,
     '--art-asteroid-opacity': 1 - ratio * .3,
