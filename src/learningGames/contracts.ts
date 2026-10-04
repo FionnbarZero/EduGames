@@ -9,6 +9,7 @@ export type LearningGameId =
   | 'sentence-scramble'
   | 'read-aloud-boss-rush'
   | 'dictation-streak'
+  | 'speller-bee'
   | 'copy-hide-write-combo'
   | 'correction-rescue'
 

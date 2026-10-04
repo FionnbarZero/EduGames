@@ -45,9 +45,10 @@ export type ProductionRunnerControls = {
 }
 
 type ProductionRunnerProps = LearningGameBaseProps & {
-  readonly gameId: Extract<LearningGameId, 'read-aloud-boss-rush' | 'dictation-streak'>
+  readonly gameId: Extract<LearningGameId, 'read-aloud-boss-rush' | 'dictation-streak' | 'speller-bee'>
   readonly rounds: readonly ProductionGameRound[]
   readonly playAudio?: PlayLearningAudio
+  readonly assessmentMode?: LearningGameAttempt['assessmentMode']
   readonly defaultTitle: string
   readonly defaultEyebrow: string
   readonly prompt: (round: ProductionGameRound, controls: ProductionRunnerControls) => ReactNode
@@ -59,6 +60,7 @@ export function ProductionRunner({
   gameId,
   rounds,
   playAudio,
+  assessmentMode = 'automatic',
   defaultTitle,
   defaultEyebrow,
   prompt,
@@ -98,7 +100,7 @@ export function ProductionRunner({
       targetId: round.targetId,
       correct,
       response,
-      assessmentMode: 'automatic',
+      assessmentMode,
     }
     setAttempts((current) => [...current, attempt])
     const nextStreak = correct ? streak + 1 : 0

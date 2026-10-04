@@ -11,6 +11,7 @@ import {
   MemoryFlip,
   ReadAloudBossRush,
   SentenceScramble,
+  SpellerBee,
   SpeedMatch,
   TargetBlast,
   type ContextGameRound,
@@ -158,6 +159,19 @@ const productionRounds: readonly ProductionGameRound[] = [
   { id: 'production-3', targetId: 'goodbye', targetText: '再见', audioText: '再见' },
 ]
 
+const spellingRounds: readonly ProductionGameRound[] = [
+  { id: 'spelling-1', targetId: 'cat', targetText: 'cat', audioText: 'cat' },
+  { id: 'spelling-2', targetId: 'water', targetText: 'water', audioText: 'water' },
+  { id: 'spelling-3', targetId: 'friend', targetText: 'friend', audioText: 'friend' },
+  { id: 'spelling-4', targetId: 'school', targetText: 'school', audioText: 'school' },
+  { id: 'spelling-5', targetId: 'apple', targetText: 'apple', audioText: 'apple' },
+  { id: 'spelling-6', targetId: 'teacher', targetText: 'teacher', audioText: 'teacher' },
+  { id: 'spelling-7', targetId: 'family', targetText: 'family', audioText: 'family' },
+  { id: 'spelling-8', targetId: 'morning', targetText: 'morning', audioText: 'morning' },
+  { id: 'spelling-9', targetId: 'yellow', targetText: 'yellow', audioText: 'yellow' },
+  { id: 'spelling-10', targetId: 'beautiful', targetText: 'beautiful', audioText: 'beautiful' },
+]
+
 let speechRequestId = 0
 let speechStartTimer: number | undefined
 let settleActiveSpeech: (() => void) | undefined
@@ -165,6 +179,16 @@ let activeRecordedAudio: HTMLAudioElement | undefined
 let settleActiveRecording: (() => void) | undefined
 
 const recordedLearningAudio: Readonly<Record<string, string>> = {
+  'cat': `${import.meta.env.BASE_URL}audio/speller-bee/cat.wav?v=1`,
+  'water': `${import.meta.env.BASE_URL}audio/speller-bee/water.wav?v=1`,
+  'friend': `${import.meta.env.BASE_URL}audio/speller-bee/friend.wav?v=1`,
+  'school': `${import.meta.env.BASE_URL}audio/speller-bee/school.wav?v=1`,
+  'apple': `${import.meta.env.BASE_URL}audio/speller-bee/apple.wav?v=1`,
+  'teacher': `${import.meta.env.BASE_URL}audio/speller-bee/teacher.wav?v=1`,
+  'family': `${import.meta.env.BASE_URL}audio/speller-bee/family.wav?v=1`,
+  'morning': `${import.meta.env.BASE_URL}audio/speller-bee/morning.wav?v=1`,
+  'yellow': `${import.meta.env.BASE_URL}audio/speller-bee/yellow.wav?v=1`,
+  'beautiful': `${import.meta.env.BASE_URL}audio/speller-bee/beautiful.wav?v=1`,
   '你好': `${import.meta.env.BASE_URL}audio/read-aloud/hello.wav?v=1`,
   '谢谢': `${import.meta.env.BASE_URL}audio/read-aloud/thanks.wav?v=1`,
   '再见': `${import.meta.env.BASE_URL}audio/read-aloud/goodbye.wav?v=1`,
@@ -337,6 +361,7 @@ function GamePreview({ gameId, onExit, onComplete }: {
     case 'sentence-scramble': return <SentenceScramble {...shared} rounds={sequenceRounds} playAudio={playAudio} />
     case 'read-aloud-boss-rush': return <ReadAloudBossRush {...shared} rounds={productionRounds} playAudio={playAudio} />
     case 'dictation-streak': return <DictationStreak {...shared} rounds={productionRounds} playAudio={playAudio} />
+    case 'speller-bee': return <SpellerBee {...shared} rounds={spellingRounds} playAudio={playAudio} />
     case 'copy-hide-write-combo': return <CopyHideWriteCombo {...shared} rounds={productionRounds} playAudio={playAudio} />
     case 'correction-rescue': return <CorrectionRescue {...shared} rounds={productionRounds} playAudio={playAudio} />
   }
@@ -370,11 +395,11 @@ export function App() {
 
     <header id="top" className="hero">
       <div className="hero-copy">
-        <p className="eyebrow"><Sparkles size={14} /> Mandarin practice arcade</p>
+        <p className="eyebrow"><Sparkles size={14} /> Language practice arcade</p>
         <h1>Pick a game.<br /><em>Start playing.</em></h1>
-        <p className="hero-description">Practice Mandarin through matching, reading, listening, speaking, and writing. Every game gives you instant feedback as you play.</p>
+        <p className="hero-description">Practice Mandarin and English through matching, reading, listening, speaking, spelling, and writing. Every game gives you instant feedback as you play.</p>
         <div className="hero-meta">
-          <span><Gamepad2 size={16} /> 10 games</span>
+          <span><Gamepad2 size={16} /> 11 games</span>
           <span><BookOpen size={16} /> Reading</span>
           <span><Keyboard size={16} /> Writing</span>
           <span><Headphones size={16} /> Audio</span>
@@ -396,7 +421,7 @@ export function App() {
 
     <section className="catalog" aria-labelledby="catalog-title">
       <div className="section-heading">
-        <div><p className="eyebrow">10 ways to practice</p><h2 id="catalog-title">Choose your challenge</h2></div>
+        <div><p className="eyebrow">11 ways to practice</p><h2 id="catalog-title">Choose your challenge</h2></div>
         <p>Pick any game. Each one shows you what to do.</p>
       </div>
       <div className="game-grid">

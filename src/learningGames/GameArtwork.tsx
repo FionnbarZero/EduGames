@@ -149,6 +149,7 @@ function ArtworkFor({ gameId }: { readonly gameId: LearningGameId }) {
     case 'sentence-scramble': return <ScrambleArt />
     case 'read-aloud-boss-rush': return <BossArt />
     case 'dictation-streak': return <DictationArt />
+    case 'speller-bee': return <DictationArt />
     case 'copy-hide-write-combo': return <CopyArt />
     case 'correction-rescue': return <RescueArt />
   }
