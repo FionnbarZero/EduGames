@@ -10,6 +10,10 @@ Every direct child folder is a complete copy-and-drop React module. A module own
 - Host applications provide curriculum content through `pairs` or `rounds`, an optional `playAudio` callback, and the `onExit` / `onComplete` callbacks.
 - Install the external dependencies listed in that module's README.
 - Styles are loaded by the module automatically.
+- The destination build must support ordinary CSS imports and
+  `new URL('./asset', import.meta.url)` asset URLs (Vite and webpack do).
+- Repeated files under `runtime/` are deliberate. They keep each copied folder
+  independent; do not replace them with imports from a shared repository path.
 
 ## Modules
 

@@ -220,7 +220,7 @@ export function TargetBlast({
       timer = window.setTimeout(() => setPhase('bonk'), 360)
     } else if (phase === 'bonk') {
       timer = window.setTimeout(() => {
-        void playAudioRef.current?.('不好！', 'zh-CN')
+        void Promise.resolve(playAudioRef.current?.('不好！', 'zh-CN')).catch(() => undefined)
         setPhase('feedback')
       }, 440)
     } else if (phase === 'feedback') {

@@ -252,7 +252,9 @@ class LilyPondScene extends Phaser.Scene {
     })
 
     if (round.audioText && this.options.playAudio) {
-      this.time.delayedCall(280, () => void this.options.playAudio?.(round.audioText!))
+      this.time.delayedCall(280, () => {
+        void Promise.resolve(this.options.playAudio?.(round.audioText!)).catch(() => undefined)
+      })
     }
   }
 
@@ -999,6 +1001,7 @@ export function LilyPadPath({
   const hostRef = useRef<HTMLDivElement>(null)
   const attemptsRef = useRef<LearningGameAttempt[]>([])
   const choiceHandlerRef = useRef<((choiceIndex: number) => void) | null>(null)
+  const playAudioRef = useRef(playAudio)
   const [completed, setCompleted] = useState(0)
   const [correct, setCorrect] = useState(0)
   const [streak, setStreak] = useState(0)
@@ -1007,6 +1010,15 @@ export function LilyPadPath({
   const [feedback, setFeedback] = useState<FeedbackState>(null)
   const [finished, setFinished] = useState(false)
   const valid = validSelectionRounds(playableRounds) && playableRounds.every((round) => round.choices.length >= 3)
+  const hasAudio = Boolean(playAudio)
+
+  useEffect(() => {
+    playAudioRef.current = playAudio
+  }, [playAudio])
+
+  const playLearningAudio = useCallback<PlayLearningAudio>((text, language, playbackRate) => (
+    playAudioRef.current?.(text, language, playbackRate)
+  ), [])
 
   const handleAttempt = useCallback((index: number, choiceId: string, wasCorrect: boolean) => {
     const round = playableRounds[index]
@@ -1027,7 +1039,7 @@ export function LilyPadPath({
     if (!valid || !hostRef.current) return
     const scene = new LilyPondScene({
       rounds: playableRounds,
-      playAudio,
+      playAudio: hasAudio ? playLearningAudio : undefined,
       onAttempt: handleAttempt,
       onProgress: (nextCompleted, nextCorrect, nextStreak, nextBest) => {
         setCompleted(nextCompleted)
@@ -1052,7 +1064,7 @@ export function LilyPadPath({
       scene: [scene],
     })
     return () => game.destroy(true)
-  }, [handleAttempt, playAudio, playableRounds, valid])
+  }, [handleAttempt, hasAudio, playLearningAudio, playableRounds, valid])
 
   const finish = useCallback(() => {
     onComplete(summarizeLearningGame('lily-pad-path', attemptsRef.current))
@@ -1074,7 +1086,7 @@ export function LilyPadPath({
         <span><strong>{correct}</strong> first-try landings</span>
         <span><strong>{streak}</strong> momentum</span>
         <span><strong>{bestStreak}</strong> best run</span>
-        <button type="button" onClick={() => currentRound?.audioText && void playAudio?.(currentRound.audioText)} disabled={finished || !currentRound?.audioText || !playAudio}>
+        <button type="button" onClick={() => { if (currentRound?.audioText) void Promise.resolve(playLearningAudio(currentRound.audioText)).catch(() => undefined) }} disabled={finished || !currentRound?.audioText || !hasAudio}>
           <Headphones size={17} /> Hear clue
         </button>
       </div>

@@ -6,6 +6,7 @@ const modulesRoot = resolve('src/gameModules')
 const allowedPackages = new Set(['react', 'react-dom', 'lucide-react', 'phaser'])
 const requiredFiles = ['Game.tsx', 'README.md', 'index.ts', 'manifest.ts', 'styles.css', 'runtime/contracts.ts', 'runtime/GameShell.tsx']
 const sourceExtensions = ['.ts', '.tsx', '.css']
+const assetExtensions = new Set(['.png', '.jpg', '.jpeg', '.webp', '.svg', '.wav', '.mp3', '.ogg'])
 
 function walk(directory) {
   return readdirSync(directory).flatMap((name) => {
@@ -35,6 +36,7 @@ for (const folder of moduleFolders) {
   }
 
   const files = walk(moduleRoot)
+  const referencedAssets = new Set()
   for (const file of files.filter((path) => sourceExtensions.includes(extname(path)))) {
     const source = readFileSync(file, 'utf8')
     assert.ok(!source.includes('import.meta.env.BASE_URL'), `${folder}: ${relative(moduleRoot, file)} depends on the host public base URL`)
@@ -46,6 +48,7 @@ for (const folder of moduleFolders) {
     ].map((match) => match[1])
 
     for (const specifier of moduleSpecifiers) {
+      assert.ok(!/\.tsx?$/.test(specifier), `${folder}: source import should omit TypeScript extension: ${specifier}`)
       if (!specifier.startsWith('.')) {
         const packageName = specifier.startsWith('@') ? specifier.split('/').slice(0, 2).join('/') : specifier.split('/')[0]
         assert.ok(allowedPackages.has(packageName), `${folder}: undeclared external dependency ${specifier}`)
@@ -61,7 +64,12 @@ for (const folder of moduleFolders) {
       const assetPath = resolve(dirname(file), match[1])
       assert.ok(assetPath.startsWith(`${moduleRoot}${sep}`), `${folder}: asset escapes module folder: ${match[1]}`)
       assert.ok(existsSync(assetPath), `${folder}: missing asset ${match[1]}`)
+      referencedAssets.add(assetPath)
     }
+  }
+
+  for (const assetPath of files.filter((path) => assetExtensions.has(extname(path).toLowerCase()))) {
+    assert.ok(referencedAssets.has(assetPath), `${folder}: unreferenced asset ${relative(moduleRoot, assetPath)}`)
   }
 }
 

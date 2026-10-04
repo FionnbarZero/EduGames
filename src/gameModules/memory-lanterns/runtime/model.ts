@@ -1,54 +1,19 @@
 import type {
-  ContextGameRound,
   GamePair,
   LearningGameAttempt,
   LearningGameId,
   LearningGameSummary,
-  SelectionGameRound,
-  SequenceGameRound,
 } from './contracts'
 
-export function distinctGameIds(values: readonly { readonly id: string }[]) {
+function distinctIds(values: readonly { readonly id: string }[]) {
   return new Set(values.map((value) => value.id)).size === values.length
-}
-
-export function validContextRounds(rounds: readonly ContextGameRound[]) {
-  return validSelectionRounds(rounds)
-    && rounds.every((round) => Boolean(round.sentenceBefore.trim() || round.sentenceAfter.trim()))
 }
 
 export function validGamePairs(pairs: readonly GamePair[]) {
   return pairs.length > 0
-    && distinctGameIds(pairs)
+    && distinctIds(pairs)
     && pairs.every((pair) => pair.targetId && pair.left.id && pair.right.id
       && pair.left.id !== pair.right.id && pair.left.label && pair.right.label)
-}
-
-export function validSelectionRounds(rounds: readonly SelectionGameRound[]) {
-  return rounds.length > 0
-    && distinctGameIds(rounds)
-    && rounds.every((round) => round.targetId
-      && round.targetText
-      && round.choices.length >= 2
-      && distinctGameIds(round.choices)
-      && round.choices.some((choice) => choice.id === round.correctChoiceId))
-}
-
-export function validSequenceRounds(rounds: readonly SequenceGameRound[]) {
-  return rounds.length > 0
-    && distinctGameIds(rounds)
-    && rounds.every((round) => round.targetId
-      && round.targetText
-      && round.tokens.length >= 2
-      && distinctGameIds(round.tokens)
-      && round.correctTokenIds.length === round.tokens.length
-      && new Set(round.correctTokenIds).size === round.correctTokenIds.length
-      && round.correctTokenIds.every((id) => round.tokens.some((token) => token.id === id)))
-}
-
-export function sequenceIsCorrect(round: SequenceGameRound, response: readonly string[]) {
-  return response.length === round.correctTokenIds.length
-    && response.every((id, index) => id === round.correctTokenIds[index])
 }
 
 export function summarizeLearningGame(
@@ -64,7 +29,7 @@ export function summarizeLearningGame(
 }
 
 export function memoryDeck(pairs: readonly GamePair[]) {
-  const cards = pairs.flatMap((pair, index) => [
+  const cards = pairs.flatMap((pair) => [
     { id: `${pair.id}:left`, pairId: pair.id, targetId: pair.targetId, face: pair.left },
     { id: `${pair.id}:right`, pairId: pair.id, targetId: pair.targetId, face: pair.right },
   ])

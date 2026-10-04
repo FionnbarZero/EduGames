@@ -3,30 +3,35 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "generate:context-audio": "node scripts/generateContextGapAudio.mjs",
     "generate:lantern-audio": "node scripts/generateLanternSounds.mjs",
     "generate:read-aloud-audio": "node scripts/generateReadAloudAudio.mjs",
+    "generate:speed-match-audio": "node scripts/generateSpeedMatchAudio.mjs",
     "generate:speller-bee-audio": "node scripts/generateSpellerBeeAudio.mjs",
     "generate:scramble-audio": "node scripts/generateSentenceScrambleAudio.mjs",
-    "test": "npm run test:modules && npm run test:audio && npm run build",
+    "test": "npm run test:modules && npm run test:hygiene && npm run test:audio && npm run build",
     "test:modules": "node scripts/testModuleIsolation.mjs",
-    "test:audio": "node scripts/testLanternSounds.mjs && node scripts/testMandarinAudio.mjs && node scripts/testContextGapAudio.mjs && node scripts/testSentenceScrambleAudio.mjs && node scripts/testReadAloudAudio.mjs && node scripts/testSpellerBeeAudio.mjs",
+    "test:hygiene": "node scripts/testSourceHygiene.mjs",
+    "test:audio": "node scripts/testLanternSounds.mjs && node scripts/testMandarinAudio.mjs && node scripts/testContextGapAudio.mjs && node scripts/testSentenceScrambleAudio.mjs && node scripts/testReadAloudAudio.mjs && node scripts/testSpellerBeeAudio.mjs && node scripts/testSpeedMatchAudio.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "latest",
-    "lucide-react": "latest",
-    "phaser": "^4.2.1",
-    "react": "latest",
-    "react-dom": "latest",
-    "vite": "latest"
+    "lucide-react": "1.51.0",
+    "phaser": "4.2.1",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "typescript": "latest"
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "typescript": "7.0.2",
+    "vite": "8.3.2"
   }
 }

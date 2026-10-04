@@ -1,7 +1,7 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { ArrowRight, BookOpen, Gamepad2, Headphones, Keyboard, RotateCcw, Sparkles } from 'lucide-react'
-import { GameArtwork } from './gameCatalog/GameArtwork.tsx'
-import { LEARNING_GAME_CATALOG } from './gameCatalog/catalog.ts'
+import { GameArtwork } from './gameCatalog/GameArtwork'
+import { LEARNING_GAME_CATALOG } from './gameCatalog/catalog'
 import type {
   ContextGameRound,
   GamePair,
@@ -11,18 +11,18 @@ import type {
   SelectionGameRound,
   SequenceGameRound,
   StrokeOrderGameRound,
-} from './gameCatalog/contracts.ts'
+} from './gameCatalog/contracts'
 
-const SpeedMatch = lazy(() => import('./gameModules/speed-match/index.ts').then((module) => ({ default: module.SpeedMatch })))
-const TargetBlast = lazy(() => import('./gameModules/target-blast/index.ts').then((module) => ({ default: module.TargetBlast })))
-const LilyPadPath = lazy(() => import('./gameModules/lily-pad-path/index.ts').then((module) => ({ default: module.LilyPadPath })))
-const MemoryFlip = lazy(() => import('./gameModules/memory-lanterns/index.ts').then((module) => ({ default: module.MemoryFlip })))
-const ContextGapDash = lazy(() => import('./gameModules/context-gap-dash/index.ts').then((module) => ({ default: module.ContextGapDash })))
-const SentenceScramble = lazy(() => import('./gameModules/sushi-scramble/index.ts').then((module) => ({ default: module.SentenceScramble })))
-const ReadAloudBossRush = lazy(() => import('./gameModules/whispering-scrolls/index.ts').then((module) => ({ default: module.ReadAloudBossRush })))
-const DictationStreak = lazy(() => import('./gameModules/dictation-streak/index.ts').then((module) => ({ default: module.DictationStreak })))
-const SpellerBee = lazy(() => import('./gameModules/speller-bee/index.ts').then((module) => ({ default: module.SpellerBee })))
-const StrokeOrderSlay = lazy(() => import('./gameModules/stroke-order-slay/index.ts').then((module) => ({ default: module.StrokeOrderSlay })))
+const SpeedMatch = lazy(() => import('./gameModules/speed-match').then((module) => ({ default: module.SpeedMatch })))
+const TargetBlast = lazy(() => import('./gameModules/target-blast').then((module) => ({ default: module.TargetBlast })))
+const LilyPadPath = lazy(() => import('./gameModules/lily-pad-path').then((module) => ({ default: module.LilyPadPath })))
+const MemoryFlip = lazy(() => import('./gameModules/memory-lanterns').then((module) => ({ default: module.MemoryFlip })))
+const ContextGapDash = lazy(() => import('./gameModules/context-gap-dash').then((module) => ({ default: module.ContextGapDash })))
+const SentenceScramble = lazy(() => import('./gameModules/sushi-scramble').then((module) => ({ default: module.SentenceScramble })))
+const ReadAloudBossRush = lazy(() => import('./gameModules/whispering-scrolls').then((module) => ({ default: module.ReadAloudBossRush })))
+const DictationStreak = lazy(() => import('./gameModules/dictation-streak').then((module) => ({ default: module.DictationStreak })))
+const SpellerBee = lazy(() => import('./gameModules/speller-bee').then((module) => ({ default: module.SpellerBee })))
+const StrokeOrderSlay = lazy(() => import('./gameModules/stroke-order-slay').then((module) => ({ default: module.StrokeOrderSlay })))
 
 const pairs: readonly GamePair[] = [
   { id: 'pair-1', targetId: 'hello', left: { id: 'left-nihao', label: '你好' }, right: { id: 'right-hello', label: 'hello' } },
@@ -211,9 +211,14 @@ let activeRecordedAudio: HTMLAudioElement | undefined
 let settleActiveRecording: (() => void) | undefined
 
 const recordedLearningAudio: Readonly<Record<string, string>> = {
-  'cat': `${import.meta.env.BASE_URL}audio/speller-bee/cat.wav?v=1`,
-  'water': `${import.meta.env.BASE_URL}audio/speller-bee/water.wav?v=1`,
+  'hello': `${import.meta.env.BASE_URL}audio/speed-match/hello.wav?v=1`,
+  'thank you': `${import.meta.env.BASE_URL}audio/speed-match/thank-you.wav?v=1`,
+  'goodbye': `${import.meta.env.BASE_URL}audio/speed-match/goodbye.wav?v=1`,
   'friend': `${import.meta.env.BASE_URL}audio/speller-bee/friend.wav?v=1`,
+  'water': `${import.meta.env.BASE_URL}audio/speller-bee/water.wav?v=1`,
+  'cat': `${import.meta.env.BASE_URL}audio/speller-bee/cat.wav?v=1`,
+  'tea': `${import.meta.env.BASE_URL}audio/speed-match/tea.wav?v=1`,
+  'book': `${import.meta.env.BASE_URL}audio/speed-match/book.wav?v=1`,
   'school': `${import.meta.env.BASE_URL}audio/speller-bee/school.wav?v=1`,
   'apple': `${import.meta.env.BASE_URL}audio/speller-bee/apple.wav?v=1`,
   'teacher': `${import.meta.env.BASE_URL}audio/speller-bee/teacher.wav?v=1`,
@@ -273,19 +278,28 @@ const recordedLearningAudio: Readonly<Record<string, string>> = {
   '她是我的朋友。': `${import.meta.env.BASE_URL}audio/sentence-scramble/she-is-my-friend.wav?v=1`,
 }
 
-function playAudio(text: string, language = 'zh-CN', playbackRate = 1): Promise<void> {
-  activeRecordedAudio?.pause()
-  settleActiveRecording?.()
+function stopLearningAudio() {
+  speechRequestId += 1
+  if (speechStartTimer !== undefined) {
+    window.clearTimeout(speechStartTimer)
+    speechStartTimer = undefined
+  }
+  settleActiveSpeech?.()
+  settleActiveSpeech = undefined
+  window.speechSynthesis?.cancel()
+
+  const recording = activeRecordedAudio
   activeRecordedAudio = undefined
+  settleActiveRecording?.()
   settleActiveRecording = undefined
+  recording?.pause()
+}
+
+function playAudio(text: string, language = 'zh-CN', playbackRate = 1): Promise<void> {
+  stopLearningAudio()
 
   const recordingUrl = recordedLearningAudio[text]
   if (recordingUrl) {
-    speechRequestId += 1
-    if (speechStartTimer !== undefined) window.clearTimeout(speechStartTimer)
-    settleActiveSpeech?.()
-    window.speechSynthesis?.cancel()
-
     return new Promise((resolve, reject) => {
       const audio = new Audio(recordingUrl)
       let settled = false
@@ -317,9 +331,6 @@ function playAudio(text: string, language = 'zh-CN', playbackRate = 1): Promise<
   }
 
   const requestId = ++speechRequestId
-  if (speechStartTimer !== undefined) window.clearTimeout(speechStartTimer)
-  settleActiveSpeech?.()
-  synth.cancel()
 
   return new Promise((resolve, reject) => {
     let watchdog: number | undefined
@@ -405,27 +416,36 @@ export function App() {
   const [lastSummary, setLastSummary] = useState<LearningGameSummary | null>(null)
   const [sessionKey, setSessionKey] = useState(0)
 
+  useEffect(() => () => stopLearningAudio(), [])
+
   function openGame(gameId: LearningGameId) {
+    stopLearningAudio()
     setActiveGame(gameId)
     setSessionKey((current) => current + 1)
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   function finishGame(summary: LearningGameSummary) {
+    stopLearningAudio()
     setLastSummary(summary)
+    setActiveGame(null)
+  }
+
+  function exitGame() {
+    stopLearningAudio()
     setActiveGame(null)
   }
 
   if (activeGame) {
     return <Suspense fallback={<main className="playground"><p role="status">Loading game module…</p></main>}>
-      <GamePreview key={`${activeGame}-${sessionKey}`} gameId={activeGame} onExit={() => setActiveGame(null)} onComplete={finishGame} />
+      <GamePreview key={`${activeGame}-${sessionKey}`} gameId={activeGame} onExit={exitGame} onComplete={finishGame} />
     </Suspense>
   }
 
   return <main className="playground">
     <nav className="playground-nav">
       <a className="brand" href="#top"><span><Gamepad2 size={19} /></span> EduGames</a>
-      <div className="nav-note"><span className="status-dot" /> Local playground</div>
+      <div className="nav-note"><span className="status-dot" /> 10 games ready</div>
     </nav>
 
     <header id="top" className="hero">

@@ -10,9 +10,24 @@ function DictationConsole({ round, playAudio, streak, onAssess }: {
   readonly onAssess: (correct: boolean, response?: string) => void
 }) {
   const [answer, setAnswer] = useState('')
+  const [audioError, setAudioError] = useState(false)
+
+  async function speakWord() {
+    setAudioError(false)
+    try {
+      await playAudio(round.audioText || round.targetText)
+    } catch {
+      setAudioError(true)
+    }
+  }
 
   useEffect(() => {
-    void playAudio(round.audioText || round.targetText)
+    let active = true
+    setAudioError(false)
+    Promise.resolve(playAudio(round.audioText || round.targetText)).catch(() => {
+      if (active) setAudioError(true)
+    })
+    return () => { active = false }
   }, [playAudio, round.audioText, round.id, round.targetText])
 
   function submit(event: FormEvent) {
@@ -29,7 +44,8 @@ function DictationConsole({ round, playAudio, streak, onAssess }: {
     </div>
     <p className="lg-kicker">Incoming transmission</p>
     <h2>{round.instruction || 'Hear it. Type it. Lock it in.'}</h2>
-    <button className="lg-audio" type="button" onClick={() => void playAudio(round.audioText || round.targetText)}><Headphones size={20} /> Replay transmission</button>
+    <button className="lg-audio" type="button" onClick={() => void speakWord()}><Headphones size={20} /> Replay transmission</button>
+    {audioError && <p className="lg-audio-error" role="alert">The word could not play. Press Replay transmission to try again.</p>}
     <label className="lg-answer-terminal">
       <span>Your answer</span>
       <input value={answer} onChange={(event) => setAnswer(event.target.value)} autoFocus autoComplete="off" spellCheck={false} lang="zh-Hans" placeholder="Type what you heard" />

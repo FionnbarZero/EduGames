@@ -1,5 +1,3 @@
-import type { ReactNode } from 'react'
-
 export type LearningGameId = 'copy-hide-write-combo'
 
 export type LearningGameChannel = 'tier-1-writing' | 'tier-2-reading'
@@ -17,46 +15,12 @@ export type LearningGameDefinition = {
   readonly estimatedSeconds: readonly [minimum: number, maximum: number]
 }
 
-export type GameChoice = {
-  readonly id: string
-  readonly label: string
-  readonly accessibleLabel?: string
-}
-
-export type GamePair = {
-  readonly id: string
-  readonly targetId: string
-  readonly left: GameChoice
-  readonly right: GameChoice
-}
-
 export type GamePrompt = {
   readonly id: string
   readonly targetId: string
   readonly targetText: string
   readonly cueText?: string
   readonly audioText?: string
-}
-
-export type SelectionGameRound = GamePrompt & {
-  readonly choices: readonly GameChoice[]
-  readonly correctChoiceId: string
-}
-
-export type ContextGameRound = SelectionGameRound & {
-  readonly sentenceBefore: string
-  readonly sentenceAfter: string
-}
-
-export type SequenceToken = GameChoice
-
-export type SequenceGameRound = GamePrompt & {
-  readonly tokens: readonly SequenceToken[]
-  readonly correctTokenIds: readonly string[]
-}
-
-export type ProductionGameRound = GamePrompt & {
-  readonly instruction?: string
 }
 
 export type StrokePoint = readonly [x: number, y: number]
@@ -91,23 +55,3 @@ export type LearningGameBaseProps = {
 }
 
 export type PlayLearningAudio = (text: string, language?: string, playbackRate?: number) => void | Promise<void>
-
-export type ReadingCaptureControls = {
-  readonly onReady: () => void
-}
-
-export type RenderReadingCapture = (
-  round: ProductionGameRound,
-  controls: ReadingCaptureControls,
-) => ReactNode
-
-export type ReadingResponseControls = {
-  readonly onAssess: (correct: boolean, response?: string) => void
-  readonly index: number
-  readonly total: number
-}
-
-export type RenderReadingResponse = (
-  round: ProductionGameRound,
-  controls: ReadingResponseControls,
-) => ReactNode

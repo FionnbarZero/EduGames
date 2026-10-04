@@ -16,7 +16,7 @@ import type {
   StrokePoint,
 } from './runtime/contracts'
 import { LearningGameComplete, LearningGameEmpty, LearningGameShell, SelfAssessmentButtons } from './runtime/GameShell'
-import { AutoAssessmentFeedback, type AssessmentFeedback } from './runtime/ProductionGameShared'
+import { AutoAssessmentFeedback, type AssessmentFeedback } from './runtime/AssessmentFeedback'
 import { playGameSound } from './runtime/gameFeel'
 import { summarizeLearningGame } from './runtime/model'
 

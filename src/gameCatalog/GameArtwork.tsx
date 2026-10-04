@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import type { LearningGameId } from './contracts.ts'
+import type { LearningGameId } from './contracts'
 import './artwork.css'
 
 type GameArtworkProps = {
