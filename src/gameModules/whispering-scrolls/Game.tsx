@@ -278,7 +278,7 @@ function TimedReadAloudCapture({ round, onReady, onCapture, meterAudioContext }:
           window.clearTimeout(stopTimer)
           window.clearInterval(countdownTimer)
           window.cancelAnimationFrame(meterFrame)
-          setState('checking')
+          if (!disposed) setState('checking')
           stream?.getTracks().forEach((track) => track.stop())
           if (recognitionStarted) {
             try { recognition?.stop() } catch { finishRecognition() }

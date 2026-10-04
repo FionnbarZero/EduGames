@@ -1,5 +1,3 @@
-import type { ReactNode } from 'react'
-
 export type LearningGameId =
   | 'speed-match'
   | 'target-blast'
@@ -91,33 +89,3 @@ export type LearningGameSummary = {
   readonly correct: number
   readonly attempts: readonly LearningGameAttempt[]
 }
-
-export type LearningGameBaseProps = {
-  readonly title?: string
-  readonly eyebrow?: string
-  readonly onExit: () => void
-  readonly onAttempt?: (attempt: LearningGameAttempt) => void
-  readonly onComplete: (summary: LearningGameSummary) => void
-}
-
-export type PlayLearningAudio = (text: string, language?: string, playbackRate?: number) => void | Promise<void>
-
-export type ReadingCaptureControls = {
-  readonly onReady: () => void
-}
-
-export type RenderReadingCapture = (
-  round: ProductionGameRound,
-  controls: ReadingCaptureControls,
-) => ReactNode
-
-export type ReadingResponseControls = {
-  readonly onAssess: (correct: boolean, response?: string) => void
-  readonly index: number
-  readonly total: number
-}
-
-export type RenderReadingResponse = (
-  round: ProductionGameRound,
-  controls: ReadingResponseControls,
-) => ReactNode

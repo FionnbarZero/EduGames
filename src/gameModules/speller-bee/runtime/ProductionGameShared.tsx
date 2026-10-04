@@ -12,15 +12,15 @@ import { summarizeLearningGame } from './model'
 import { LearningGameComplete, LearningGameEmpty, LearningGameShell, SelfAssessmentButtons } from './GameShell'
 import { playGameSound } from './gameFeel'
 
-export function validProductionRounds(rounds: readonly ProductionGameRound[]) {
+function validProductionRounds(rounds: readonly ProductionGameRound[]) {
   return rounds.length > 0
     && new Set(rounds.map((round) => round.id)).size === rounds.length
     && rounds.every((round) => round.id && round.targetId && round.targetText)
 }
 
-export type AssessmentFeedback = 'correct' | 'incorrect'
+type AssessmentFeedback = 'correct' | 'incorrect'
 
-export function AutoAssessmentFeedback({ feedback, lastRound }: {
+function AutoAssessmentFeedback({ feedback, lastRound }: {
   readonly feedback: AssessmentFeedback
   readonly lastRound: boolean
 }) {
@@ -133,7 +133,7 @@ export function ProductionRunner({
       }) : directResponse ? directResponse(round, { onAssess: assess, index, total: rounds.length }) : <>
         <p className="lg-kicker">Compare with the target</p>
         <div className="lg-reveal-word" lang="zh-Hans">{round.targetText}</div>
-        {playAudio && <button className="lg-audio" type="button" onClick={() => void playAudio(round.audioText || round.targetText)}><Volume2 size={20} /> Hear the model</button>}
+        {playAudio && <button className="lg-audio" type="button" onClick={() => { void Promise.resolve(playAudio(round.audioText || round.targetText)).catch(() => undefined) }}><Volume2 size={20} /> Hear the model</button>}
         <p>How did your response compare?</p>
         <SelfAssessmentButtons onAnswer={assess} />
       </>}

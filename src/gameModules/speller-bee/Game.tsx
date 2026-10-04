@@ -79,7 +79,7 @@ function SpellingReview({ round, response, playAudio, onAssess }: {
         <strong lang="en">{round.targetText}</strong>
       </section>
     </div>
-    <button className="lg-audio" type="button" onClick={() => void playAudio(round.audioText || round.targetText, 'en-US')}><Volume2 size={20} /> Hear the word again</button>
+    <button className="lg-audio" type="button" onClick={() => { void Promise.resolve(playAudio(round.audioText || round.targetText, 'en-US')).catch(() => undefined) }}><Volume2 size={20} /> Hear the word again</button>
     <p>Does your spelling match the correct word?</p>
     <SelfAssessmentButtons
       incorrectLabel="Try this word again"
