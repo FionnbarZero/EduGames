@@ -101,16 +101,27 @@ function ScrambleArt() {
   </svg>
 }
 
-function BossArt() {
+function WhisperingScrollArt() {
   return <svg viewBox="0 0 420 150" role="presentation">
-    <g className="art-boss-aura"><path d="M210 8v18M150 25l12 17m108-17-12 17M116 64l22 5m166-5-22 5" /></g>
-    <g className="art-boss">
-      <path className="art-boss-horns" d="m146 60-30-35 42 16m116 19 30-35-42 16" />
-      <path className="art-boss-head" d="M151 46q59-39 118 0l18 67-40 27h-74l-40-27z" />
-      <path className="art-boss-brow" d="m165 76 32 9m58-9-32 9" /><circle className="art-boss-eye" cx="184" cy="87" r="8" /><circle className="art-boss-eye" cx="236" cy="87" r="8" />
-      <path className="art-boss-mouth" d="M177 111h66l-12 19h-42z" /><path className="art-boss-tooth" d="m188 112 8 12 8-12m12 0 8 12 8-12" />
+    <circle className="art-scroll-moon" cx="350" cy="37" r="29" />
+    <path className="art-scroll-roofs" d="M0 124h74l38-29 29 21 43-37 45 39 42-27 49 33h100v26H0z" />
+    <g className="art-scroll-bamboo"><path d="M33 131 48 21m-3 23 22-17M42 68 18 48m21 48 24-20M384 132 373 30m3 27-20-16m22 45 21-18" /></g>
+    <g className="art-scroll-ninja">
+      <circle cx="94" cy="66" r="25" />
+      <path d="M69 63h50v16H69z" />
+      <path className="art-scroll-eyes" d="M79 70h10m9 0h10" />
+      <path d="M70 88h47l18 44H52z" />
+      <path className="art-scroll-hands" d="m73 99 44 12m-2-12-40 13" />
+      <path className="art-scroll-scarf" d="m112 55 48-14-29 25 35 6-51 7" />
     </g>
-    <g className="art-mic"><path d="M73 74v30m-18-13q18 20 36 0M73 104v18M58 122h30" /><rect x="62" y="38" width="22" height="57" rx="11" /></g>
+    <g className="art-open-scroll">
+      <rect x="170" y="25" width="154" height="102" rx="7" />
+      <path className="art-scroll-rolls" d="M169 25h20v102h-20q-17-51 0-102Zm155 0h-20v102h20q17-51 0-102Z" />
+      <path className="art-scroll-ink" d="M207 47h79m-79 46h79" />
+      <text x="247" y="86">读</text>
+      <circle className="art-scroll-seal" cx="295" cy="104" r="10" />
+    </g>
+    <g className="art-whisper-wind"><path d="M130 42q28-19 52 0t49 0M139 58q18-12 34 0m-38 66q22 13 43 0" /></g>
   </svg>
 }
 
@@ -139,7 +150,7 @@ function ArtworkFor({ gameId }: { readonly gameId: LearningGameId }) {
     case 'memory-flip': return <MemoryArt />
     case 'context-gap-dash': return <ContextArt />
     case 'sentence-scramble': return <ScrambleArt />
-    case 'read-aloud-boss-rush': return <BossArt />
+    case 'read-aloud-boss-rush': return <WhisperingScrollArt />
     case 'dictation-streak': return <DictationArt />
     case 'speller-bee': return <DictationArt />
     case 'copy-hide-write-combo': return <StrokeArt />
@@ -158,9 +169,8 @@ export function GameArtwork({ gameId, progress = 0, total = 3, compact = false }
     '--art-runner-shift': `${ratio * 115}px`,
     '--art-asteroid-opacity': 1 - ratio * .3,
     '--art-asteroid-scale': 1 - ratio * .12,
-    '--art-boss-aura-opacity': 1 - ratio * .7,
-    '--art-boss-scale': 1 - ratio * .14,
-    '--art-boss-opacity': 1 - ratio * .25,
+    '--art-scroll-shift': `${ratio * 11}px`,
+    '--art-scroll-glow': .35 + ratio * .65,
   } as CSSProperties
 
   return <div className={`lg-game-art lg-art-${gameId}${compact ? ' is-compact' : ''}`} style={style} aria-hidden="true">

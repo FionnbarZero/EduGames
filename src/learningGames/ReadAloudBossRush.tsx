@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
-import { Headphones, Mic, MicOff, RefreshCw, Volume2 } from 'lucide-react'
+import { Headphones, Mic, MicOff, RefreshCw, ScrollText, Volume2, Wind } from 'lucide-react'
 import type {
   LearningGameBaseProps,
   PlayLearningAudio,
@@ -11,7 +11,10 @@ import { ProductionRunner } from './ProductionGameShared.tsx'
 import { scoreRecordedWord, type AcousticWordScore, type ReadAloudModel } from './readAloudScoring.ts'
 
 const RECORDING_SECONDS = 6
-const READ_ALOUD_INSTRUCTION_AUDIO = `${import.meta.env.BASE_URL}audio/read-aloud/instructions.wav?v=1`
+const MIN_SPEECH_MILLISECONDS = 450
+const TRAILING_SILENCE_MILLISECONDS = 700
+const MIN_SPEECH_FRAMES = 8
+const READ_ALOUD_INSTRUCTION_AUDIO = `${import.meta.env.BASE_URL}audio/read-aloud/instructions.wav?v=2`
 const READ_ALOUD_MODELS: readonly ReadAloudModel[] = [
   { text: '你好', url: `${import.meta.env.BASE_URL}audio/read-aloud/hello.wav?v=1` },
   { text: '谢谢', url: `${import.meta.env.BASE_URL}audio/read-aloud/thanks.wav?v=1` },
@@ -54,13 +57,13 @@ function ReadAloudBriefing({ onComplete }: { readonly onComplete: () => void }) 
   }
 
   return <div className="lg-read-aloud-briefing">
-    <Volume2 className="lg-production-icon" size={42} aria-hidden="true" />
-    <p className="lg-kicker">Listen first</p>
-    <h2>Read each word you see aloud</h2>
-    <p>Recording starts automatically for every word and ends after six seconds. Then you will hear your voice followed by the model word.</p>
-    <span className="lg-briefing-status" role="status" aria-live="polite"><span aria-hidden="true" /> {instructionState === 'playing' ? 'Playing recorded instructions…' : instructionState === 'blocked' ? 'Tap “Hear instructions” if you need them.' : 'Ready to record'}</span>
-    <button className="lg-audio" type="button" onClick={playInstructions}><Volume2 size={18} /> Hear instructions</button>
-    <button className="lg-primary lg-start-recording" type="button" onClick={startRecording}><Mic size={18} /> Start recording</button>
+    <div className="lg-scroll-briefing-mark" aria-hidden="true"><ScrollText size={45} /><span>声</span><Wind size={29} /></div>
+    <p className="lg-kicker">Scroll keeper briefing</p>
+    <h2>Enter the Whispering Scroll trial</h2>
+    <p>Each scroll reveals one Mandarin word. Read it aloud before the six-second whisper window closes, then compare your echo with the scroll keeper’s voice.</p>
+    <span className="lg-briefing-status" role="status" aria-live="polite"><span aria-hidden="true" /> {instructionState === 'playing' ? 'The scroll keeper is speaking…' : instructionState === 'blocked' ? 'Tap “Hear the scroll keeper” to listen.' : 'Ready to enter the dojo'}</span>
+    <button className="lg-audio" type="button" onClick={playInstructions}><Volume2 size={18} /> Hear the scroll keeper</button>
+    <button className="lg-primary lg-start-recording" type="button" onClick={startRecording}><ScrollText size={18} /> Unroll the first scroll</button>
   </div>
 }
 
@@ -156,6 +159,9 @@ function TimedReadAloudCapture({ round, onReady, onCapture, meterAudioContext }:
     let recognitionStarted = false
     let transcript = ''
     let speechFrames = 0
+    let speechStartedAt: number | null = null
+    let lastSpeechAt: number | null = null
+    let autoStopRequested = false
     let meterStarted = false
     let resolveRecognition: ((value: string) => void) | null = null
     const recognitionFinished = new Promise<string>((resolve) => { resolveRecognition = resolve })
@@ -203,7 +209,22 @@ function TimedReadAloudCapture({ round, onReady, onCapture, meterAudioContext }:
               for (const sample of samples) squaredTotal += sample * sample
               const rms = Math.sqrt(squaredTotal / samples.length)
               const level = Math.min(1, rms * 9)
-              if (rms >= .015) speechFrames += 1
+              if (rms >= .015) {
+                speechFrames += 1
+                speechStartedAt ??= timestamp
+                lastSpeechAt = timestamp
+              } else if (
+                !autoStopRequested
+                && speechStartedAt !== null
+                && lastSpeechAt !== null
+                && speechFrames >= MIN_SPEECH_FRAMES
+                && timestamp - speechStartedAt >= MIN_SPEECH_MILLISECONDS
+                && timestamp - lastSpeechAt >= TRAILING_SILENCE_MILLISECONDS
+                && recorder?.state === 'recording'
+              ) {
+                autoStopRequested = true
+                recorder.stop()
+              }
               if (timestamp - lastMeterUpdate >= 60) {
                 setInputLevel(level)
                 lastMeterUpdate = timestamp
@@ -261,7 +282,7 @@ function TimedReadAloudCapture({ round, onReady, onCapture, meterAudioContext }:
           }
           const recognizedText = await Promise.race([
             recognitionFinished,
-            new Promise<string>((resolve) => window.setTimeout(() => resolve(transcript.trim()), 1200)),
+            new Promise<string>((resolve) => window.setTimeout(() => resolve(transcript.trim()), 700)),
           ])
           if (disposed) return
           const recording = new Blob(chunks, { type: recorder?.mimeType || 'audio/webm' })
@@ -316,23 +337,25 @@ function TimedReadAloudCapture({ round, onReady, onCapture, meterAudioContext }:
   }, [meterAudioContext, onCapture, onReady, retryKey, round])
 
   const captureStyle = { '--capture-progress': `${((RECORDING_SECONDS - remainingSeconds) / RECORDING_SECONDS) * 100}%` } as CSSProperties
-  return <div className={`lg-voice-combat is-${state}`} style={captureStyle}>
+  return <div className={`lg-voice-combat lg-scroll-reading-stage is-${state}`} style={captureStyle}>
+    <div className="lg-scroll-night" aria-hidden="true"><i /><i /><i /></div>
+    <div className="lg-scroll-ninja-reader" aria-hidden="true"><i /><b /><em /><span /></div>
     <div className="lg-record-orb">
       <Mic className={`lg-production-icon${state === 'recording' ? ' is-recording' : ''}`} size={34} aria-hidden="true" />
       <i aria-hidden="true" />
     </div>
     <div className="lg-live-wave" role="meter" aria-label="Live microphone level" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(inputLevel * 100)}>{Array.from({ length: 19 }, (_, index) => <i key={index} style={{ height: `${8 + inputLevel * (18 + (index % 5) * 5)}px`, opacity: .3 + inputLevel * .7 } as CSSProperties} />)}</div>
-    <p className="lg-kicker">Voice attack charging</p>
-    <h2>Read this word aloud</h2>
-    <div className="lg-prompt-word lg-combat-word" lang="zh-Hans">{round.targetText}</div>
+    <p className="lg-kicker">{state === 'recording' ? 'Whisper window open' : 'Ancient scroll awakening'}</p>
+    <h2>Read the scroll aloud</h2>
+    <div className="lg-prompt-word lg-combat-word lg-whisper-scroll" lang="zh-Hans"><span>{round.targetText}</span></div>
     {state === 'requesting' && <div className="lg-recording-status is-requesting" role="status">
-      <span aria-hidden="true" /> Preparing the microphone…
+      <span aria-hidden="true" /> Preparing the listening chamber…
     </div>}
     {state === 'recording' && <div className="lg-recording-status is-recording" role="timer" aria-live="polite">
-      <span aria-hidden="true" /> Recording · {remainingSeconds.toFixed(1)} seconds
+      <span aria-hidden="true" /> Scroll listening · {remainingSeconds.toFixed(1)} sec max
     </div>}
-    {state === 'recording' && <p className="lg-microphone-label">Using {microphoneLabel}</p>}
-    {state === 'checking' && <div className="lg-recording-status is-requesting" role="status"><span aria-hidden="true" /> Checking your recording…</div>}
+    {state === 'recording' && <p className="lg-microphone-label">Using {microphoneLabel} · closes when your voice settles</p>}
+    {state === 'checking' && <div className="lg-recording-status is-requesting" role="status"><span aria-hidden="true" /> Sending your echo to the scroll keeper…</div>}
     {(state === 'unavailable' || state === 'silent') && <div className="lg-microphone-error" role="alert">
       <MicOff size={24} aria-hidden="true" />
       <strong>{state === 'silent' ? 'We could not hear your voice.' : 'Microphone setup needs attention.'}</strong>
@@ -537,12 +560,12 @@ function ReadAloudReview({ round, recording, playAudio, onAssess }: {
 
   const comparisonPlaying = phase === 'child' || phase === 'model'
   return <div className="lg-read-aloud-review">
-    <p className="lg-kicker">Listen and compare</p>
-    <h2>Your voice first, then the model</h2>
+    <p className="lg-kicker">Hall of echoes</p>
+    <h2>Your whisper first, then the scroll keeper</h2>
     <div className="lg-reading-comparison">
       <section className={phase === 'child' ? 'is-playing' : ''}>
         <span className="lg-comparison-number">1</span>
-        <strong>Your recording</strong>
+        <strong>Your whisper</strong>
         <div className="lg-recording-wave" aria-label="Waveform from your recording">{waveform.map((level, index) => <i key={index} style={{ height: `${8 + level * 31}px` }} />)}</div>
         <audio ref={childAudioRef} src={recordingUrl || undefined} controls preload="auto">Your browser cannot play this recording.</audio>
         <small>{recording.microphoneLabel}</small>
@@ -550,40 +573,40 @@ function ReadAloudReview({ round, recording, playAudio, onAssess }: {
       <span className="lg-comparison-arrow" aria-hidden="true">→</span>
       <section className={phase === 'model' ? 'is-playing' : ''}>
         <span className="lg-comparison-number">2</span>
-        <strong>Model word</strong>
+        <strong>Scroll keeper</strong>
         <div className="lg-review-word" lang="zh-Hans">{round.targetText}</div>
-        {playAudio && <button className="lg-audio" type="button" disabled={comparisonPlaying} onClick={() => void playModelOnly()}><Volume2 size={18} /> Hear model only</button>}
+        {playAudio && <button className="lg-audio" type="button" disabled={comparisonPlaying} onClick={() => void playModelOnly()}><Volume2 size={18} /> Hear keeper only</button>}
       </section>
     </div>
     <div className={`lg-comparison-status is-${phase}`} role="status" aria-live="polite">
       <Headphones size={18} aria-hidden="true" />
-      {phase === 'child' ? 'Playing your recording…' : phase === 'model' ? 'Now playing the recorded model word…' : phase === 'blocked' ? `${playbackError || 'Automatic playback was blocked.'} Select replay to try again.` : 'Comparison complete. Your speech match is ready.'}
+      {phase === 'child' ? 'Your whisper is crossing the chamber…' : phase === 'model' ? 'Now the scroll keeper answers…' : phase === 'blocked' ? `${playbackError || 'Automatic playback was blocked.'} Select replay to try again.` : 'The echoes have settled. Your scroll verdict is ready.'}
     </div>
-    <button className="lg-replay-comparison" type="button" disabled={comparisonPlaying} onClick={() => void playComparison()}><RefreshCw size={17} /> {phase === 'blocked' ? 'Play comparison' : 'Play comparison again'}</button>
+    <button className="lg-replay-comparison" type="button" disabled={comparisonPlaying} onClick={() => void playComparison()}><RefreshCw size={17} /> {phase === 'blocked' ? 'Play both echoes' : 'Replay both echoes'}</button>
     {!comparisonPlaying && phase !== 'blocked' && <div className={`lg-speech-score is-${outcome}`} role="status">
       {scoring ? <>
-        <strong>Analyzing your speech…</strong>
-        <span>Checking recognition and voice-pattern evidence separately.</span>
+        <strong>The scroll is listening…</strong>
+        <span>Comparing the recognized word and the shape of your voice.</span>
       </> : outcome === 'strong' ? <>
-        <strong>Strong match</strong>
+        <strong>Scroll mastered</strong>
         <span>{recognizedEvidence === 'exact'
           ? <>Both checks matched <b lang="zh-Hans">{round.targetText}</b>.</>
           : <>The voice comparison strongly matched <b lang="zh-Hans">{round.targetText}</b>.</>}</span>
       </> : outcome === 'close' ? <>
-        <strong>Close—try once more</strong>
+        <strong>The whisper is close—read again</strong>
         <span>{recognizedEvidence === 'exact' && !acousticMatchedTarget
           ? <>The word was recognized, but the voice pattern was closer to <b lang="zh-Hans">{acousticScore?.matchedText || 'another word'}</b>.</>
           : acousticMatchedTarget
             ? <>The voice pattern was closest to <b lang="zh-Hans">{round.targetText}</b>, but the evidence was not strong enough to pass.</>
             : <>The word was recognized, but a second audio check was unavailable.</>}</span>
       </> : outcome === 'retry' ? <>
-        <strong>Different word detected</strong>
+        <strong>A different word reached the scroll</strong>
         <span>{recording.transcript ? <>Browser heard: <b lang="zh-Hans">{recording.transcript}</b>. </> : null}Voice comparison was closest to <b lang="zh-Hans">{acousticScore?.matchedText}</b>; target: <b lang="zh-Hans">{round.targetText}</b>.</span>
       </> : <>
-        <strong>Couldn’t score this attempt</strong>
+        <strong>The scroll could not judge this echo</strong>
         <span>The recording did not provide enough reliable evidence. Check the microphone and try again.</span>
       </>}
-      {!scoring && <button className={passed ? 'lg-primary' : 'lg-incorrect'} type="button" onClick={() => onAssess(passed, `${outcome}:heard-${normalizeSpokenText(recording.transcript) || 'none'}:acoustic-${acousticScore?.matchedText || 'none'}`)}>{passed ? 'Continue' : 'Record again'}</button>}
+      {!scoring && <button className={passed ? 'lg-primary' : 'lg-incorrect'} type="button" onClick={() => onAssess(passed, `${outcome}:heard-${normalizeSpokenText(recording.transcript) || 'none'}:acoustic-${acousticScore?.matchedText || 'none'}`)}>{passed ? 'Open next scroll' : 'Read scroll again'}</button>}
     </div>}
   </div>
 }
@@ -633,12 +656,15 @@ export function ReadAloudBossRush({
     rounds={rounds}
     playAudio={playAudio}
     gameId="read-aloud-boss-rush"
-    defaultTitle="Read-Aloud Boss Rush"
-    defaultEyebrow="Tier 2 · Reading"
-    completionMessage="Every reading target is now mastered."
+    defaultTitle="Challenge of the Whispering Scrolls"
+    defaultEyebrow="Ninja reading trial"
+    completionMessage="Every whispering scroll is sealed. The dojo recognizes your reading voice."
     directResponse={renderResponse || defaultResponse}
     prompt={(round, controls) => briefingComplete ? <>
-      <div className="lg-boss-meter" aria-label={`${controls.total - controls.index} boss power segments remaining`}><span style={{ width: `${((controls.total - controls.index) / controls.total) * 100}%` }} /></div>
+      <div className="lg-scroll-progress" aria-label={`${controls.index} of ${controls.total} scrolls mastered`}>
+        <span><b style={{ width: `${(controls.index / controls.total) * 100}%` }} /></span>
+        <small>{controls.index}/{controls.total} scroll seals mastered</small>
+      </div>
       {renderCapture
         ? renderCapture(round, { onReady: controls.reveal })
         : <TimedReadAloudCapture key={round.id} round={round} onReady={controls.reveal} onCapture={saveRecording} meterAudioContext={meterAudioContextRef.current} />}

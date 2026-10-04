@@ -21,16 +21,18 @@ export function validProductionRounds(rounds: readonly ProductionGameRound[]) {
 
 export type AssessmentFeedback = 'correct' | 'incorrect'
 
-export function AutoAssessmentFeedback({ feedback, lastRound }: {
+export function AutoAssessmentFeedback({ feedback, lastRound, theme = 'default' }: {
   readonly feedback: AssessmentFeedback
   readonly lastRound: boolean
+  readonly theme?: 'default' | 'scrolls'
 }) {
+  const scrolls = theme === 'scrolls'
   return <div className={`lg-feedback is-${feedback} is-auto lg-assessment-feedback`} role="status">
     <div className="lg-feedback-energy" aria-hidden="true">{Array.from({ length: 10 }, (_, index) => <i key={index} />)}</div>
-    <span className="lg-feedback-emblem" aria-hidden="true">{feedback === 'correct' ? '✓' : '↻'}</span>
-    <strong>{feedback === 'correct' ? 'Target mastered!' : 'Learning moment — one more try.'}</strong>
-    <span className="lg-feedback-detail">{feedback === 'correct' ? 'Mastery +1' : 'This target stays in practice until it feels solid.'}</span>
-    <span className="lg-auto-status">{feedback === 'correct' ? lastRound ? 'Preparing your result…' : 'Next challenge coming up…' : 'Resetting for your retry…'}</span>
+    <span className="lg-feedback-emblem" aria-hidden="true">{feedback === 'correct' ? scrolls ? '印' : '✓' : '↻'}</span>
+    <strong>{feedback === 'correct' ? scrolls ? 'Scroll mastered!' : 'Target mastered!' : scrolls ? 'The scroll whispers—read it once more.' : 'Learning moment — one more try.'}</strong>
+    <span className="lg-feedback-detail">{feedback === 'correct' ? scrolls ? 'Your voice has sealed this scroll.' : 'Mastery +1' : scrolls ? 'Listen to the echo and steady your voice.' : 'This target stays in practice until it feels solid.'}</span>
+    <span className="lg-auto-status">{feedback === 'correct' ? lastRound ? scrolls ? 'The final seal is opening…' : 'Preparing your result…' : scrolls ? 'Unfurling the next scroll…' : 'Next challenge coming up…' : scrolls ? 'Rolling the scroll back for another reading…' : 'Resetting for your retry…'}</span>
   </div>
 }
 
@@ -81,6 +83,7 @@ export function ProductionRunner({
   const round = rounds[index]
   const valid = validProductionRounds(rounds)
   const complete = valid && index >= rounds.length
+  const scrollChallenge = gameId === 'read-aloud-boss-rush'
 
   useEffect(() => {
     if (!feedback) return
@@ -88,9 +91,11 @@ export function ProductionRunner({
       if (feedback === 'correct') setIndex((current) => current + 1)
       setRevealed(false)
       setFeedback(null)
-    }, feedback === 'correct' ? 1000 : 1900)
+    }, scrollChallenge
+      ? feedback === 'correct' ? 650 : 1250
+      : feedback === 'correct' ? 1000 : 1900)
     return () => window.clearTimeout(timer)
-  }, [feedback])
+  }, [feedback, scrollChallenge])
 
   function assess(correct: boolean, response = correct ? 'correct' : 'practice-again') {
     if (!round || feedback) return
@@ -118,13 +123,13 @@ export function ProductionRunner({
       message={completionMessage}
       onDone={() => onComplete(summary)}
     /> : round ? <section className={`lg-card lg-production-card lg-${gameId}`}>
-      <p className="lg-round-label">Prompt {index + 1} of {rounds.length}</p>
+      <p className="lg-round-label">{scrollChallenge ? 'Scroll' : 'Prompt'} {index + 1} of {rounds.length}</p>
       <div className="lg-stat-row">
-        <span><strong>{streak}</strong> momentum</span>
-        <span><strong>{bestStreak}</strong> best run</span>
+        <span><strong>{streak}</strong> {scrollChallenge ? 'scroll streak' : 'momentum'}</span>
+        <span><strong>{bestStreak}</strong> {scrollChallenge ? 'best focus' : 'best run'}</span>
       </div>
       {gameId === 'read-aloud-boss-rush' && <GameArtwork gameId={gameId} progress={index + (feedback === 'correct' ? 1 : 0)} total={rounds.length} />}
-      {feedback ? <AutoAssessmentFeedback feedback={feedback} lastRound={index + 1 === rounds.length} /> : !revealed ? prompt(round, {
+      {feedback ? <AutoAssessmentFeedback feedback={feedback} lastRound={index + 1 === rounds.length} theme={scrollChallenge ? 'scrolls' : 'default'} /> : !revealed ? prompt(round, {
         reveal: () => setRevealed(true),
         playAudio,
         index,

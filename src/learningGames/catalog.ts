@@ -67,9 +67,9 @@ export const LEARNING_GAME_CATALOG = [
   },
   {
     id: 'read-aloud-boss-rush',
-    title: 'Read-Aloud Boss Rush',
-    description: 'Read each Mandarin word aloud, compare it with the recorded model, and receive an automatic speech-match score.',
-    activityLabel: 'Speak aloud',
+    title: 'Challenge of the Whispering Scrolls',
+    description: 'Become a ninja reader: speak each Mandarin scroll aloud, compare echoes with the scroll keeper, and earn a voice-match seal.',
+    activityLabel: 'Read ninja scrolls',
     channels: ['tier-2-reading'],
     skills: ['reading'],
     inputKind: 'production',

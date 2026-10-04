@@ -4,7 +4,7 @@ import { resolve } from 'node:path'
 
 const outputDirectory = resolve('public/audio/read-aloud')
 const recordings = [
-  ['instructions', 'Read the word aloud. You have six seconds. Then listen to your recording and the model word.', 'Samantha', 170],
+  ['instructions', 'Unroll the scroll. Read the word aloud before the six-second whisper window closes. Then listen to your echo and the scroll keeper.', 'Samantha', 165],
   ['hello', '你好', 'Eddy (Chinese (China mainland))', 140],
   ['thanks', '谢谢', 'Eddy (Chinese (China mainland))', 140],
   ['goodbye', '再见', 'Eddy (Chinese (China mainland))', 140],
