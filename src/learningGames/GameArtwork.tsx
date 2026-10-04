@@ -131,15 +131,6 @@ function StrokeArt() {
   </svg>
 }
 
-function RescueArt() {
-  return <svg viewBox="0 0 420 150" role="presentation">
-    <path className="art-rescue-ground" d="M20 130h380" />
-    <g className="art-castle"><path d="M264 54h96v76h-96z" /><path d="M254 54V30h24v24m68 0V30h24v24" /><path d="M294 130V91q18-24 36 0v39" /><path d="M276 73h18m36 0h18" /></g>
-    <g className="art-rescue-star"><path d="m101 25 16 33 36 5-26 25 6 36-32-17-32 17 6-36-26-25 36-5z" /><circle cx="89" cy="72" r="4" /><circle cx="113" cy="72" r="4" /><path d="M89 88q12 10 24 0" /></g>
-    <path className="art-rescue-path" d="M140 108c42-30 69 27 117-5" />
-  </svg>
-}
-
 function ArtworkFor({ gameId }: { readonly gameId: LearningGameId }) {
   switch (gameId) {
     case 'speed-match': return <SpeedArt />
@@ -152,7 +143,6 @@ function ArtworkFor({ gameId }: { readonly gameId: LearningGameId }) {
     case 'dictation-streak': return <DictationArt />
     case 'speller-bee': return <DictationArt />
     case 'copy-hide-write-combo': return <StrokeArt />
-    case 'correction-rescue': return <RescueArt />
   }
 }
 
@@ -166,7 +156,6 @@ export function GameArtwork({ gameId, progress = 0, total = 3, compact = false }
     '--art-ship-shift': `${ratio * 34}px`,
     '--art-frog-shift': `${-110 + ratio * 220}px`,
     '--art-runner-shift': `${ratio * 115}px`,
-    '--art-rescue-shift': `${ratio * 135}px`,
     '--art-asteroid-opacity': 1 - ratio * .3,
     '--art-asteroid-scale': 1 - ratio * .12,
     '--art-boss-aura-opacity': 1 - ratio * .7,

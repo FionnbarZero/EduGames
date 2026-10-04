@@ -105,16 +105,6 @@ export const LEARNING_GAME_CATALOG = [
     inputKind: 'production',
     estimatedSeconds: [120, 240],
   },
-  {
-    id: 'correction-rescue',
-    title: 'Correction Rescue',
-    description: 'Copy the visible word three times, then type it once from memory.',
-    activityLabel: 'Correct and recall',
-    channels: ['tier-1-writing'],
-    skills: ['writing'],
-    inputKind: 'production',
-    estimatedSeconds: [60, 150],
-  },
 ] as const satisfies readonly LearningGameDefinition[]
 
 export function learningGameDefinition(id: LearningGameId) {

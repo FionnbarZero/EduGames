@@ -114,15 +114,6 @@
 .lg-phase-steps .is-current b { background: #6c4b9f; }
 .lg-phase-steps .is-complete { color: #36704a; background: #e4f2e7; }
 .lg-phase-steps .is-complete b { background: #5a9b70; }
-.lg-rescue-meter { display: flex; justify-content: center; gap: 9px; margin-bottom: 14px; }
-.lg-rescue-meter span { width: 45px; height: 12px; border-radius: 999px; background: #ded5e7; }
-.lg-rescue-meter span.is-complete { background: #66a87b; }
-.lg-rescue-scene { display: flex; align-items: end; justify-content: center; min-height: 72px; margin: 3px 0 12px; }
-.lg-rescue-scene > span { display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; color: #776a82; background: #ece6f0; font-size: 1.6rem; transition: transform 180ms ease, color 180ms ease, background 180ms ease; }
-.lg-rescue-scene > span.is-rescued { color: #8a6200; background: #ffe395; transform: translateY(-9px) rotate(8deg); }
-.lg-rescue-scene > div { display: flex; align-items: end; gap: 3px; margin-left: -8px; }
-.lg-rescue-scene i { display: block; width: 31px; height: 39px; border-radius: 5px 5px 2px 2px; background: #807288; box-shadow: inset 0 -5px rgb(0 0 0 / 10%); }
-.lg-rescue-scene i.is-cleared { visibility: hidden; }
 .lg-complete, .lg-empty { display: grid; place-items: center; align-content: center; }
 .lg-complete-mark { display: grid; place-items: center; width: 82px; height: 82px; margin-bottom: 17px; border-radius: 26px; color: #36734d; background: #dff2e4; }
 .lg-complete h2 { margin: 4px 0 9px; color: #5c3e91; font-size: 2.5rem; }

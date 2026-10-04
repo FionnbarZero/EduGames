@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { ArrowRight, BookOpen, Gamepad2, Headphones, Keyboard, RotateCcw, Sparkles } from 'lucide-react'
 import {
   ContextGapDash,
-  CorrectionRescue,
   DictationStreak,
   GameArtwork,
   LEARNING_GAME_CATALOG,
@@ -397,7 +396,6 @@ function GamePreview({ gameId, onExit, onComplete }: {
     case 'dictation-streak': return <DictationStreak {...shared} rounds={productionRounds} playAudio={playAudio} />
     case 'speller-bee': return <SpellerBee {...shared} rounds={spellingRounds} playAudio={playAudio} />
     case 'copy-hide-write-combo': return <StrokeOrderSlay {...shared} rounds={strokeOrderRounds} playAudio={playAudio} />
-    case 'correction-rescue': return <CorrectionRescue {...shared} rounds={productionRounds} playAudio={playAudio} />
   }
 }
 
@@ -433,7 +431,7 @@ export function App() {
         <h1>Pick a game.<br /><em>Start playing.</em></h1>
         <p className="hero-description">Practice Mandarin and English through matching, reading, listening, speaking, spelling, and writing. Every game gives you instant feedback as you play.</p>
         <div className="hero-meta">
-          <span><Gamepad2 size={16} /> 11 games</span>
+          <span><Gamepad2 size={16} /> 10 games</span>
           <span><BookOpen size={16} /> Reading</span>
           <span><Keyboard size={16} /> Writing</span>
           <span><Headphones size={16} /> Audio</span>
@@ -455,7 +453,7 @@ export function App() {
 
     <section className="catalog" aria-labelledby="catalog-title">
       <div className="section-heading">
-        <div><p className="eyebrow">11 ways to practice</p><h2 id="catalog-title">Choose your challenge</h2></div>
+        <div><p className="eyebrow">10 ways to practice</p><h2 id="catalog-title">Choose your challenge</h2></div>
         <p>Pick any game. Each one shows you what to do.</p>
       </div>
       <div className="game-grid">

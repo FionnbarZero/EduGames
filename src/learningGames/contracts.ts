@@ -11,7 +11,6 @@ export type LearningGameId =
   | 'dictation-streak'
   | 'speller-bee'
   | 'copy-hide-write-combo'
-  | 'correction-rescue'
 
 export type LearningGameChannel = 'tier-1-writing' | 'tier-2-reading'
 export type LearningGameSkill = 'writing' | 'reading' | 'receptive'
