@@ -25,6 +25,8 @@ export type {
   SelectionGameRound,
   SequenceGameRound,
   SequenceToken,
+  StrokeOrderGameRound,
+  StrokePoint,
 } from './contracts.ts'
 export {
   distinctGameIds,
@@ -47,5 +49,5 @@ export { LilyPadConstructGame } from './LilyPadConstructGame.tsx'
 export { ReadAloudBossRush } from './ReadAloudBossRush.tsx'
 export { DictationStreak } from './DictationStreak.tsx'
 export { SpellerBee } from './SpellerBee.tsx'
-export { CopyHideWriteCombo } from './CopyHideWriteCombo.tsx'
+export { StrokeOrderSlay, StrokeOrderSlay as CopyHideWriteCombo } from './StrokeOrderSlay.tsx'
 export { CorrectionRescue } from './CorrectionRescue.tsx'

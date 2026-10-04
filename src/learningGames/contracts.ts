@@ -70,6 +70,13 @@ export type ProductionGameRound = GamePrompt & {
   readonly instruction?: string
 }
 
+export type StrokePoint = readonly [x: number, y: number]
+
+export type StrokeOrderGameRound = GamePrompt & {
+  readonly meaning: string
+  readonly strokes: readonly (readonly StrokePoint[])[]
+}
+
 export type LearningGameAttempt = {
   readonly gameId: LearningGameId
   readonly promptId: string

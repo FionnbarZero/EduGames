@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { ArrowRight, BookOpen, Gamepad2, Headphones, Keyboard, RotateCcw, Sparkles } from 'lucide-react'
 import {
   ContextGapDash,
-  CopyHideWriteCombo,
   CorrectionRescue,
   DictationStreak,
   GameArtwork,
@@ -13,6 +12,7 @@ import {
   SentenceScramble,
   SpellerBee,
   SpeedMatch,
+  StrokeOrderSlay,
   TargetBlast,
   type ContextGameRound,
   type GamePair,
@@ -21,6 +21,7 @@ import {
   type ProductionGameRound,
   type SelectionGameRound,
   type SequenceGameRound,
+  type StrokeOrderGameRound,
 } from './learningGames/index.ts'
 
 const pairs: readonly GamePair[] = [
@@ -172,6 +173,37 @@ const spellingRounds: readonly ProductionGameRound[] = [
   { id: 'spelling-10', targetId: 'beautiful', targetText: 'beautiful', audioText: 'beautiful' },
 ]
 
+const strokeOrderRounds: readonly StrokeOrderGameRound[] = [
+  {
+    id: 'stroke-one', targetId: 'one', targetText: '一', meaning: 'one', audioText: '一',
+    strokes: [
+      [[18, 52], [32, 51], [48, 49], [66, 47], [82, 49]],
+    ],
+  },
+  {
+    id: 'stroke-two', targetId: 'two', targetText: '二', meaning: 'two', audioText: '二',
+    strokes: [
+      [[27, 35], [43, 34], [58, 32], [73, 33]],
+      [[17, 68], [35, 67], [55, 64], [72, 63], [84, 66]],
+    ],
+  },
+  {
+    id: 'stroke-three', targetId: 'three', targetText: '三', meaning: 'three', audioText: '三',
+    strokes: [
+      [[30, 25], [45, 24], [58, 22], [70, 24]],
+      [[28, 49], [43, 49], [58, 47], [70, 49]],
+      [[17, 73], [34, 73], [53, 70], [70, 69], [83, 73]],
+    ],
+  },
+  {
+    id: 'stroke-person', targetId: 'person', targetText: '人', meaning: 'person', audioText: '人',
+    strokes: [
+      [[53, 20], [52, 34], [47, 49], [38, 65], [27, 78], [18, 84]],
+      [[50, 43], [57, 54], [65, 65], [74, 75], [83, 81]],
+    ],
+  },
+]
+
 let speechRequestId = 0
 let speechStartTimer: number | undefined
 let settleActiveSpeech: (() => void) | undefined
@@ -200,6 +232,8 @@ const recordedLearningAudio: Readonly<Record<string, string>> = {
   '山': `${import.meta.env.BASE_URL}audio/mandarin/mountain.wav?v=2`,
   '月': `${import.meta.env.BASE_URL}audio/mandarin/moon.wav?v=2`,
   '一': `${import.meta.env.BASE_URL}audio/mandarin/one.wav?v=2`,
+  '二': `${import.meta.env.BASE_URL}audio/mandarin/two.wav?v=2`,
+  '三': `${import.meta.env.BASE_URL}audio/mandarin/three.wav?v=2`,
   '人': `${import.meta.env.BASE_URL}audio/mandarin/person.wav?v=2`,
   '好': `${import.meta.env.BASE_URL}audio/mandarin/good.wav?v=2`,
   '不好！': `${import.meta.env.BASE_URL}audio/mandarin/bu-hao.wav?v=2`,
@@ -362,7 +396,7 @@ function GamePreview({ gameId, onExit, onComplete }: {
     case 'read-aloud-boss-rush': return <ReadAloudBossRush {...shared} rounds={productionRounds} playAudio={playAudio} />
     case 'dictation-streak': return <DictationStreak {...shared} rounds={productionRounds} playAudio={playAudio} />
     case 'speller-bee': return <SpellerBee {...shared} rounds={spellingRounds} playAudio={playAudio} />
-    case 'copy-hide-write-combo': return <CopyHideWriteCombo {...shared} rounds={productionRounds} playAudio={playAudio} />
+    case 'copy-hide-write-combo': return <StrokeOrderSlay {...shared} rounds={strokeOrderRounds} playAudio={playAudio} />
     case 'correction-rescue': return <CorrectionRescue {...shared} rounds={productionRounds} playAudio={playAudio} />
   }
 }

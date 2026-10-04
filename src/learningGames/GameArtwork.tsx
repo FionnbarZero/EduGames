@@ -122,11 +122,12 @@ function DictationArt() {
   </svg>
 }
 
-function CopyArt() {
+function StrokeArt() {
   return <svg viewBox="0 0 420 150" role="presentation">
-    <g className="art-copy-book"><path d="M73 37q68-14 137 20v78q-69-34-137-20z" /><path d="M347 37q-68-14-137 20v78q69-34 137-20z" /><path d="M210 57v78" /></g>
-    <g className="art-copy-glyph"><rect x="166" y="17" width="88" height="82" rx="15" /><path d="M185 49h50m-25-20v50m-17-15h34" /></g>
-    <path className="art-copy-scan" d="M155 90h110" />
+    <g className="art-stroke-grid"><rect x="116" y="16" width="128" height="118" rx="8" /><path d="M180 17v116M117 75h126M117 17l126 116M243 17 117 133" /></g>
+    <g className="art-stroke-character"><path d="M183 34c-2 24-11 48-30 70-8 9-15 15-24 20" /><path d="M179 65c15 24 35 44 58 59" /></g>
+    <path className="art-stroke-brush" d="m278 25 45 27-55 66-28 14 5-31z" /><path className="art-stroke-brush-tip" d="m240 132 18-8-14-14z" />
+    <g className="art-stroke-sparks"><circle cx="329" cy="27" r="4" /><circle cx="342" cy="45" r="3" /><circle cx="304" cy="17" r="2" /></g>
   </svg>
 }
 
@@ -150,7 +151,7 @@ function ArtworkFor({ gameId }: { readonly gameId: LearningGameId }) {
     case 'read-aloud-boss-rush': return <BossArt />
     case 'dictation-streak': return <DictationArt />
     case 'speller-bee': return <DictationArt />
-    case 'copy-hide-write-combo': return <CopyArt />
+    case 'copy-hide-write-combo': return <StrokeArt />
     case 'correction-rescue': return <RescueArt />
   }
 }

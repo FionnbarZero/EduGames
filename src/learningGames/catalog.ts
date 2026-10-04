@@ -97,13 +97,13 @@ export const LEARNING_GAME_CATALOG = [
   },
   {
     id: 'copy-hide-write-combo',
-    title: 'Copy–Hide–Write Combo',
-    description: 'Copy the visible word once. When it disappears, type it again from memory.',
-    activityLabel: 'Copy and recall',
+    title: 'Stroke-order Slay',
+    description: 'Follow the animated stroke order, trace the character by touch, then hide it, write it, and compare.',
+    activityLabel: 'Trace and write',
     channels: ['tier-1-writing'],
     skills: ['writing'],
     inputKind: 'production',
-    estimatedSeconds: [60, 150],
+    estimatedSeconds: [120, 240],
   },
   {
     id: 'correction-rescue',
