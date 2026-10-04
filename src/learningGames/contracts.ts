@@ -105,7 +105,7 @@ export type RenderReadingCapture = (
 ) => ReactNode
 
 export type ReadingResponseControls = {
-  readonly onAssess: (correct: boolean) => void
+  readonly onAssess: (correct: boolean, response?: string) => void
   readonly index: number
   readonly total: number
 }

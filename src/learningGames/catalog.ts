@@ -68,7 +68,7 @@ export const LEARNING_GAME_CATALOG = [
   {
     id: 'read-aloud-boss-rush',
     title: 'Read-Aloud Boss Rush',
-    description: 'Read each Mandarin word aloud, hear the model, then mark how you did.',
+    description: 'Read each Mandarin word aloud, compare it with the recorded model, and receive an automatic speech-match score.',
     activityLabel: 'Speak aloud',
     channels: ['tier-2-reading'],
     skills: ['reading'],

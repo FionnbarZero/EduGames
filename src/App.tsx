@@ -165,6 +165,9 @@ let activeRecordedAudio: HTMLAudioElement | undefined
 let settleActiveRecording: (() => void) | undefined
 
 const recordedLearningAudio: Readonly<Record<string, string>> = {
+  '你好': `${import.meta.env.BASE_URL}audio/read-aloud/hello.wav?v=1`,
+  '谢谢': `${import.meta.env.BASE_URL}audio/read-aloud/thanks.wav?v=1`,
+  '再见': `${import.meta.env.BASE_URL}audio/read-aloud/goodbye.wav?v=1`,
   '猫': `${import.meta.env.BASE_URL}audio/mandarin/cat.wav?v=2`,
   '水': `${import.meta.env.BASE_URL}audio/mandarin/water.wav?v=2`,
   '大': `${import.meta.env.BASE_URL}audio/mandarin/big.wav?v=2`,

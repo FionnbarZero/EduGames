@@ -98,7 +98,7 @@ export function ProductionRunner({
       targetId: round.targetId,
       correct,
       response,
-      assessmentMode: gameId === 'dictation-streak' ? 'automatic' : 'self-assessment',
+      assessmentMode: 'automatic',
     }
     setAttempts((current) => [...current, attempt])
     const nextStreak = correct ? streak + 1 : 0
@@ -122,7 +122,7 @@ export function ProductionRunner({
         <span><strong>{bestStreak}</strong> best run</span>
       </div>
       {gameId === 'read-aloud-boss-rush' && <GameArtwork gameId={gameId} progress={index + (feedback === 'correct' ? 1 : 0)} total={rounds.length} />}
-      {feedback ? <AutoAssessmentFeedback feedback={feedback} lastRound={index + 1 === rounds.length} /> : directResponse ? directResponse(round, { onAssess: assess, index, total: rounds.length }) : !revealed ? prompt(round, {
+      {feedback ? <AutoAssessmentFeedback feedback={feedback} lastRound={index + 1 === rounds.length} /> : !revealed ? prompt(round, {
         reveal: () => setRevealed(true),
         playAudio,
         index,
@@ -130,7 +130,7 @@ export function ProductionRunner({
         streak,
         bestStreak,
         assess,
-      }) : <>
+      }) : directResponse ? directResponse(round, { onAssess: assess, index, total: rounds.length }) : <>
         <p className="lg-kicker">Compare with the target</p>
         <div className="lg-reveal-word" lang="zh-Hans">{round.targetText}</div>
         {playAudio && <button className="lg-audio" type="button" onClick={() => void playAudio(round.audioText || round.targetText)}><Volume2 size={20} /> Hear the model</button>}
