@@ -1,0 +1,11 @@
+name = "meghangames-edugames"
+compatibility_date = "2026-10-01"
+workers_dev = false
+preview_urls = false
+
+[[routes]]
+pattern = "edugames.meghangames.com"
+custom_domain = true
+
+[assets]
+directory = "./dist"
