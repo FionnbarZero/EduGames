@@ -23,8 +23,18 @@ npm test
 
 The test command verifies module import boundaries and asset ownership, rejects
 orphaned public files and TypeScript-extension imports, validates the checked-in
-audio recordings, runs strict TypeScript checks, and creates a production build
-in `dist/`.
+audio recordings, runs strict TypeScript checks, creates a production build,
+enforces bundle/image budgets, and runs Playwright gameplay, mobile-layout, keyboard,
+and accessibility checks in Chromium.
+
+The host stores versioned practice sessions in browser local storage. Completed and
+exited sessions remain distinct; continuing an exited session starts again at the
+first prompt while preserving earlier attempts as a separate record.
+
+The sample content is registered through a validated curriculum-pack contract in
+`src/gameCatalog/curriculum.ts`, including learner and target levels. Whispering
+Scrolls is explicitly marked as a safety preview until its pronunciation fixtures
+have broader learner calibration.
 
 Audio-generation scripts use the macOS `say` command. Generated recordings are
 checked in, so Linux CI and copied game modules do not need `say` at runtime.

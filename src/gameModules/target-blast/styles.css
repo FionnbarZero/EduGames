@@ -11,7 +11,7 @@
 .lg-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .lg-exit { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; cursor: pointer; }
 .lg-exit { padding: 9px 13px; border-radius: 999px; color: #5b5670; background: #efeaf6; font-size: .78rem; font-weight: 800; }
-.lg-progress { display: grid; gap: 6px; width: min(260px, 48vw); padding: 8px 12px 10px; border-radius: 15px; color: #4d3e63; background: #eee6f7; font-size: .68rem; font-weight: 850; }
+.lg-progress { display: grid; gap: 6px; width: min(260px, 48vw); padding: 8px 12px 10px; border-radius: 15px; color: #4d3e63; background: #eee6f7; font-size: .75rem; font-weight: 850; }
 .lg-progress > span { display: flex; align-items: center; gap: 6px; letter-spacing: .04em; text-transform: uppercase; }
 .lg-progress strong { margin-left: auto; font-size: .72rem; letter-spacing: 0; text-transform: none; }
 .lg-progress > i { display: block; height: 7px; overflow: hidden; border-radius: 999px; background: rgb(0 0 0 / 12%); }
@@ -210,7 +210,7 @@
 }
 .lg-active-playfield { position: relative; width: min(790px, 100%); min-height: 330px; overflow: hidden; margin: 14px auto 0; border: 1px solid rgb(var(--lg-accent-rgb) / 30%); border-radius: 29px; background: #070b1a; box-shadow: inset 0 0 70px rgb(0 0 0 / 40%), 0 18px 40px rgb(0 0 0 / 24%); isolation: isolate; }
 .lg-world-choice-grid { position: relative; z-index: 3; }
-.lg-world-choice { position: relative; min-width: 0; border: 0; color: white; cursor: pointer; font: inherit; font-size: clamp(1.45rem, 3.4vw, 2.3rem); font-weight: 900; }
+.lg-world-choice { position: relative; min-width: 0; border: 0; color: white; cursor: pointer; font: inherit; font-size: clamp(1.75rem, 3.4vw, 2.3rem); font-weight: 900; }
 .lg-world-choice:disabled { cursor: default; }
 .lg-world-choice > span { position: relative; z-index: 3; }
 .lg-impact-callout { position: absolute; z-index: 8; top: 50%; left: 50%; display: grid; gap: 2px; min-width: 220px; padding: 15px 23px; border: 2px solid; border-radius: 16px; translate: -50% -50%; rotate: -3deg; box-shadow: 0 18px 45px rgb(0 0 0 / 38%); text-align: center; pointer-events: none; }
@@ -355,9 +355,9 @@
 }
 .lg-journey-map { --journey-color: #69ead0; position: relative; width: min(790px,100%); margin: 10px auto 13px; padding: 11px 18px 15px; overflow: hidden; border: 1px solid color-mix(in srgb,var(--journey-color) 28%,transparent); border-radius: 19px; background: linear-gradient(135deg,rgb(255 255 255 / 5%),transparent 45%),#0a1020; box-shadow: inset 0 0 35px rgb(0 0 0 / 24%); }
 .lg-journey-map.is-target-blast { --journey-color: #ffb84f; background: radial-gradient(circle at 80% 20%,rgb(255 197 92 / 18%),transparent 170px),linear-gradient(180deg,#252034,#12131e); }
-.lg-journey-copy { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 9px; color: #8491aa; font-size: .59rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.lg-journey-copy { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 9px; color: #8491aa; font-size: .75rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
 .lg-journey-copy span:last-child { text-align: right; }
-.lg-journey-copy strong { color: var(--journey-color); font-size: .65rem; letter-spacing: .04em; }
+.lg-journey-copy strong { color: var(--journey-color); font-size: .75rem; letter-spacing: .04em; }
 .lg-journey-actor { position: absolute; z-index: 5; top: 8px; left: var(--journey-progress); display: block; width: 39px; height: 34px; translate: -50%; filter: drop-shadow(0 7px 7px rgb(0 0 0 / 40%)); transition: left 650ms cubic-bezier(.12,.82,.2,1); }
 .lg-journey-actor.is-target-blast { top: 2px; height: 43px; }
 .lg-journey-actor.is-target-blast i { position: absolute; z-index: 3; top: 0; left: 11px; width: 22px; aspect-ratio: 1; border: 2px solid #606982; border-radius: 50%; background: radial-gradient(ellipse at 50% 56%,#ffd85d 0 8%,#151a28 10% 100%); }
@@ -390,7 +390,7 @@
 .lg-training-posts { position: absolute; z-index: 3; inset: 0; }
 .lg-training-posts > i { position: absolute; bottom: 34px; left: var(--training-post-x); width: 7px; height: 28px; border-radius: 3px 3px 0 0; background: #61462d; translate: -50%; transition: background 260ms ease,box-shadow 260ms ease,scale 260ms ease; }
 .lg-training-posts > i::before { position: absolute; top: -4px; left: -8px; width: 23px; height: 7px; border-radius: 3px; background: inherit; content: ""; }
-.lg-training-posts > i > b { position: absolute; top: -21px; left: 50%; display: grid; place-items: center; width: 18px; aspect-ratio: 1; translate: -50%; border: 1px solid #745a3c; border-radius: 50%; color: #bda77f; background: #201c19; font-size: .48rem; font-style: normal; }
+.lg-training-posts > i > b { position: absolute; top: -21px; left: 50%; display: grid; place-items: center; width: 18px; aspect-ratio: 1; translate: -50%; border: 1px solid #745a3c; border-radius: 50%; color: #bda77f; background: #201c19; font-size: .75rem; font-style: normal; }
 .lg-training-posts > i.is-cleared { background: #e9b951; box-shadow: 0 0 13px #e8a93e; scale: 1.08; }
 .lg-training-posts > i.is-cleared > b { border-color: #ffe7a0; color: #34200d; background: #ffd46e; }
 .lg-training-field .lg-training-ninja { top: auto; bottom: 31px; left: var(--training-ninja-x); z-index: 6; scale: 1.8; filter: drop-shadow(0 6px 5px rgb(0 0 0 / 55%)) drop-shadow(0 0 7px rgb(255 190 76 / 24%)); transform-origin: center bottom; transition: left 900ms cubic-bezier(.16,.82,.2,1); }
@@ -457,12 +457,12 @@
   .lg-journey-map { padding-right: 10px; padding-left: 10px; }
   .lg-training-field { padding: 9px; }
   .lg-training-field .lg-journey-copy { grid-template-columns: 1fr auto 1fr; padding-bottom: 6px; }
-  .lg-training-field .lg-journey-copy strong { display: block; max-width: 120px; overflow: hidden; font-size: .55rem; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+  .lg-training-field .lg-journey-copy strong { display: block; max-width: 120px; overflow: hidden; font-size: .75rem; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
   .lg-training-viewport { height: 126px; }
   .lg-training-field .lg-training-ninja { bottom: 28px; scale: 1.48; }
   .lg-training-posts > i { bottom: 31px; }
   .lg-training-dojo { bottom: 34px; scale: .86; transform-origin: bottom; }
-  .lg-auto-prompt-status { max-width: 90%; font-size: .62rem; text-align: center; }
+  .lg-auto-prompt-status { max-width: 90%; font-size: .75rem; text-align: center; }
   .lg-journey-complete { grid-template-columns: 1fr; }
   .lg-finale-stage { min-height: 330px; }
   .lg-finale-copy { padding: 34px 20px 40px; }

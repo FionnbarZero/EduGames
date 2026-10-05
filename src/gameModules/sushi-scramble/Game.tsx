@@ -28,6 +28,7 @@ function SushiWord({
   className = '',
   disabled,
   position,
+  action = 'place',
   onClick,
 }: {
   readonly token: GameChoice
@@ -35,13 +36,14 @@ function SushiWord({
   readonly className?: string
   readonly disabled?: boolean
   readonly position: number
+  readonly action?: 'place' | 'remove'
   readonly onClick: () => void
 }) {
   return <button
     type="button"
     className={`lg-sushi-piece is-${type}${className ? ` ${className}` : ''}`}
     disabled={disabled}
-    aria-label={`Place ${token.label} in sentence position ${position}`}
+    aria-label={action === 'remove' ? `Remove ${token.label} from sentence position ${position}` : `Place ${token.label} in sentence position ${position}`}
     onClick={onClick}
   >
     <span className="lg-sushi-body" aria-hidden="true"><i /><b /></span>
@@ -166,7 +168,7 @@ export function SentenceScramble({
   }
 
   const summary = summarizeLearningGame('sentence-scramble', attempts)
-  return <LearningGameShell gameId="sentence-scramble" title={title} eyebrow={eyebrow} progress={`${Math.min(index + (correct ? 1 : 0), rounds.length)}/${rounds.length} mastered`} onExit={onExit}>
+  return <LearningGameShell gameId="sentence-scramble" title={title} eyebrow={eyebrow} progress={`${Math.min(index + (correct ? 1 : 0), rounds.length)}/${rounds.length} completed`} onExit={onExit}>
     {!valid ? <LearningGameEmpty onExit={onExit} /> : complete ? <LearningGameComplete
       summary={summary}
       message="You rebuilt every approved sentence."
@@ -209,6 +211,7 @@ export function SentenceScramble({
                 type={SUSHI_TYPES[tokenIndex % SUSHI_TYPES.length]}
                 className="is-plated"
                 position={position + 1}
+                action="remove"
                 disabled={checked || promptPlaying || Boolean(carryingId)}
                 onClick={() => remove(id)}
               /> : null
@@ -242,7 +245,7 @@ export function SentenceScramble({
       {checked && <div className={`lg-feedback is-${correct ? 'correct' : 'incorrect'} is-auto`} role="status">
         <strong>{correct ? 'Perfect order!' : 'That order needs another try.'}</strong>
         {!correct && <span className="lg-correction-line" lang="zh-Hans">{round.correctTokenIds.map((id) => round.tokens.find((token) => token.id === id)?.label).join(' ')}</span>}
-        <span className="lg-feedback-detail">{correct ? 'The chef approves. Mastery +1' : 'You’ll plate this same sentence again.'}</span>
+        <span className="lg-feedback-detail">{correct ? 'The chef approves. Correct answer' : 'You’ll plate this same sentence again.'}</span>
         <span className="lg-auto-status">{correct ? 'Next sushi order coming up…' : <><RotateCcw size={14} /> Clearing the plate for your retry…</>}</span>
       </div>}
     </section> : null}

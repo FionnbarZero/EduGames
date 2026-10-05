@@ -3,6 +3,7 @@ import { Headphones, PencilLine } from 'lucide-react'
 import type { LearningGameBaseProps, PlayLearningAudio, ProductionGameRound } from './runtime/contracts'
 import { ProductionRunner } from './runtime/ProductionGameShared'
 import { findCharacterCorrections, isCorrectCharacterAt, isExactPinyin, isPinyinPrefix, normalizePinyin } from './runtime/pinyin'
+import { validDictationRound } from './runtime/model'
 
 const HANZI_CHARACTER = /[\u3400-\u9fff]/u
 
@@ -55,15 +56,16 @@ function DictationConsole({ round, playAudio, streak, onAssess }: {
   const messageTimerRef = useRef<number | undefined>(undefined)
   const restartTimerRef = useRef<number | undefined>(undefined)
   const stepCandidates = useMemo(() => shuffledStepCandidates(round), [round])
+  const guidedPinyin = Boolean(round.pinyinSteps)
   const selectedCharacters = Array.from(answer).filter((character) => HANZI_CHARACTER.test(character)).join('')
   const pinyinInput = Array.from(answer).filter((character) => !HANZI_CHARACTER.test(character)).join('')
   const currentStepIndex = Array.from(selectedCharacters).length
   const currentStep = round.pinyinSteps?.[currentStepIndex]
   const candidates = stepCandidates[currentStepIndex] || []
   const showCandidates = Boolean(currentStep && isExactPinyin(pinyinInput, currentStep.pinyin))
-  const wordComplete = Boolean(round.pinyinSteps?.length)
-    && currentStepIndex === round.pinyinSteps?.length
-    && !pinyinInput.trim()
+  const wordComplete = guidedPinyin
+    ? currentStepIndex === round.pinyinSteps?.length && !pinyinInput.trim()
+    : selectedCharacters.length === Array.from(round.targetText.trim()).length && !pinyinInput.trim()
 
   async function speakWord() {
     setAudioError(false)
@@ -140,6 +142,7 @@ function DictationConsole({ round, playAudio, streak, onAssess }: {
   function updateAnswer(nextAnswer: string) {
     setAnswer(nextAnswer)
     if (composingRef.current || correctionPinyin || characterCorrection) return
+    if (!guidedPinyin) return
     const nextSelectedCharacters = Array.from(nextAnswer).filter((character) => HANZI_CHARACTER.test(character)).join('')
     const nextPinyinInput = Array.from(nextAnswer).filter((character) => !HANZI_CHARACTER.test(character)).join('')
     const nextStep = round.pinyinSteps?.[Array.from(nextSelectedCharacters).length]
@@ -180,7 +183,7 @@ function DictationConsole({ round, playAudio, streak, onAssess }: {
     <button className="lg-audio" type="button" onClick={() => void speakWord()}><Headphones size={20} /> Replay transmission</button>
     {audioError && <p className="lg-audio-error" role="alert">The word could not play. Press Replay transmission to try again.</p>}
     <label className="lg-answer-terminal">
-      <span>Type Pinyin, then choose the characters</span>
+      <span>{guidedPinyin ? 'Type Pinyin, then choose the characters' : 'Type the Chinese characters'}</span>
       <input
         ref={inputRef}
         value={answer}
@@ -195,7 +198,7 @@ function DictationConsole({ round, playAudio, streak, onAssess }: {
         autoCapitalize="none"
         spellCheck={false}
         lang="zh-Hans"
-        placeholder="Start typing Pinyin"
+        placeholder={guidedPinyin ? 'Start typing Pinyin' : 'Use your Chinese keyboard'}
         disabled={Boolean(correctionPinyin || characterCorrection)}
       />
       <i aria-hidden="true" />
@@ -205,9 +208,11 @@ function DictationConsole({ round, playAudio, streak, onAssess }: {
       <div>{candidates.map((candidate) => <button key={candidate} type="button" role="option" aria-selected={answer === candidate} onClick={() => selectCandidate(candidate)}>{candidate}</button>)}</div>
     </div>}
     {spellingMessage && <p className="lg-spelling-alert" role="alert">{spellingMessage}</p>}
-    {!wordComplete && <p className="lg-pinyin-hint">{currentStepIndex
-      ? `Character ${currentStepIndex} selected. Type the next Pinyin syllable.`
-      : 'Type the first Pinyin syllable. Choose one character at a time.'}</p>}
+    {!wordComplete && <p className="lg-pinyin-hint">{guidedPinyin
+      ? currentStepIndex
+        ? `Character ${currentStepIndex} selected. Type the next Pinyin syllable.`
+        : 'Type the first Pinyin syllable. Choose one character at a time.'
+      : 'Use a Chinese keyboard to enter the complete word.'}</p>}
     {wordComplete && <p className="lg-pinyin-hint is-complete">Word assembled. Check the characters when you are ready.</p>}
     <button className="lg-primary lg-launch-answer" type="submit" disabled={!wordComplete}><PencilLine size={18} /> Check characters</button>
     {correctionPinyin && <div className="lg-pinyin-correction-backdrop" role="alert" aria-live="assertive">
@@ -244,7 +249,9 @@ export function DictationStreak({
     gameId="dictation-streak"
     defaultTitle="Dictation Streak"
     defaultEyebrow="Tier 1 · Writing"
-    completionMessage="Every writing target is now mastered."
+    completionMessage="Every writing target is complete."
+    validateRound={validDictationRound}
+    invalidContentMessage="Each guided Dictation prompt needs one valid Pinyin step per Chinese character. Prompts without Pinyin steps remain available for direct Chinese-keyboard entry."
     feedbackAnswer={(round) => <span className="lg-dictation-answer-key"><b lang="zh-Hans">{round.targetText}</b>{round.pinyinText && <><i aria-hidden="true">·</i><span lang="zh-Latn-pinyin">{round.pinyinText}</span></>}</span>}
     incorrectFeedback={(round, response) => <WrongCharacterCard response={response} target={round.targetText} />}
     incorrectFeedbackDuration={2800}

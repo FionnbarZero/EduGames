@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Flag, Headphones } from 'lucide-react'
 import Phaser from 'phaser'
 import type {
@@ -31,12 +31,12 @@ const AREA_NAMES = [
 ]
 const START_Y = 582
 const POND_ASSETS = {
-  night: new URL('./assets/moonlit-marsh-v2.png', import.meta.url).href,
-  waterfall: new URL('./assets/waterfall-gardens-v2.png', import.meta.url).href,
-  sunset: new URL('./assets/enchanted-pond.png', import.meta.url).href,
-  scoutIdle: new URL('./assets/scout-frog.png', import.meta.url).href,
-  scoutCrouch: new URL('./assets/scout-crouch-v2.png', import.meta.url).href,
-  scoutCelebrate: new URL('./assets/scout-celebrate-v2.png', import.meta.url).href,
+  night: new URL('./assets/moonlit-marsh-v2.webp', import.meta.url).href,
+  waterfall: new URL('./assets/waterfall-gardens-v2.webp', import.meta.url).href,
+  sunset: new URL('./assets/enchanted-pond.webp', import.meta.url).href,
+  scoutIdle: new URL('./assets/scout-frog.webp', import.meta.url).href,
+  scoutCrouch: new URL('./assets/scout-crouch-v2.webp', import.meta.url).href,
+  scoutCelebrate: new URL('./assets/scout-celebrate-v2.webp', import.meta.url).href,
 } as const
 
 type FeedbackState = null | {
@@ -47,6 +47,7 @@ type FeedbackState = null | {
 
 type PondSceneOptions = {
   readonly rounds: readonly SelectionGameRound[]
+  readonly reducedMotion: boolean
   readonly playAudio?: PlayLearningAudio
   readonly onAttempt: (roundIndex: number, choiceId: string, correct: boolean) => void
   readonly onProgress: (completed: number, correct: number, streak: number, bestStreak: number) => void
@@ -91,6 +92,19 @@ class LilyPondScene extends Phaser.Scene {
   constructor(options: PondSceneOptions) {
     super({ key: 'LilyPondVerticalSlice' })
     this.options = options
+  }
+
+  private addMotionTween(config: Phaser.Types.Tweens.TweenBuilderConfig) {
+    if (this.options.reducedMotion && config.repeat === -1) return
+    this.tweens.add(this.options.reducedMotion
+      ? { ...config, duration: 1, delay: 0, repeat: 0, yoyo: false }
+      : config)
+  }
+
+  private addMotionCounter(config: Phaser.Types.Tweens.NumberTweenBuilderConfig) {
+    this.tweens.addCounter(this.options.reducedMotion
+      ? { ...config, duration: 1, delay: 0, repeat: 0, yoyo: false }
+      : config)
   }
 
   preload() {
@@ -139,7 +153,7 @@ class LilyPondScene extends Phaser.Scene {
     this.options.registerChoiceHandler((choiceIndex) => this.choosePad(choiceIndex))
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.options.registerChoiceHandler(null))
 
-    this.game.canvas.setAttribute('aria-label', 'Lily-Pad Path. Help Scout cross ten changing pond areas by choosing one of three lily-pad answers.')
+    this.game.canvas.setAttribute('aria-label', `Lily-Pad Path. Help Scout cross ${this.options.rounds.length} changing pond areas by choosing one of three lily-pad answers.`)
     this.game.canvas.setAttribute('tabindex', '0')
     this.renderRound()
   }
@@ -158,7 +172,7 @@ class LilyPondScene extends Phaser.Scene {
         index % 3 === 0 ? 0xffe4a3 : 0xb9f8ff,
         Phaser.Math.FloatBetween(0.07, 0.2),
       ).setDepth(5)
-      this.tweens.add({
+      this.addMotionTween({
         targets: shimmer,
         scaleX: { from: 0.45, to: 1.35 },
         alpha: { from: 0.04, to: 0.2 },
@@ -284,8 +298,8 @@ class LilyPondScene extends Phaser.Scene {
     const highlight = this.add.ellipse(x - 22, y - 10, 122, 32, 0xc9ffa9, 0.18).setDepth(16)
     const notch = this.add.triangle(x + 72, y - 4, 0, 0, 34, -15, 34, 15, 0x174a45, 1).setDepth(17)
     this.roundObjects.push(ripple, shadow, pad, highlight, notch)
-    this.tweens.add({ targets: [shadow, pad, highlight, notch], y: '+=5', duration: 1600, repeat: -1, yoyo: true, ease: 'Sine.easeInOut' })
-    this.tweens.add({ targets: ripple, scaleX: 1.3, scaleY: 1.2, alpha: { from: 0.48, to: 0 }, duration: 1750, repeat: -1, ease: 'Sine.easeOut' })
+    this.addMotionTween({ targets: [shadow, pad, highlight, notch], y: '+=5', duration: 1600, repeat: -1, yoyo: true, ease: 'Sine.easeInOut' })
+    this.addMotionTween({ targets: ripple, scaleX: 1.3, scaleY: 1.2, alpha: { from: 0.48, to: 0 }, duration: 1750, repeat: -1, ease: 'Sine.easeOut' })
   }
 
   private createAnswerPad(
@@ -298,7 +312,7 @@ class LilyPondScene extends Phaser.Scene {
       .setStrokeStyle(3, 0xa8efff, 0.36)
       .setDepth(13)
     this.roundObjects.push(ripple)
-    this.tweens.add({ targets: ripple, scaleX: 1.25, scaleY: 1.12, alpha: { from: 0.4, to: 0 }, duration: 1500 + index * 190, repeat: -1 })
+    this.addMotionTween({ targets: ripple, scaleX: 1.25, scaleY: 1.12, alpha: { from: 0.4, to: 0 }, duration: 1500 + index * 190, repeat: -1 })
 
     const container = this.add.container(position.x, position.y).setDepth(20).setRotation(position.rotation)
     const shadow = this.add.ellipse(0, 22, 226, 72, 0x052832, 0.52)
@@ -333,17 +347,17 @@ class LilyPondScene extends Phaser.Scene {
     container.on('pointerover', () => {
       if (!this.acceptingInput) return
       glow.setFillStyle(0xd9ff9f, 0.34)
-      this.tweens.add({ targets: container, scale: 1.075, duration: 140, ease: 'Back.easeOut' })
+      this.addMotionTween({ targets: container, scale: 1.075, duration: 140, ease: 'Back.easeOut' })
     })
     container.on('pointerout', () => {
       if (!this.acceptingInput) return
       glow.setFillStyle(0xb8ffbf, 0.07)
-      this.tweens.add({ targets: container, scale: 1, duration: 130 })
+      this.addMotionTween({ targets: container, scale: 1, duration: 130 })
     })
     container.on('pointerdown', () => this.choosePad(index))
     container.setAlpha(0).setScale(0.68)
-    this.tweens.add({ targets: container, alpha: 1, scale: 1, duration: 470, delay: 90 + index * 110, ease: 'Back.easeOut' })
-    this.tweens.add({ targets: container, y: position.y + 8, duration: 1400 + index * 170, delay: index * 120, repeat: -1, yoyo: true, ease: 'Sine.easeInOut' })
+    this.addMotionTween({ targets: container, alpha: 1, scale: 1, duration: 470, delay: 90 + index * 110, ease: 'Back.easeOut' })
+    this.addMotionTween({ targets: container, y: position.y + 8, duration: 1400 + index * 170, delay: index * 120, repeat: -1, yoyo: true, ease: 'Sine.easeInOut' })
     this.roundObjects.push(container)
 
     return { container, glow, plate, label, choiceId, choiceLabel }
@@ -399,7 +413,7 @@ class LilyPondScene extends Phaser.Scene {
         Phaser.Math.FloatBetween(0.25, 0.82),
       ).setDepth(11).setBlendMode(Phaser.BlendModes.ADD)
       this.roundObjects.push(firefly)
-      this.tweens.add({
+      this.addMotionTween({
         targets: firefly,
         x: firefly.x + Phaser.Math.Between(-38, 38),
         y: firefly.y + Phaser.Math.Between(-30, 30),
@@ -423,7 +437,7 @@ class LilyPondScene extends Phaser.Scene {
         Phaser.Math.FloatBetween(0.025, 0.1),
       ).setDepth(10)
       this.roundObjects.push(mist)
-      this.tweens.add({ targets: mist, x: mist.x + Phaser.Math.Between(60, 150), alpha: 0, duration: Phaser.Math.Between(2400, 4200), repeat: -1 })
+      this.addMotionTween({ targets: mist, x: mist.x + Phaser.Math.Between(60, 150), alpha: 0, duration: Phaser.Math.Between(2400, 4200), repeat: -1 })
     }
   }
 
@@ -438,7 +452,7 @@ class LilyPondScene extends Phaser.Scene {
         Phaser.Math.FloatBetween(0.4, 0.85),
       ).setDepth(12).setRotation(Phaser.Math.FloatBetween(0, Math.PI))
       this.roundObjects.push(petal)
-      this.tweens.add({
+      this.addMotionTween({
         targets: petal,
         x: petal.x + Phaser.Math.Between(-55, 65),
         y: petal.y + Phaser.Math.Between(65, 145),
@@ -461,7 +475,7 @@ class LilyPondScene extends Phaser.Scene {
         Phaser.Math.FloatBetween(0.12, 0.34),
       ).setDepth(12).setRotation(-0.12)
       this.roundObjects.push(drop)
-      this.tweens.add({ targets: drop, x: drop.x - 38, y: drop.y + 175, alpha: 0, duration: Phaser.Math.Between(650, 1100), delay: Phaser.Math.Between(0, 500), repeat: -1 })
+      this.addMotionTween({ targets: drop, x: drop.x - 38, y: drop.y + 175, alpha: 0, duration: Phaser.Math.Between(650, 1100), delay: Phaser.Math.Between(0, 500), repeat: -1 })
     }
   }
 
@@ -475,7 +489,7 @@ class LilyPondScene extends Phaser.Scene {
         0.72,
       ).setDepth(12).setBlendMode(Phaser.BlendModes.ADD)
       this.roundObjects.push(light)
-      this.tweens.add({ targets: light, y: light.y - Phaser.Math.Between(55, 125), scale: 1.8, alpha: 0, duration: Phaser.Math.Between(1800, 3100), delay: index * 120, repeat: -1, ease: 'Sine.easeOut' })
+      this.addMotionTween({ targets: light, y: light.y - Phaser.Math.Between(55, 125), scale: 1.8, alpha: 0, duration: Phaser.Math.Between(1800, 3100), delay: index * 120, repeat: -1, ease: 'Sine.easeOut' })
     }
   }
 
@@ -531,12 +545,12 @@ class LilyPondScene extends Phaser.Scene {
     if (safePad) {
       safePad.glow.setFillStyle(0xdcff91, 0.7)
       safePad.plate.setFillStyle(0x79df82, 1)
-      this.tweens.add({ targets: safePad.container, scale: 1.08, duration: 220, repeat: 2, yoyo: true })
+      this.addMotionTween({ targets: safePad.container, scale: 1.08, duration: 220, repeat: 2, yoyo: true })
     }
 
     this.options.onFeedback({ correct: false, answer: safeAnswer, message: `Splash. ${safeAnswer} is the safe route; Scout is recovering automatically.` })
     this.showCallout(chosenPad.container.x, chosenPad.container.y - 122, 'SPLASH!', `SAFE ROUTE  →  ${safeAnswer}`, false)
-    this.cameras.main.shake(220, 0.004)
+    if (!this.options.reducedMotion) this.cameras.main.shake(220, 0.004)
     const waterX = chosenPad.container.x + 22
     const waterY = Math.min(658, chosenPad.container.y + 92)
 
@@ -595,7 +609,7 @@ class LilyPondScene extends Phaser.Scene {
     }).setOrigin(0.5)
     container.add([panel, heading, detail]).setAlpha(0).setScale(0.72)
     this.roundObjects.push(container)
-    this.tweens.add({ targets: container, alpha: 1, scale: 1, y: y - 10, duration: 360, ease: 'Back.easeOut' })
+    this.addMotionTween({ targets: container, alpha: 1, scale: 1, y: y - 10, duration: 360, ease: 'Back.easeOut' })
   }
 
   private jumpFrogTo(targetX: number, targetY: number, dive: boolean, onComplete: () => void) {
@@ -607,7 +621,7 @@ class LilyPondScene extends Phaser.Scene {
     this.setFrogPose('crouch')
     const crouchScaleX = this.frog.scaleX
     const crouchScaleY = this.frog.scaleY
-    this.tweens.add({
+    this.addMotionTween({
       targets: this.frog,
       scaleX: crouchScaleX * 1.1,
       scaleY: crouchScaleY * 0.78,
@@ -620,7 +634,7 @@ class LilyPondScene extends Phaser.Scene {
         const flightScaleY = this.frog.scaleY
         const controlX = (startX + targetX) / 2
         const controlY = Math.min(startY, targetY) - (dive ? 128 : 205)
-        this.tweens.addCounter({
+        this.addMotionCounter({
           from: 0,
           to: 1,
           duration: dive ? 650 : 780,
@@ -646,7 +660,7 @@ class LilyPondScene extends Phaser.Scene {
             this.frogShadow.setPosition(targetX, targetY + 14).setScale(1).setAlpha(0.45)
             const baseX = this.frog.scaleX
             const baseY = this.frog.scaleY
-            this.tweens.add({
+            this.addMotionTween({
               targets: this.frog,
               scaleX: baseX * 1.16,
               scaleY: baseY * 0.78,
@@ -696,13 +710,13 @@ class LilyPondScene extends Phaser.Scene {
     const hopCycles = distance > 900 ? 6 : 4
 
     this.instructionText.setText(`TRAVELING TO ${AREA_NAMES[nextIndex].toUpperCase()}…`)
-    this.pads.forEach((pad) => this.tweens.add({ targets: pad.container, alpha: 0.18, duration: 350 }))
+    this.pads.forEach((pad) => this.addMotionTween({ targets: pad.container, alpha: 0.18, duration: 350 }))
     this.setFrogPose('idle')
     const baseScaleX = this.frog.scaleX
     const baseScaleY = this.frog.scaleY
     this.createTravelTrail(startX, targetX, startY)
 
-    this.tweens.addCounter({
+    this.addMotionCounter({
       from: 0,
       to: 1,
       duration: travelDuration,
@@ -726,7 +740,7 @@ class LilyPondScene extends Phaser.Scene {
         this.setFrogPose('idle')
         this.frog.setPosition(targetX, START_Y).setRotation(0)
         this.frogShadow.setPosition(targetX, START_Y + 14).setScale(1).setAlpha(0.46)
-        if (nextIndex === 4 || nextIndex === 7) this.cameras.main.flash(420, 196, 250, 226, false)
+        if (nextIndex === 4 || nextIndex === 7) if (!this.options.reducedMotion) this.cameras.main.flash(420, 196, 250, 226, false)
         this.renderRound()
       },
     })
@@ -735,7 +749,7 @@ class LilyPondScene extends Phaser.Scene {
   private createTravelTrail(startX: number, endX: number, y: number) {
     for (let index = 0; index < 16; index += 1) {
       const mote = this.add.circle(startX, y - 20, index % 4 === 0 ? 5 : 3, index % 2 ? 0xffdf78 : 0x8ff4c5, 0.85).setDepth(30)
-      this.tweens.add({
+      this.addMotionTween({
         targets: mote,
         x: Phaser.Math.Linear(startX, endX, index / 15) + Phaser.Math.Between(-30, 30),
         y: y - Phaser.Math.Between(20, 130),
@@ -759,17 +773,17 @@ class LilyPondScene extends Phaser.Scene {
     this.options.onFeedback(null)
     this.areaText.setText('DESTINATION  ·  CELEBRATION SHORE')
     this.promptText.setText('Scout reached Celebration Shore!')
-    this.instructionText.setText('TEN RESPONSES  ·  SAFE PASSAGE COMPLETE')
+    this.instructionText.setText(`${this.options.rounds.length} RESPONSES  ·  SAFE PASSAGE COMPLETE`)
     this.pads.forEach((pad) => pad.container.disableInteractive())
-    const destinationX = AREA_SCROLL[JOURNEY_LENGTH - 1] + 1100
+    const destinationX = AREA_SCROLL[Math.max(0, this.options.rounds.length - 1)] + 1100
     const destinationY = 565
 
     this.jumpFrogTo(destinationX, destinationY, false, () => {
       this.setFrogPose('celebrate')
       this.frog.setPosition(destinationX, destinationY - 8)
       this.frogShadow.setPosition(destinationX, destinationY + 14).setScale(1.18)
-      this.tweens.add({ targets: this.frog, y: destinationY - 26, rotation: -0.04, duration: 520, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' })
-      this.cameras.main.flash(480, 255, 232, 152, false)
+      this.addMotionTween({ targets: this.frog, y: destinationY - 26, rotation: -0.04, duration: 520, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' })
+      if (!this.options.reducedMotion) this.cameras.main.flash(480, 255, 232, 152, false)
       playGameSound('victory')
       this.createSparkBurst(destinationX, destinationY - 85, 0xffdc62)
       this.createSparkBurst(destinationX, destinationY - 55, 0x8ef0c4)
@@ -813,7 +827,7 @@ class LilyPondScene extends Phaser.Scene {
   private createRewardOrbit(x: number, y: number, colors: readonly [number, number]) {
     for (let index = 0; index < 9; index += 1) {
       const orb = this.add.circle(x, y - 25, 5, colors[index % 2], 0.95).setDepth(56).setBlendMode(Phaser.BlendModes.ADD)
-      this.tweens.add({
+      this.addMotionTween({
         targets: orb,
         x: x + Math.cos((Math.PI * 2 * index) / 9) * 105,
         y: y - 55 + Math.sin((Math.PI * 2 * index) / 9) * 62,
@@ -831,7 +845,7 @@ class LilyPondScene extends Phaser.Scene {
       const note = this.add.text(x + Phaser.Math.Between(-110, 110), y, index % 3 === 0 ? '♫' : '♪', {
         fontFamily: 'Georgia, serif', fontSize: `${Phaser.Math.Between(24, 42)}px`, color: index % 2 ? '#fff2a3' : '#a8ffd5',
       }).setOrigin(0.5).setDepth(58)
-      this.tweens.add({ targets: note, x: note.x + Phaser.Math.Between(-35, 35), y: y - Phaser.Math.Between(115, 215), rotation: Phaser.Math.FloatBetween(-0.4, 0.4), alpha: 0, duration: 1250, delay: index * 90, ease: 'Sine.easeOut', onComplete: () => note.destroy() })
+      this.addMotionTween({ targets: note, x: note.x + Phaser.Math.Between(-35, 35), y: y - Phaser.Math.Between(115, 215), rotation: Phaser.Math.FloatBetween(-0.4, 0.4), alpha: 0, duration: 1250, delay: index * 90, ease: 'Sine.easeOut', onComplete: () => note.destroy() })
     }
   }
 
@@ -839,7 +853,7 @@ class LilyPondScene extends Phaser.Scene {
     for (let index = 0; index < 18; index += 1) {
       const angle = (Math.PI * 2 * index) / 18
       const petal = this.add.ellipse(x, y - 28, 12, 6, colors[index % 2], 0.96).setDepth(59).setRotation(angle)
-      this.tweens.add({ targets: petal, x: x + Math.cos(angle) * Phaser.Math.Between(85, 165), y: y - 35 + Math.sin(angle) * Phaser.Math.Between(60, 120), rotation: angle + 4, alpha: 0, duration: 1000, delay: index * 25, ease: 'Cubic.easeOut', onComplete: () => petal.destroy() })
+      this.addMotionTween({ targets: petal, x: x + Math.cos(angle) * Phaser.Math.Between(85, 165), y: y - 35 + Math.sin(angle) * Phaser.Math.Between(60, 120), rotation: angle + 4, alpha: 0, duration: 1000, delay: index * 25, ease: 'Cubic.easeOut', onComplete: () => petal.destroy() })
     }
   }
 
@@ -847,7 +861,7 @@ class LilyPondScene extends Phaser.Scene {
     for (let index = 0; index < 16; index += 1) {
       const angle = (Math.PI * 2 * index) / 16
       const ray = this.add.rectangle(x, y - 42, 7, 46, index % 2 ? 0xffd364 : 0xff9e73, 0.82).setDepth(55).setRotation(angle)
-      this.tweens.add({ targets: ray, x: x + Math.sin(angle) * 150, y: y - 42 - Math.cos(angle) * 115, scaleY: 0.2, alpha: 0, duration: 920, delay: index * 22, ease: 'Cubic.easeOut', onComplete: () => ray.destroy() })
+      this.addMotionTween({ targets: ray, x: x + Math.sin(angle) * 150, y: y - 42 - Math.cos(angle) * 115, scaleY: 0.2, alpha: 0, duration: 920, delay: index * 22, ease: 'Cubic.easeOut', onComplete: () => ray.destroy() })
     }
   }
 
@@ -857,7 +871,7 @@ class LilyPondScene extends Phaser.Scene {
       const halo = this.add.circle(0, 0, 22, index % 3 === 0 ? 0xff9db8 : 0xffc85a, 0.24).setBlendMode(Phaser.BlendModes.ADD)
       const light = this.add.circle(0, 0, 8, index % 3 === 0 ? 0xffb6ca : 0xffe998, 1)
       lantern.add([halo, light])
-      this.tweens.add({ targets: lantern, y: y - Phaser.Math.Between(110, 220), alpha: 0, duration: 1350, delay: index * 75, onComplete: () => lantern.destroy() })
+      this.addMotionTween({ targets: lantern, y: y - Phaser.Math.Between(110, 220), alpha: 0, duration: 1350, delay: index * 75, onComplete: () => lantern.destroy() })
     }
   }
 
@@ -868,7 +882,7 @@ class LilyPondScene extends Phaser.Scene {
     const eye = this.add.circle(10, -3, 2, 0x112533, 1)
     fish.add([tail, body, eye]).setAlpha(0)
     this.roundObjects.push(fish)
-    this.tweens.add({
+    this.addMotionTween({
       targets: fish,
       alpha: { from: 0, to: 1 },
       x: x + (reward ? Phaser.Math.Between(70, 120) : -80),
@@ -911,7 +925,7 @@ class LilyPondScene extends Phaser.Scene {
   private createLandingRipple(x: number, y: number, color: number) {
     for (let index = 0; index < 3; index += 1) {
       const ripple = this.add.ellipse(x, y, 72, 22, color, 0).setStrokeStyle(4, color, 0.72).setDepth(25).setScale(0.25)
-      this.tweens.add({ targets: ripple, scaleX: 2.4, scaleY: 1.6, alpha: 0, duration: 760, delay: index * 100, onComplete: () => ripple.destroy() })
+      this.addMotionTween({ targets: ripple, scaleX: 2.4, scaleY: 1.6, alpha: 0, duration: 760, delay: index * 100, onComplete: () => ripple.destroy() })
     }
   }
 
@@ -919,7 +933,7 @@ class LilyPondScene extends Phaser.Scene {
     for (let index = 0; index < 18; index += 1) {
       const angle = (Math.PI * 2 * index) / 18
       const spark = this.add.circle(x, y, index % 4 === 0 ? 6 : 3, color, 0.96).setDepth(63)
-      this.tweens.add({
+      this.addMotionTween({
         targets: spark,
         x: x + Math.cos(angle) * Phaser.Math.Between(75, 155),
         y: y + Math.sin(angle) * Phaser.Math.Between(50, 115),
@@ -938,7 +952,7 @@ class LilyPondScene extends Phaser.Scene {
       const droplet = this.add.circle(x, y, Phaser.Math.Between(3, 7), index % 3 ? 0xa5f4ff : 0xffffff, 0.92).setDepth(60)
       const direction = Phaser.Math.FloatBetween(-1.02, -2.12)
       const distance = Phaser.Math.Between(55, 145)
-      this.tweens.add({
+      this.addMotionTween({
         targets: droplet,
         x: x + Math.cos(direction) * distance,
         y: y + Math.sin(direction) * distance,
@@ -962,7 +976,7 @@ class LilyPondScene extends Phaser.Scene {
         Phaser.Utils.Array.GetRandom(colors),
         0.94,
       ).setDepth(120).setRotation(Phaser.Math.FloatBetween(0, Math.PI))
-      this.tweens.add({
+      this.addMotionTween({
         targets: piece,
         y: GAME_HEIGHT + 70,
         x: piece.x + Phaser.Math.Between(-110, 110),
@@ -989,7 +1003,7 @@ export function LilyPadPath({
   rounds,
   playAudio,
   title = 'Lily-Pad Path',
-  eyebrow = 'A ten-crossing storybook pond adventure',
+  eyebrow,
   onExit,
   onAttempt,
   onComplete,
@@ -997,7 +1011,7 @@ export function LilyPadPath({
   readonly rounds: readonly SelectionGameRound[]
   readonly playAudio?: PlayLearningAudio
 }) {
-  const playableRounds = useMemo(() => rounds.slice(0, JOURNEY_LENGTH), [rounds])
+  const playableRounds = rounds
   const hostRef = useRef<HTMLDivElement>(null)
   const attemptsRef = useRef<LearningGameAttempt[]>([])
   const choiceHandlerRef = useRef<((choiceIndex: number) => void) | null>(null)
@@ -1009,7 +1023,9 @@ export function LilyPadPath({
   const [roundIndex, setRoundIndex] = useState(0)
   const [feedback, setFeedback] = useState<FeedbackState>(null)
   const [finished, setFinished] = useState(false)
-  const valid = validSelectionRounds(playableRounds) && playableRounds.every((round) => round.choices.length >= 3)
+  const valid = playableRounds.length <= JOURNEY_LENGTH
+    && validSelectionRounds(playableRounds)
+    && playableRounds.every((round) => round.choices.length >= 3)
   const hasAudio = Boolean(playAudio)
 
   useEffect(() => {
@@ -1039,6 +1055,7 @@ export function LilyPadPath({
     if (!valid || !hostRef.current) return
     const scene = new LilyPondScene({
       rounds: playableRounds,
+      reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
       playAudio: hasAudio ? playLearningAudio : undefined,
       onAttempt: handleAttempt,
       onProgress: (nextCompleted, nextCorrect, nextStreak, nextBest) => {
@@ -1077,11 +1094,11 @@ export function LilyPadPath({
   return <LearningGameShell
     gameId="lily-pad-path"
     title={title}
-    eyebrow={eyebrow}
+    eyebrow={eyebrow || `A ${playableRounds.length}-crossing storybook pond adventure`}
     progress={`${completed}/${playableRounds.length} crossings`}
     onExit={onExit}
   >
-    {!valid ? <LearningGameEmpty onExit={onExit} /> : <section className="lg-phaser-lily-card" style={stageStyle}>
+    {!valid ? <LearningGameEmpty onExit={onExit} message={`Lily-Pad Path requires 1–${JOURNEY_LENGTH} rounds with at least three choices each.`} /> : <section className="lg-phaser-lily-card" style={stageStyle}>
       <div className="lg-phaser-meta" aria-live="polite">
         <span><strong>{correct}</strong> first-try landings</span>
         <span><strong>{streak}</strong> momentum</span>
@@ -1095,6 +1112,7 @@ export function LilyPadPath({
       </div>
       {!finished && <div className="lg-mobile-pad-choices" role="group" aria-label="Touch-friendly lily-pad choices">
         {currentRound?.choices.slice(0, 3).map((choice, index) => <button key={choice.id} type="button" disabled={busy} onClick={() => choiceHandlerRef.current?.(index)}><small>{index + 1}</small><strong>{choice.label}</strong></button>)}
+        <span className="lg-mobile-feedback" role="status">{feedback?.message}</span>
       </div>}
       <div className="lg-canvas-access" role="group" aria-label="Lily-pad answer choices">
         <span role="status">{feedback?.message}</span>

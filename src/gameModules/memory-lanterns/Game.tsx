@@ -15,7 +15,7 @@ export function MemoryFlip({
   onAttempt,
   onComplete,
 }: PairGameProps) {
-  const characterPairs = useMemo(() => pairs.slice(0, 5).map((pair) => ({
+  const characterPairs = useMemo(() => pairs.map((pair) => ({
     ...pair,
     left: { ...pair.left, id: `${pair.left.id}:copy-one` },
     right: { ...pair.left, id: `${pair.left.id}:copy-two` },
@@ -92,7 +92,7 @@ export function MemoryFlip({
       <div className="lg-mission-banner"><span>Lantern festival</span><strong>Find each character’s exact twin</strong></div>
       <p className="lg-instruction">Tap a lantern to reveal and hear its character, then find the identical character.</p>
       <div className="lg-stat-row">
-        <span><strong>{matchedPairIds.length}/5</strong> pairs glowing</span>
+        <span><strong>{matchedPairIds.length}/{characterPairs.length}</strong> pairs glowing</span>
         <span><strong>{attempts.length}</strong> turns</span>
       </div>
       <div className="lg-lantern-courtyard">

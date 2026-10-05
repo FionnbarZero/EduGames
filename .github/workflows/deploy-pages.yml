@@ -27,6 +27,8 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Install browser for gameplay tests
+        run: npx playwright install --with-deps chromium
       - name: Test and build
         run: npm test
       - name: Configure Pages

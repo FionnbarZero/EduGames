@@ -11,7 +11,7 @@
 .lg-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .lg-exit { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; cursor: pointer; }
 .lg-exit { padding: 9px 13px; border-radius: 999px; color: #5b5670; background: #efeaf6; font-size: .78rem; font-weight: 800; }
-.lg-progress { display: grid; gap: 6px; width: min(260px, 48vw); padding: 8px 12px 10px; border-radius: 15px; color: #4d3e63; background: #eee6f7; font-size: .68rem; font-weight: 850; }
+.lg-progress { display: grid; gap: 6px; width: min(260px, 48vw); padding: 8px 12px 10px; border-radius: 15px; color: #4d3e63; background: #eee6f7; font-size: .75rem; font-weight: 850; }
 .lg-progress > span { display: flex; align-items: center; gap: 6px; letter-spacing: .04em; text-transform: uppercase; }
 .lg-progress strong { margin-left: auto; font-size: .72rem; letter-spacing: 0; text-transform: none; }
 .lg-progress > i { display: block; height: 7px; overflow: hidden; border-radius: 999px; background: rgb(0 0 0 / 12%); }
@@ -202,7 +202,7 @@
   .lg-card { min-height: calc(100vh - 175px); border-radius: 27px; }
 }
 .lg-mission-banner { display: grid; justify-items: center; gap: 5px; margin: 2px auto 16px; }
-.lg-mission-banner span { color: var(--lg-accent); font-size: .64rem; font-weight: 950; letter-spacing: .18em; text-transform: uppercase; }
+.lg-mission-banner span { color: var(--lg-accent); font-size: .75rem; font-weight: 950; letter-spacing: .18em; text-transform: uppercase; }
 .lg-mission-banner strong { color: #f8f9ff; font-size: clamp(1.35rem, 3vw, 2.05rem); font-weight: 950; letter-spacing: -.035em; }
 .lg-active-playfield + .lg-feedback { width: min(620px, 100%); min-height: 82px; margin: 14px auto 0; padding: 10px 16px; }
 .lg-shuriken-timeout .lg-primary { margin-top: 15px; color: #29170d; background: linear-gradient(135deg,#ffe27a,#ff925c); }
@@ -247,10 +247,10 @@
 .lg-lantern-card > span::before { position: absolute; inset: 5px 13px; border-right: 2px solid rgb(255 224 153 / 22%); border-left: 2px solid rgb(255 224 153 / 22%); border-radius: 46%; content: ""; }
 .lg-lantern-card > span::after { position: absolute; top: 10px; bottom: 10px; left: 50%; width: 1px; background: rgb(255 226 155 / 18%); content: ""; }
 .lg-lantern-card .lg-card-back { opacity: 1; color: #ffe39a; background: radial-gradient(circle at 50% 43%,#e86a3d,#bd302e 66%,#7b1e2b); box-shadow: inset 8px 0 15px rgb(83 12 27 / 29%),inset -8px 0 15px rgb(83 12 27 / 29%),0 0 17px rgb(255 107 48 / 36%); }
-.lg-lantern-card .lg-card-back b { position: absolute; top: 9px; left: 50%; translate: -50%; color: rgb(255 234 175 / 72%); font-size: .58rem; }
-.lg-lantern-card .lg-card-back i { color: #ffe7a2; font-size: 1.55rem; font-style: normal; font-weight: 850; text-shadow: 0 0 10px rgb(255 223 126 / 55%); }
+.lg-lantern-card .lg-card-back b { position: absolute; top: 9px; left: 50%; translate: -50%; color: rgb(255 234 175 / 72%); font-size: .75rem; }
+.lg-lantern-card .lg-card-back i { color: #ffe7a2; font-size: 1.75rem; font-style: normal; font-weight: 850; text-shadow: 0 0 10px rgb(255 223 126 / 55%); }
 .lg-lantern-card span > em { position: absolute; top: calc(100% + 11px); left: 50%; width: 3px; height: 23px; translate: -50%; background: #d8a045; box-shadow: -5px 4px 0 -1px #b86e34,5px 4px 0 -1px #b86e34; content: ""; }
-.lg-lantern-card .lg-card-face { opacity: 0; color: #3b1716; background: radial-gradient(circle at 50% 43%,#fff2b2,#ffc85d 66%,#e07136); box-shadow: inset 8px 0 17px rgb(186 59 23 / 23%),inset -8px 0 17px rgb(186 59 23 / 23%),0 0 31px rgb(255 194 71 / 75%); font-size: clamp(1rem,2.3vw,1.55rem); transform: scale(.9); }
+.lg-lantern-card .lg-card-face { opacity: 0; color: #3b1716; background: radial-gradient(circle at 50% 43%,#fff2b2,#ffc85d 66%,#e07136); box-shadow: inset 8px 0 17px rgb(186 59 23 / 23%),inset -8px 0 17px rgb(186 59 23 / 23%),0 0 31px rgb(255 194 71 / 75%); font-size: clamp(1rem,2.3vw,1.75rem); transform: scale(.9); }
 .lg-lantern-card .lg-card-face b { position: relative; z-index: 2; padding: 4px; line-height: 1.05; text-align: center; text-wrap: balance; }
 .lg-lantern-card .lg-card-face i { position: absolute; inset: 8px 17px; border: 1px solid rgb(122 44 24 / 28%); border-radius: 48%; }
 .lg-lantern-card:hover:not(:disabled) { border-color: transparent; transform: translateY(-5px); }

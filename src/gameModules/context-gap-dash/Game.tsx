@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import { Flag, Volume2 } from 'lucide-react'
 import Phaser from 'phaser'
 import type {
@@ -32,12 +32,12 @@ const AREA_NAMES = [
 ]
 const START_Y = 606
 const DASH_ASSETS = {
-  riverfront: new URL('./assets/riverfront-dawn-v1.png', import.meta.url).href,
-  skybridge: new URL('./assets/rain-skybridge-v1.png', import.meta.url).href,
-  stadium: new URL('./assets/victory-stadium-v1.png', import.meta.url).href,
-  ready: new URL('./assets/kai-ready-v1.png', import.meta.url).href,
-  sprint: new URL('./assets/kai-sprint-v1.png', import.meta.url).href,
-  celebrate: new URL('./assets/kai-celebrate-v1.png', import.meta.url).href,
+  riverfront: new URL('./assets/riverfront-dawn-v1.webp', import.meta.url).href,
+  skybridge: new URL('./assets/rain-skybridge-v1.webp', import.meta.url).href,
+  stadium: new URL('./assets/victory-stadium-v1.webp', import.meta.url).href,
+  ready: new URL('./assets/kai-ready-v1.webp', import.meta.url).href,
+  sprint: new URL('./assets/kai-sprint-v1.webp', import.meta.url).href,
+  celebrate: new URL('./assets/kai-celebrate-v1.webp', import.meta.url).href,
 } as const
 
 type FeedbackState = null | {
@@ -48,6 +48,7 @@ type FeedbackState = null | {
 
 type DashSceneOptions = {
   readonly rounds: readonly ContextGameRound[]
+  readonly reducedMotion: boolean
   readonly onAttempt: (roundIndex: number, choiceId: string, correct: boolean) => void
   readonly onProgress: (completed: number, correct: number, streak: number, bestStreak: number) => void
   readonly onRoundChange: (roundIndex: number) => void
@@ -96,6 +97,19 @@ class ContextDashScene extends Phaser.Scene {
     this.options = options
   }
 
+  private addMotionTween(config: Phaser.Types.Tweens.TweenBuilderConfig) {
+    if (this.options.reducedMotion && config.repeat === -1) return
+    this.tweens.add(this.options.reducedMotion
+      ? { ...config, duration: 1, delay: 0, repeat: 0, yoyo: false }
+      : config)
+  }
+
+  private addMotionCounter(config: Phaser.Types.Tweens.NumberTweenBuilderConfig) {
+    this.tweens.addCounter(this.options.reducedMotion
+      ? { ...config, duration: 1, delay: 0, repeat: 0, yoyo: false }
+      : config)
+  }
+
   preload() {
     this.load.image('dash-riverfront', DASH_ASSETS.riverfront)
     this.load.image('dash-skybridge', DASH_ASSETS.skybridge)
@@ -137,7 +151,7 @@ class ContextDashScene extends Phaser.Scene {
     this.options.registerChoiceHandler((choiceIndex) => this.chooseGate(choiceIndex))
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.options.registerChoiceHandler(null))
 
-    this.game.canvas.setAttribute('aria-label', 'Context Gap Dash. Listen to the Mandarin sentence, hover over a gate to hear its word, then guide Kai through the best answer.')
+    this.game.canvas.setAttribute('aria-label', `Context Gap Dash with ${this.options.rounds.length} gates. Listen to the Mandarin sentence, hover over a gate to hear its word, then guide Kai through the best answer.`)
     this.game.canvas.setAttribute('tabindex', '0')
     this.renderRound()
   }
@@ -149,7 +163,7 @@ class ContextDashScene extends Phaser.Scene {
   private createTrackGlints() {
     for (let x = 90; x < WORLD_WIDTH; x += 235) {
       const dash = this.add.rectangle(x, 650, 105, 4, 0xffffff, 0.14).setDepth(4).setRotation(-0.015)
-      this.tweens.add({ targets: dash, alpha: { from: 0.06, to: 0.24 }, duration: 1400 + (x % 900), repeat: -1, yoyo: true })
+      this.addMotionTween({ targets: dash, alpha: { from: 0.06, to: 0.24 }, duration: 1400 + (x % 900), repeat: -1, yoyo: true })
     }
   }
 
@@ -226,7 +240,7 @@ class ContextDashScene extends Phaser.Scene {
     const ring = this.add.ellipse(x, y + 16, 126, 37, 0x6ff1d6, 0).setStrokeStyle(3, 0x91f8e2, 0.48).setDepth(13)
     const line = this.add.rectangle(x - 56, y + 16, 8, 76, 0xffffff, 0.6).setDepth(12).setRotation(Math.PI / 2)
     this.roundObjects.push(ring, line)
-    this.tweens.add({ targets: ring, scaleX: 1.5, scaleY: 1.3, alpha: 0, duration: 1350, repeat: -1, ease: 'Sine.easeOut' })
+    this.addMotionTween({ targets: ring, scaleX: 1.5, scaleY: 1.3, alpha: 0, duration: 1350, repeat: -1, ease: 'Sine.easeOut' })
   }
 
   private createGate(choiceId: string, choiceLabel: string, index: number, position: { x: number; y: number; rotation: number }): GateView {
@@ -255,17 +269,17 @@ class ContextDashScene extends Phaser.Scene {
       this.options.onChoicePreview(choiceLabel)
       if (!this.acceptingInput) return
       glow.setFillStyle(0xa4ffe9, 0.34)
-      this.tweens.add({ targets: container, scale: 1.065, duration: 140, ease: 'Back.easeOut' })
+      this.addMotionTween({ targets: container, scale: 1.065, duration: 140, ease: 'Back.easeOut' })
     })
     container.on('pointerout', () => {
       if (!this.acceptingInput) return
       glow.setFillStyle(0x65ecd2, 0.08)
-      this.tweens.add({ targets: container, scale: 1, duration: 130 })
+      this.addMotionTween({ targets: container, scale: 1, duration: 130 })
     })
     container.on('pointerdown', () => this.chooseGate(index))
     container.setAlpha(0).setScale(0.7)
-    this.tweens.add({ targets: container, alpha: 1, scale: 1, duration: 470, delay: 80 + index * 105, ease: 'Back.easeOut' })
-    this.tweens.add({ targets: chevrons, x: 9, alpha: { from: 0.28, to: 0.88 }, duration: 820 + index * 90, repeat: -1, yoyo: true })
+    this.addMotionTween({ targets: container, alpha: 1, scale: 1, duration: 470, delay: 80 + index * 105, ease: 'Back.easeOut' })
+    this.addMotionTween({ targets: chevrons, x: 9, alpha: { from: 0.28, to: 0.88 }, duration: 820 + index * 90, repeat: -1, yoyo: true })
     this.roundObjects.push(container)
 
     return { container, frame, glow, barrier, panel, label, choiceId, choiceLabel }
@@ -330,13 +344,13 @@ class ContextDashScene extends Phaser.Scene {
     this.paintGate(chosenGate, false)
     if (safeGate) {
       this.paintGate(safeGate, true)
-      this.tweens.add({ targets: safeGate.container, scale: 1.07, duration: 220, repeat: 2, yoyo: true })
+      this.addMotionTween({ targets: safeGate.container, scale: 1.07, duration: 220, repeat: 2, yoyo: true })
     }
     this.options.onFeedback({ correct: false, answer: safeAnswer, message: 'Barrier hit. The safe gate is highlighted and Kai will reroute automatically.' })
     this.showCallout(chosenGate.container.x, chosenGate.container.y - 184, 'BARRIER!', 'SAFE GATE  →  ' + safeAnswer, false)
 
     this.runRunnerTo(chosenGate.container.x - 102, chosenGate.container.y + 10, 650, () => {
-      this.cameras.main.shake(240, 0.006)
+      if (!this.options.reducedMotion) this.cameras.main.shake(240, 0.006)
       this.createBarrierImpact(chosenGate.container.x - 62, chosenGate.container.y - 49)
       this.setRunnerPose('ready')
       this.time.delayedCall(650, () => {
@@ -364,8 +378,8 @@ class ContextDashScene extends Phaser.Scene {
   }
 
   private openGate(gate: GateView) {
-    this.tweens.add({ targets: gate.barrier, alpha: 0, scaleY: 0.08, duration: 320, ease: 'Cubic.easeIn' })
-    this.tweens.add({ targets: gate.glow, scaleX: 1.45, scaleY: 1.4, alpha: 0, duration: 680, ease: 'Sine.easeOut' })
+    this.addMotionTween({ targets: gate.barrier, alpha: 0, scaleY: 0.08, duration: 320, ease: 'Cubic.easeIn' })
+    this.addMotionTween({ targets: gate.glow, scaleX: 1.45, scaleY: 1.4, alpha: 0, duration: 680, ease: 'Sine.easeOut' })
   }
 
   private runRunnerTo(targetX: number, targetY: number, duration: number, onComplete: () => void) {
@@ -379,7 +393,7 @@ class ContextDashScene extends Phaser.Scene {
     const baseScaleY = this.runner.scaleY
     this.createSpeedTrail(startX, targetX, startY)
 
-    this.tweens.addCounter({
+    this.addMotionCounter({
       from: 0, to: 1, duration, ease: 'Sine.easeInOut',
       onUpdate: (tween) => {
         const progress = tween.getValue() || 0
@@ -430,13 +444,13 @@ class ContextDashScene extends Phaser.Scene {
     const travelDuration = Math.min(2300, 1200 + distance * 0.72)
 
     this.instructionText.setText('RACING TO ' + AREA_NAMES[nextIndex].toUpperCase() + '…')
-    this.gates.forEach((gate) => this.tweens.add({ targets: gate.container, alpha: 0.12, duration: 320 }))
+    this.gates.forEach((gate) => this.addMotionTween({ targets: gate.container, alpha: 0.12, duration: 320 }))
     this.setRunnerPose('sprint')
     const baseScaleX = this.runner.scaleX
     const baseScaleY = this.runner.scaleY
     this.createSpeedTrail(startX, targetX, startY)
 
-    this.tweens.addCounter({
+    this.addMotionCounter({
       from: 0, to: 1, duration: travelDuration, ease: 'Sine.easeInOut',
       onUpdate: (tween) => {
         const progress = tween.getValue() || 0
@@ -455,7 +469,7 @@ class ContextDashScene extends Phaser.Scene {
         this.setRunnerPose('ready')
         this.runner.setPosition(targetX, START_Y)
         this.runnerShadow.setPosition(targetX, START_Y + 8).setScale(1)
-        if (nextIndex === 4 || nextIndex === 7) this.cameras.main.flash(420, 145, 245, 225, false)
+        if (nextIndex === 4 || nextIndex === 7) if (!this.options.reducedMotion) this.cameras.main.flash(420, 145, 245, 225, false)
         this.renderRound()
       },
     })
@@ -469,17 +483,17 @@ class ContextDashScene extends Phaser.Scene {
     this.options.onFeedback(null)
     this.areaText.setText('DESTINATION  ·  VICTORY STADIUM')
     this.sentenceText.setText('Kai crossed the championship finish!')
-    this.instructionText.setText('TEN SENTENCES  ·  VICTORY ROUTE COMPLETE')
+    this.instructionText.setText(`${this.options.rounds.length} SENTENCES  ·  VICTORY ROUTE COMPLETE`)
     this.gates.forEach((gate) => gate.container.disableInteractive())
-    const destinationX = AREA_SCROLL[JOURNEY_LENGTH - 1] + 1115
+    const destinationX = AREA_SCROLL[Math.max(0, this.options.rounds.length - 1)] + 1115
     const destinationY = 598
 
     this.runRunnerTo(destinationX, destinationY, 880, () => {
       this.setRunnerPose('celebrate')
       this.runner.setPosition(destinationX, destinationY - 8)
       this.runnerShadow.setPosition(destinationX, destinationY + 8).setScale(1.15)
-      this.tweens.add({ targets: this.runner, y: destinationY - 27, rotation: -0.025, duration: 520, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' })
-      this.cameras.main.flash(520, 255, 226, 124, false)
+      this.addMotionTween({ targets: this.runner, y: destinationY - 27, rotation: -0.025, duration: 520, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' })
+      if (!this.options.reducedMotion) this.cameras.main.flash(520, 255, 226, 124, false)
       playGameSound('victory')
       this.createSpeedBurst(destinationX, destinationY - 85, 0xffda62)
       this.createSpeedBurst(destinationX, destinationY - 52, 0x72efcf)
@@ -507,7 +521,7 @@ class ContextDashScene extends Phaser.Scene {
       const angle = (Math.PI * 2 * index) / 16
       const spark = this.add.rectangle(x, y - 42, index % 3 === 0 ? 9 : 5, index % 3 === 0 ? 22 : 11, colors[index % 2], 0.94)
         .setDepth(60).setRotation(angle)
-      this.tweens.add({
+      this.addMotionTween({
         targets: spark,
         x: x + Math.cos(angle) * Phaser.Math.Between(75, 160),
         y: y - 45 + Math.sin(angle) * Phaser.Math.Between(55, 125),
@@ -531,7 +545,7 @@ class ContextDashScene extends Phaser.Scene {
     const detail = this.add.text(0, 18, subtitle, { fontFamily: KAITI_SC_FONT, fontSize: '13px', fontStyle: 'normal', color: '#345144', letterSpacing: 1 }).setOrigin(0.5)
     container.add([panel, heading, detail]).setAlpha(0).setScale(0.72)
     this.roundObjects.push(container)
-    this.tweens.add({ targets: container, alpha: 1, scale: 1, y: safeY - 10, duration: 360, ease: 'Back.easeOut' })
+    this.addMotionTween({ targets: container, alpha: 1, scale: 1, y: safeY - 10, duration: 360, ease: 'Back.easeOut' })
   }
 
   private createAreaDetails(areaIndex: number, scrollX: number) {
@@ -556,7 +570,7 @@ class ContextDashScene extends Phaser.Scene {
       const mote = this.add.circle(scrollX + Phaser.Math.Between(40, GAME_WIDTH - 40), Phaser.Math.Between(210, 665), Phaser.Math.Between(2, 5), color, Phaser.Math.FloatBetween(0.25, 0.8))
         .setDepth(11).setBlendMode(Phaser.BlendModes.ADD)
       this.roundObjects.push(mote)
-      this.tweens.add({ targets: mote, x: mote.x + Phaser.Math.Between(-36, 55), y: mote.y + Phaser.Math.Between(-40, 26), alpha: { from: 0.16, to: 0.92 }, duration: Phaser.Math.Between(1300, 2700), repeat: -1, yoyo: true })
+      this.addMotionTween({ targets: mote, x: mote.x + Phaser.Math.Between(-36, 55), y: mote.y + Phaser.Math.Between(-40, 26), alpha: { from: 0.16, to: 0.92 }, duration: Phaser.Math.Between(1300, 2700), repeat: -1, yoyo: true })
     }
   }
 
@@ -565,7 +579,7 @@ class ContextDashScene extends Phaser.Scene {
       const petal = this.add.ellipse(scrollX + Phaser.Math.Between(30, GAME_WIDTH - 30), Phaser.Math.Between(190, 620), Phaser.Math.Between(7, 13), Phaser.Math.Between(3, 7), index % 2 ? 0xffb4c9 : 0xffe8a0, Phaser.Math.FloatBetween(0.38, 0.82))
         .setDepth(12).setRotation(Phaser.Math.FloatBetween(0, Math.PI))
       this.roundObjects.push(petal)
-      this.tweens.add({ targets: petal, x: petal.x + Phaser.Math.Between(-45, 80), y: petal.y + Phaser.Math.Between(70, 150), rotation: petal.rotation + Phaser.Math.FloatBetween(2, 5), alpha: 0.05, duration: Phaser.Math.Between(2500, 4500), repeat: -1 })
+      this.addMotionTween({ targets: petal, x: petal.x + Phaser.Math.Between(-45, 80), y: petal.y + Phaser.Math.Between(70, 150), rotation: petal.rotation + Phaser.Math.FloatBetween(2, 5), alpha: 0.05, duration: Phaser.Math.Between(2500, 4500), repeat: -1 })
     }
   }
 
@@ -574,7 +588,7 @@ class ContextDashScene extends Phaser.Scene {
       const drop = this.add.rectangle(scrollX + Phaser.Math.Between(20, GAME_WIDTH - 20), Phaser.Math.Between(175, 650), 2, Phaser.Math.Between(16, 34), 0xd7f7ff, Phaser.Math.FloatBetween(0.14, 0.38))
         .setDepth(12).setRotation(-0.1)
       this.roundObjects.push(drop)
-      this.tweens.add({ targets: drop, x: drop.x - 38, y: drop.y + 190, alpha: 0, duration: Phaser.Math.Between(620, 1050), delay: Phaser.Math.Between(0, 550), repeat: -1 })
+      this.addMotionTween({ targets: drop, x: drop.x - 38, y: drop.y + 190, alpha: 0, duration: Phaser.Math.Between(620, 1050), delay: Phaser.Math.Between(0, 550), repeat: -1 })
     }
   }
 
@@ -582,14 +596,14 @@ class ContextDashScene extends Phaser.Scene {
     for (let index = 0; index < count; index += 1) {
       const streak = this.add.rectangle(scrollX + Phaser.Math.Between(60, GAME_WIDTH - 60), Phaser.Math.Between(250, 655), Phaser.Math.Between(45, 120), 3, color, Phaser.Math.FloatBetween(0.08, 0.3)).setDepth(11)
       this.roundObjects.push(streak)
-      this.tweens.add({ targets: streak, x: streak.x + Phaser.Math.Between(90, 220), alpha: 0, duration: Phaser.Math.Between(900, 1800), delay: index * 55, repeat: -1 })
+      this.addMotionTween({ targets: streak, x: streak.x + Phaser.Math.Between(90, 220), alpha: 0, duration: Phaser.Math.Between(900, 1800), delay: index * 55, repeat: -1 })
     }
   }
 
   private createSpeedTrail(startX: number, endX: number, y: number) {
     for (let index = 0; index < 18; index += 1) {
       const trail = this.add.rectangle(startX - 20, y - Phaser.Math.Between(25, 145), Phaser.Math.Between(24, 70), 3, index % 2 ? 0x77edd4 : 0xffd671, 0.72).setDepth(29)
-      this.tweens.add({ targets: trail, x: Phaser.Math.Linear(startX, endX, index / 17) - Phaser.Math.Between(25, 80), alpha: 0, scaleX: 0.2, duration: 650, delay: index * 38, onComplete: () => trail.destroy() })
+      this.addMotionTween({ targets: trail, x: Phaser.Math.Linear(startX, endX, index / 17) - Phaser.Math.Between(25, 80), alpha: 0, scaleX: 0.2, duration: 650, delay: index * 38, onComplete: () => trail.destroy() })
     }
   }
 
@@ -597,7 +611,7 @@ class ContextDashScene extends Phaser.Scene {
     for (let index = 0; index < 24; index += 1) {
       const angle = (Math.PI * 2 * index) / 24
       const shard = this.add.triangle(x, y, 0, -8, 6, 6, -6, 6, index % 2 ? 0xff9a66 : 0xffdc9d, 0.94).setDepth(63).setRotation(angle)
-      this.tweens.add({ targets: shard, x: x + Math.cos(angle) * Phaser.Math.Between(45, 125), y: y + Math.sin(angle) * Phaser.Math.Between(35, 100), rotation: angle + 4, alpha: 0, duration: 720, ease: 'Cubic.easeOut', onComplete: () => shard.destroy() })
+      this.addMotionTween({ targets: shard, x: x + Math.cos(angle) * Phaser.Math.Between(45, 125), y: y + Math.sin(angle) * Phaser.Math.Between(35, 100), rotation: angle + 4, alpha: 0, duration: 720, ease: 'Cubic.easeOut', onComplete: () => shard.destroy() })
     }
   }
 
@@ -605,7 +619,7 @@ class ContextDashScene extends Phaser.Scene {
     for (let index = 0; index < 20; index += 1) {
       const angle = (Math.PI * 2 * index) / 20
       const ray = this.add.rectangle(x, y, 6, Phaser.Math.Between(28, 66), color, 0.9).setDepth(62).setRotation(angle)
-      this.tweens.add({ targets: ray, x: x + Math.sin(angle) * Phaser.Math.Between(60, 145), y: y - Math.cos(angle) * Phaser.Math.Between(45, 115), scaleY: 0.2, alpha: 0, duration: 720, ease: 'Cubic.easeOut', onComplete: () => ray.destroy() })
+      this.addMotionTween({ targets: ray, x: x + Math.sin(angle) * Phaser.Math.Between(60, 145), y: y - Math.cos(angle) * Phaser.Math.Between(45, 115), scaleY: 0.2, alpha: 0, duration: 720, ease: 'Cubic.easeOut', onComplete: () => ray.destroy() })
     }
   }
 
@@ -639,7 +653,7 @@ class ContextDashScene extends Phaser.Scene {
     for (let index = 0; index < 82; index += 1) {
       const piece = this.add.rectangle(centerX + Phaser.Math.Between(-520, 420), Phaser.Math.Between(-180, -20), Phaser.Math.Between(7, 13), Phaser.Math.Between(12, 23), Phaser.Utils.Array.GetRandom(colors), 0.95)
         .setDepth(120).setRotation(Phaser.Math.FloatBetween(0, Math.PI))
-      this.tweens.add({ targets: piece, y: GAME_HEIGHT + 70, x: piece.x + Phaser.Math.Between(-110, 110), rotation: piece.rotation + Phaser.Math.FloatBetween(4, 10), duration: Phaser.Math.Between(2300, 4000), delay: Phaser.Math.Between(0, 900), ease: 'Sine.easeIn', repeat: -1 })
+      this.addMotionTween({ targets: piece, y: GAME_HEIGHT + 70, x: piece.x + Phaser.Math.Between(-110, 110), rotation: piece.rotation + Phaser.Math.FloatBetween(4, 10), duration: Phaser.Math.Between(2300, 4000), delay: Phaser.Math.Between(0, 900), ease: 'Sine.easeIn', repeat: -1 })
     }
   }
 
@@ -657,7 +671,7 @@ export function ContextGapDash({
   rounds,
   playAudio,
   title = 'Context Gap Dash',
-  eyebrow = 'A ten-gate cinematic reading race',
+  eyebrow,
   onExit,
   onAttempt,
   onComplete,
@@ -665,7 +679,7 @@ export function ContextGapDash({
   readonly rounds: readonly ContextGameRound[]
   readonly playAudio?: PlayLearningAudio
 }) {
-  const playableRounds = useMemo(() => rounds.slice(0, JOURNEY_LENGTH), [rounds])
+  const playableRounds = rounds
   const hostRef = useRef<HTMLDivElement>(null)
   const attemptsRef = useRef<LearningGameAttempt[]>([])
   const choiceHandlerRef = useRef<((choiceIndex: number) => void) | null>(null)
@@ -678,7 +692,9 @@ export function ContextGapDash({
   const [roundIndex, setRoundIndex] = useState(0)
   const [feedback, setFeedback] = useState<FeedbackState>(null)
   const [finished, setFinished] = useState(false)
-  const valid = validContextRounds(playableRounds) && playableRounds.every((round) => round.choices.length >= 3)
+  const valid = playableRounds.length <= JOURNEY_LENGTH
+    && validContextRounds(playableRounds)
+    && playableRounds.every((round) => round.choices.length >= 3)
   const currentRound = playableRounds[Math.min(roundIndex, playableRounds.length - 1)]
   const contextAudioText = currentRound?.audioText || currentRound?.cueText || ''
 
@@ -728,6 +744,7 @@ export function ContextGapDash({
     if (!valid || !hostRef.current) return
     const scene = new ContextDashScene({
       rounds: playableRounds,
+      reducedMotion: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
       onAttempt: handleAttempt,
       onProgress: (nextCompleted, nextCorrect, nextStreak, nextBest) => {
         setCompleted(nextCompleted)
@@ -759,11 +776,11 @@ export function ContextGapDash({
   return <LearningGameShell
     gameId="context-gap-dash"
     title={title}
-    eyebrow={eyebrow}
+    eyebrow={eyebrow || `A ${playableRounds.length}-gate cinematic reading race`}
     progress={completed + '/' + playableRounds.length + ' gates'}
     onExit={onExit}
   >
-    {!valid ? <LearningGameEmpty onExit={onExit} /> : <section className="lg-phaser-lily-card lg-phaser-dash-card" style={stageStyle}>
+    {!valid ? <LearningGameEmpty onExit={onExit} message={`Context Gap Dash requires 1–${JOURNEY_LENGTH} rounds with at least three choices each.`} /> : <section className="lg-phaser-lily-card lg-phaser-dash-card" style={stageStyle}>
       <div className="lg-phaser-meta" aria-live="polite">
         <span><strong>{correct}</strong> first-try gates</span>
         <span><strong>{streak}</strong> momentum</span>
@@ -781,6 +798,7 @@ export function ContextGapDash({
       </div>
       {!finished && <div className="lg-mobile-gate-choices" role="group" aria-label="Touch-friendly answer gates">
         {currentRound?.choices.slice(0, 3).map((choice, index) => <button key={choice.id} type="button" disabled={busy} onPointerEnter={() => previewChoice(choice.label)} onFocus={() => previewChoice(choice.label)} onClick={() => choiceHandlerRef.current?.(index)}><small>{index + 1}</small><strong>{choice.label}</strong></button>)}
+        <span className="lg-mobile-feedback" role="status">{feedback?.message}</span>
       </div>}
       <div className="lg-canvas-access" role="group" aria-label="Context-gap answer choices">
         <span role="status">{feedback?.message}</span>

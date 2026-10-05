@@ -88,7 +88,7 @@ function TargetBlastPlayfield({ round, selectedChoiceId, phase, onChoose }: {
     </div>
     {selectedChoiceId && phase === 'impact' && <div className="lg-impact-callout is-correct" role="status">
       <strong>SHADOW STRIKE!</strong>
-      <span>+1 mastery</span>
+      <span>Correct answer</span>
     </div>}
   </div>
 }
@@ -97,17 +97,17 @@ function TargetBlastJourneyActor({ className = '' }: { readonly className?: stri
   return <span className={`lg-journey-actor is-target-blast${className ? ` ${className}` : ''}`} aria-hidden="true"><i /><b /><em /></span>
 }
 
-function TargetBlastJourney({ mastered, total }: { readonly mastered: number; readonly total: number }) {
-  const progress = total ? mastered / total : 0
+function TargetBlastJourney({ completed, total }: { readonly completed: number; readonly total: number }) {
+  const progress = total ? completed / total : 0
   const journeyStyle = {
     '--journey-progress': `${progress * 100}%`,
     '--training-ninja-x': `${6 + progress * 88}%`,
     '--training-field-scroll': `${progress * -58}%`,
   } as CSSProperties
-  return <section className="lg-journey-map is-target-blast lg-training-field" style={journeyStyle} aria-label={`${mastered} of ${total} training posts reached`}>
+  return <section className="lg-journey-map is-target-blast lg-training-field" style={journeyStyle} aria-label={`${completed} of ${total} training posts reached`}>
     <div className="lg-journey-copy">
       <span>Training field</span>
-      <strong>{mastered === total ? 'Master dojo reached' : `Training post ${mastered} of ${total}`}</strong>
+      <strong>{completed === total ? 'Master dojo reached' : `Training post ${completed} of ${total}`}</strong>
       <span>Master dojo</span>
     </div>
     <div className="lg-training-viewport" aria-hidden="true">
@@ -119,7 +119,7 @@ function TargetBlastJourney({ mastered, total }: { readonly mastered: number; re
         <span className="lg-training-posts">
           {Array.from({ length: total + 1 }, (_, checkpoint) => <i
             key={checkpoint}
-            className={checkpoint <= mastered ? 'is-cleared' : ''}
+            className={checkpoint <= completed ? 'is-cleared' : ''}
             style={{ '--training-post-x': `${6 + (checkpoint / Math.max(1, total)) * 88}%` } as CSSProperties}
           ><b>{checkpoint}</b></i>)}
         </span>
@@ -130,8 +130,9 @@ function TargetBlastJourney({ mastered, total }: { readonly mastered: number; re
   </section>
 }
 
-function TargetBlastComplete({ summary, onDone }: {
+function TargetBlastComplete({ summary, total, onDone }: {
   readonly summary: ReturnType<typeof summarizeLearningGame>
+  readonly total: number
   readonly onDone: () => void
 }) {
   const accuracy = summary.attempted ? Math.round((summary.correct / summary.attempted) * 100) : 0
@@ -146,9 +147,9 @@ function TargetBlastComplete({ summary, onDone }: {
     </div>
     <div className="lg-finale-copy">
       <span className="lg-finale-trophy"><Trophy size={28} /></span>
-      <p className="lg-kicker">10 checkpoints cleared</p>
+      <p className="lg-kicker">{total} checkpoints cleared</p>
       <h2>Master rank reached!</h2>
-      <p>You mastered every shadow-strike target. Your character made it safely and the whole route is now glowing.</p>
+      <p>You completed every shadow-strike target. Your character made it safely and the whole route is now glowing.</p>
       <div className="lg-complete-stats">
         <span><strong>{accuracy}%</strong> attempt accuracy</span>
         <span><strong>{summary.attempted - summary.correct}</strong> learning retries</span>
@@ -278,16 +279,17 @@ export function TargetBlast({
     gameId="target-blast"
     title={title}
     eyebrow={eyebrow}
-    progress={`${index}/${rounds.length} mastered`}
+    progress={`${index}/${rounds.length} completed`}
     onExit={onExit}
   >
     {!valid ? <LearningGameEmpty onExit={onExit} /> : complete ? <TargetBlastComplete
       summary={summary}
+      total={rounds.length}
       onDone={() => onComplete(summary)}
     /> : round ? <section className="lg-card lg-blast-card">
       <p className="lg-round-label">Training strike {index + 1} of {rounds.length}</p>
       <h2>{round.cueText || 'Strike the correct practice target'}</h2>
-      <TargetBlastJourney mastered={index} total={rounds.length} />
+      <TargetBlastJourney completed={index} total={rounds.length} />
       {round.audioText && playAudio && <div className={`lg-auto-prompt-status is-${audioState}`} role="status">
         <Volume2 size={18} aria-hidden="true" />
         <span>{audioState === 'playing' ? 'Playing the word…' : audioState === 'played' ? 'Word played automatically' : audioState === 'error' ? 'Audio needs another try' : 'Get ready — the word will play automatically'}</span>

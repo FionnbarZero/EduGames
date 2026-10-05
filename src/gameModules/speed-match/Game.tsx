@@ -138,7 +138,6 @@ export function SpeedMatch({
     setCards(shuffled(initialCards))
     setSelectedCardIds([])
     setMatchedPairIds([])
-    setAttempts([])
     setFeedback(null)
     setStrikeQuality(null)
     setLastMessage('Tap a word seal to begin the rooftop mission.')
@@ -223,7 +222,7 @@ export function SpeedMatch({
           {pairs.map((pair) => <i key={pair.id} className={matchedPairIds.includes(pair.id) ? 'is-cleared' : ''} />)}
         </div>
         <div className="lg-shuriken-brief">
-          <span>Rooftop rush · eight targets</span>
+          <span>Rooftop rush · {pairs.length} {pairs.length === 1 ? 'target' : 'targets'}</span>
           <strong>Match the seals. Reach the dojo.</strong>
           <small>Click to hear each word. Match Mandarin with English before the moon gate closes.</small>
         </div>
