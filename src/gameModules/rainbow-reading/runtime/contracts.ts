@@ -1,15 +1,6 @@
-export type LearningGameId =
-  | 'speed-match'
-  | 'target-blast'
-  | 'lily-pad-path'
-  | 'memory-flip'
-  | 'context-gap-dash'
-  | 'sentence-scramble'
-  | 'read-aloud-boss-rush'
-  | 'rainbow-reading'
-  | 'dictation-streak'
-  | 'speller-bee'
-  | 'copy-hide-write-combo'
+import type { ReactNode } from 'react'
+
+export type LearningGameId = 'rainbow-reading'
 
 export type LearningGameChannel = 'tier-1-writing' | 'tier-2-reading'
 export type LearningGameSkill = 'writing' | 'reading' | 'receptive'
@@ -24,8 +15,6 @@ export type LearningGameDefinition = {
   readonly skills: readonly LearningGameSkill[]
   readonly inputKind: LearningGameInputKind
   readonly estimatedSeconds: readonly [minimum: number, maximum: number]
-  readonly releaseStatus?: 'ready' | 'hold'
-  readonly releaseNote?: string
 }
 
 export type GameChoice = {
@@ -66,15 +55,8 @@ export type SequenceGameRound = GamePrompt & {
   readonly correctTokenIds: readonly string[]
 }
 
-export type PinyinInputStep = {
-  readonly pinyin: string
-  readonly candidates: readonly string[]
-}
-
 export type ProductionGameRound = GamePrompt & {
   readonly instruction?: string
-  readonly pinyinText?: string
-  readonly pinyinSteps?: readonly PinyinInputStep[]
 }
 
 export type StrokePoint = readonly [x: number, y: number]
@@ -99,3 +81,33 @@ export type LearningGameSummary = {
   readonly correct: number
   readonly attempts: readonly LearningGameAttempt[]
 }
+
+export type LearningGameBaseProps = {
+  readonly title?: string
+  readonly eyebrow?: string
+  readonly onExit: () => void
+  readonly onAttempt?: (attempt: LearningGameAttempt) => void
+  readonly onComplete: (summary: LearningGameSummary) => void
+}
+
+export type PlayLearningAudio = (text: string, language?: string, playbackRate?: number) => void | Promise<void>
+
+export type ReadingCaptureControls = {
+  readonly onReady: () => void
+}
+
+export type RenderReadingCapture = (
+  round: ProductionGameRound,
+  controls: ReadingCaptureControls,
+) => ReactNode
+
+export type ReadingResponseControls = {
+  readonly onAssess: (correct: boolean, response?: string) => void
+  readonly index: number
+  readonly total: number
+}
+
+export type RenderReadingResponse = (
+  round: ProductionGameRound,
+  controls: ReadingResponseControls,
+) => ReactNode

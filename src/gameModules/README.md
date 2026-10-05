@@ -26,6 +26,7 @@ Every direct child folder is a complete copy-and-drop React module. A module own
 | `context-gap-dash` | `ContextGapDash` | `rounds` | `phaser` |
 | `sushi-scramble` | `SushiScramble` | `rounds` | — |
 | `whispering-scrolls` | `WhisperingScrolls` | `rounds` | — |
+| `rainbow-reading` | `RainbowReading` | `rounds` | — |
 | `dictation-streak` | `DictationStreak` | `rounds` | — |
 | `speller-bee` | `SpellerBee` | `rounds` | — |
 | `stroke-order-slay` | `StrokeOrderSlay` | `rounds` | — |

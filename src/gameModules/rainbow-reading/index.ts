@@ -1,0 +1,5 @@
+export { RainbowReading, RainbowReading as default } from './Game'
+export { gameManifest } from './manifest'
+export { normalizeSpokenText, readAloudOutcome, transcriptEvidence } from './runtime/readAloudScoring'
+export type { ReadAloudModel, ReadAloudOutcome, TranscriptEvidence } from './runtime/readAloudScoring'
+export type { LearningGameAttempt, LearningGameBaseProps, LearningGameSummary, PlayLearningAudio, ProductionGameRound, RenderReadingCapture, RenderReadingResponse } from './runtime/contracts'

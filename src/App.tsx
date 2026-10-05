@@ -2,6 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { ArrowRight, BookOpen, Gamepad2, Headphones, Keyboard, RotateCcw, Sparkles } from 'lucide-react'
 import { GameArtwork } from './gameCatalog/GameArtwork'
 import { LEARNING_GAME_CATALOG } from './gameCatalog/catalog'
+import { ProblemReporter } from './ProblemReporter'
 import type {
   ContextGameRound,
   GamePair,
@@ -29,6 +30,7 @@ const MemoryFlip = lazy(() => import('./gameModules/memory-lanterns').then((modu
 const ContextGapDash = lazy(() => import('./gameModules/context-gap-dash').then((module) => ({ default: module.ContextGapDash })))
 const SentenceScramble = lazy(() => import('./gameModules/sushi-scramble').then((module) => ({ default: module.SentenceScramble })))
 const ReadAloudBossRush = lazy(() => import('./gameModules/whispering-scrolls').then((module) => ({ default: module.ReadAloudBossRush })))
+const RainbowReading = lazy(() => import('./gameModules/rainbow-reading').then((module) => ({ default: module.RainbowReading })))
 const DictationStreak = lazy(() => import('./gameModules/dictation-streak').then((module) => ({ default: module.DictationStreak })))
 const SpellerBee = lazy(() => import('./gameModules/speller-bee').then((module) => ({ default: module.SpellerBee })))
 const StrokeOrderSlay = lazy(() => import('./gameModules/stroke-order-slay').then((module) => ({ default: module.StrokeOrderSlay })))
@@ -188,16 +190,19 @@ const productionRounds: readonly ProductionGameRound[] = [
 ]
 
 const spellingRounds: readonly ProductionGameRound[] = [
-  { id: 'spelling-1', targetId: 'cat', targetText: 'cat', audioText: 'cat' },
-  { id: 'spelling-2', targetId: 'water', targetText: 'water', audioText: 'water' },
-  { id: 'spelling-3', targetId: 'friend', targetText: 'friend', audioText: 'friend' },
-  { id: 'spelling-4', targetId: 'school', targetText: 'school', audioText: 'school' },
-  { id: 'spelling-5', targetId: 'apple', targetText: 'apple', audioText: 'apple' },
-  { id: 'spelling-6', targetId: 'teacher', targetText: 'teacher', audioText: 'teacher' },
-  { id: 'spelling-7', targetId: 'family', targetText: 'family', audioText: 'family' },
-  { id: 'spelling-8', targetId: 'morning', targetText: 'morning', audioText: 'morning' },
-  { id: 'spelling-9', targetId: 'yellow', targetText: 'yellow', audioText: 'yellow' },
-  { id: 'spelling-10', targetId: 'beautiful', targetText: 'beautiful', audioText: 'beautiful' },
+  { id: 'spelling-red-air', targetId: 'air', targetText: 'air', audioText: 'air' },
+  { id: 'spelling-red-means', targetId: 'means', targetText: 'means', audioText: 'means' },
+  { id: 'spelling-red-years', targetId: 'years', targetText: 'years', audioText: 'years' },
+  { id: 'spelling-red-here', targetId: 'here', targetText: 'here', audioText: 'here' },
+]
+
+const rainbowReadingRounds: readonly ProductionGameRound[] = [
+  { id: 'rainbow-air', targetId: 'air', targetText: 'air', audioText: 'air' },
+  { id: 'rainbow-means', targetId: 'means', targetText: 'means', audioText: 'means' },
+  { id: 'rainbow-years', targetId: 'years', targetText: 'years', audioText: 'years' },
+  { id: 'rainbow-here', targetId: 'here', targetText: 'here', audioText: 'here' },
+  { id: 'rainbow-eager', targetId: 'eager', targetText: 'eager', audioText: 'eager' },
+  { id: 'rainbow-change', targetId: 'change', targetText: 'change', audioText: 'change' },
 ]
 
 const strokeOrderRounds: readonly StrokeOrderGameRound[] = [
@@ -269,6 +274,12 @@ const recordedLearningAudio: Readonly<Record<string, string>> = {
   'morning': `${import.meta.env.BASE_URL}audio/speller-bee/morning.wav?v=1`,
   'yellow': `${import.meta.env.BASE_URL}audio/speller-bee/yellow.wav?v=1`,
   'beautiful': `${import.meta.env.BASE_URL}audio/speller-bee/beautiful.wav?v=1`,
+  'air': `${import.meta.env.BASE_URL}audio/speller-bee/air.wav?v=1`,
+  'means': `${import.meta.env.BASE_URL}audio/speller-bee/means.wav?v=1`,
+  'years': `${import.meta.env.BASE_URL}audio/speller-bee/years.wav?v=1`,
+  'here': `${import.meta.env.BASE_URL}audio/speller-bee/here.wav?v=1`,
+  'eager': new URL('./gameModules/rainbow-reading/assets/eager.wav', import.meta.url).href,
+  'change': new URL('./gameModules/rainbow-reading/assets/change.wav', import.meta.url).href,
   '你好': `${import.meta.env.BASE_URL}audio/read-aloud/hello.wav?v=1`,
   '谢谢': `${import.meta.env.BASE_URL}audio/read-aloud/thanks.wav?v=1`,
   '再见': `${import.meta.env.BASE_URL}audio/read-aloud/goodbye.wav?v=1`,
@@ -449,6 +460,7 @@ function GamePreview({ gameId, onExit, onAttempt, onComplete }: {
     case 'context-gap-dash': return <ContextGapDash {...shared} rounds={starterCurriculum.contextRounds} playAudio={playAudio} />
     case 'sentence-scramble': return <SentenceScramble {...shared} rounds={starterCurriculum.sequenceRounds} playAudio={playAudio} />
     case 'read-aloud-boss-rush': return <ReadAloudBossRush {...shared} rounds={starterCurriculum.productionRounds} playAudio={playAudio} />
+    case 'rainbow-reading': return <RainbowReading {...shared} rounds={rainbowReadingRounds} playAudio={playAudio} />
     case 'dictation-streak': return <DictationStreak {...shared} rounds={starterCurriculum.productionRounds} playAudio={playAudio} />
     case 'speller-bee': return <SpellerBee {...shared} rounds={starterCurriculum.spellingRounds} playAudio={playAudio} />
     case 'copy-hide-write-combo': return <StrokeOrderSlay {...shared} rounds={starterCurriculum.strokeOrderRounds} playAudio={playAudio} />
@@ -519,15 +531,20 @@ export function App() {
   }
 
   if (activeGame) {
-    return <Suspense fallback={<main className="playground"><p role="status">Loading game module…</p></main>}>
-      <GamePreview key={`${activeGame}-${sessionKey}`} gameId={activeGame} onExit={exitGame} onAttempt={saveAttempt} onComplete={finishGame} />
-    </Suspense>
+    const activeGameTitle = LEARNING_GAME_CATALOG.find((game) => game.id === activeGame)?.title || 'Game'
+    return <>
+      <Suspense fallback={<main className="playground"><p role="status">Loading game module…</p></main>}>
+        <GamePreview key={`${activeGame}-${sessionKey}`} gameId={activeGame} onExit={exitGame} onAttempt={saveAttempt} onComplete={finishGame} />
+      </Suspense>
+      <ProblemReporter game={activeGameTitle} />
+    </>
   }
 
-  return <main className="playground">
+  return <>
+    <main className="playground">
     <nav className="playground-nav">
       <a className="brand" href="#top"><span><Gamepad2 size={19} /></span> EduGames</a>
-      <div className="nav-note"><span className="status-dot" /> 10 games ready</div>
+      <div className="nav-note"><span className="status-dot" /> {LEARNING_GAME_CATALOG.length} games ready</div>
     </nav>
 
     <header id="top" className="hero">
@@ -536,7 +553,7 @@ export function App() {
         <h1>Pick a game.<br /><em>Start playing.</em></h1>
         <p className="hero-description">Practice Mandarin and English through matching, reading, listening, speaking, spelling, and writing. Every game gives you instant feedback as you play.</p>
         <div className="hero-meta">
-          <span><Gamepad2 size={16} /> 10 games</span>
+          <span><Gamepad2 size={16} /> {LEARNING_GAME_CATALOG.length} games</span>
           <span><BookOpen size={16} /> Reading</span>
           <span><Keyboard size={16} /> Writing</span>
           <span><Headphones size={16} /> Audio</span>
@@ -569,7 +586,7 @@ export function App() {
 
     <section className="catalog" aria-labelledby="catalog-title">
       <div className="section-heading">
-        <div><p className="eyebrow">10 ways to practice</p><h2 id="catalog-title">Choose your challenge</h2></div>
+        <div><p className="eyebrow">{LEARNING_GAME_CATALOG.length} ways to practice</p><h2 id="catalog-title">Choose your challenge</h2></div>
         <p>Pick any game. Each one shows you what to do.</p>
       </div>
       <div className="game-grid">
@@ -591,5 +608,7 @@ export function App() {
         </article>})}
       </div>
     </section>
-  </main>
+    </main>
+    <ProblemReporter game="Game library" />
+  </>
 }

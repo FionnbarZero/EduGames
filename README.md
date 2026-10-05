@@ -41,7 +41,7 @@ checked in, so Linux CI and copied game modules do not need `say` at runtime.
 
 ## Project layout
 
-- `src/gameModules/` contains the ten independent, copy-ready React game modules.
+- `src/gameModules/` contains the eleven independent, copy-ready React game modules.
 - Each game module owns its component, public types, runtime helpers, styles,
   manifest, documentation, and any game-specific artwork or recordings.
 - Runtime helpers are intentionally duplicated between module folders. This is

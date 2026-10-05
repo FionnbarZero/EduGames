@@ -9,6 +9,7 @@ import { gameManifest as strokeOrderSlay } from '../gameModules/stroke-order-sla
 import { gameManifest as sushiScramble } from '../gameModules/sushi-scramble/manifest'
 import { gameManifest as shadowStrikeDojo } from '../gameModules/target-blast/manifest'
 import { gameManifest as whisperingScrolls } from '../gameModules/whispering-scrolls/manifest'
+import { gameManifest as rainbowReading } from '../gameModules/rainbow-reading/manifest'
 
 export const LEARNING_GAME_CATALOG = [
   shurikenMatch,
@@ -18,6 +19,7 @@ export const LEARNING_GAME_CATALOG = [
   contextGapDash,
   sushiScramble,
   whisperingScrolls,
+  rainbowReading,
   dictationStreak,
   spellerBee,
   strokeOrderSlay,

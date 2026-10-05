@@ -1,7 +1,10 @@
 import assert from 'node:assert/strict'
 import { inspectPcmWave } from './wavTestUtils.mjs'
 
-const words = ['cat', 'water', 'friend', 'school', 'apple', 'teacher', 'family', 'morning', 'yellow', 'beautiful']
+const words = [
+  'cat', 'water', 'friend', 'school', 'apple', 'teacher', 'family', 'morning', 'yellow', 'beautiful',
+  'air', 'means', 'years', 'here',
+]
 
 for (const word of words) {
   const filename = `${word}.wav`

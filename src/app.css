@@ -12,6 +12,26 @@ body { min-width: 320px; min-height: 100vh; margin: 0; background: #080c1c; }
 button, a { font: inherit; }
 button { color: inherit; }
 
+.problem-report-trigger { position: fixed; z-index: 10000; right: max(18px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom)); display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 10px 15px; border: 1px solid rgb(255 255 255 / 18%); border-radius: 999px; color: #f9f7ff; background: #6e50c9; box-shadow: 0 10px 30px rgb(5 8 24 / 38%); cursor: pointer; font-size: .82rem; font-weight: 900; transition: transform 150ms ease, background 150ms ease; }
+.problem-report-trigger:hover { background: #8062df; transform: translateY(-2px); }
+.problem-report-trigger:focus-visible,.problem-report-dialog button:focus-visible,.problem-report-dialog select:focus-visible,.problem-report-dialog textarea:focus-visible { outline: 3px solid #6ce5cf; outline-offset: 3px; }
+.problem-report-backdrop { position: fixed; z-index: 10001; inset: 0; display: grid; place-items: center; padding: 18px; color: #28213a; background: rgb(5 8 24 / 72%); backdrop-filter: blur(7px); }
+.problem-report-dialog { position: relative; width: min(520px,100%); max-height: calc(100vh - 36px); overflow: auto; border: 1px solid rgb(100 71 177 / 18%); border-radius: 24px; background: #fbf9ff; box-shadow: 0 30px 90px rgb(0 0 0 / 40%); color-scheme: light; }
+.problem-report-dialog form,.problem-report-success { display: grid; gap: 15px; padding: 28px; }
+.problem-report-close { position: absolute; z-index: 1; top: 14px; right: 14px; display: grid; place-items: center; width: 38px; aspect-ratio: 1; padding: 0; border: 0; border-radius: 50%; color: #6b607e; background: #eee9f7; cursor: pointer; }
+.problem-report-mark { display: grid; place-items: center; width: 46px; aspect-ratio: 1; border-radius: 15px; color: white; background: linear-gradient(135deg,#7a59d5,#d25cae); }
+.problem-report-eyebrow { margin: 0 0 -10px; color: #7854ca; font-size: .69rem; font-weight: 950; letter-spacing: .12em; text-transform: uppercase; }
+.problem-report-dialog h2 { margin: 0; color: #28213a; font-size: 1.7rem; letter-spacing: -.035em; }
+.problem-report-context { margin: -6px 0 2px; color: #6d637e; font-size: .86rem; line-height: 1.5; }
+.problem-report-dialog label { display: grid; gap: 7px; color: #403650; font-size: .82rem; font-weight: 900; }
+.problem-report-dialog select,.problem-report-dialog textarea { width: 100%; padding: 11px 12px; border: 1px solid #d7cfe4; border-radius: 12px; color: #28213a; background: white; font: inherit; }
+.problem-report-dialog textarea { min-height: 110px; resize: vertical; line-height: 1.45; }
+.problem-report-submit,.problem-report-success > button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 10px 16px; border: 0; border-radius: 13px; color: white; background: #6e50c9; cursor: pointer; font-weight: 900; }
+.problem-report-submit:disabled { cursor: not-allowed; opacity: .45; }
+.problem-report-success { justify-items: center; padding-block: 44px; text-align: center; }
+.problem-report-success > svg { color: #31a875; }
+.problem-report-success p { max-width: 380px; margin: -4px 0 4px; color: #6d637e; line-height: 1.55; }
+
 .playground { min-height: 100vh; overflow: hidden; background: radial-gradient(circle at 85% 0, rgb(112 79 255 / 16%), transparent 34rem), radial-gradient(circle at 5% 34%, rgb(42 220 194 / 8%), transparent 28rem), #080c1c; }
 .playground-nav { display: flex; align-items: center; justify-content: space-between; width: min(1180px, calc(100% - 40px)); margin: 0 auto; padding: 24px 0; }
 .brand { display: inline-flex; align-items: center; gap: 10px; color: #fafaff; text-decoration: none; font-weight: 900; letter-spacing: -.03em; }
@@ -96,6 +116,8 @@ button { color: inherit; }
   .last-result { align-items: stretch; flex-direction: column; gap: 11px; }
   .practice-history { margin-top: -20px; }
   .practice-history li { align-items: stretch; flex-direction: column; }
+  .problem-report-trigger { right: 12px; bottom: 12px; min-height: 42px; padding: 9px 12px; font-size: .74rem; }
+  .problem-report-dialog form,.problem-report-success { padding: 23px 19px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

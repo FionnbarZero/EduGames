@@ -27,7 +27,7 @@ const moduleFolders = readdirSync(modulesRoot)
   .filter((name) => statSync(join(modulesRoot, name)).isDirectory())
   .sort()
 
-assert.equal(moduleFolders.length, 10, 'expected ten portable game modules')
+assert.equal(moduleFolders.length, 11, 'expected eleven portable game modules')
 
 for (const folder of moduleFolders) {
   const moduleRoot = join(modulesRoot, folder)

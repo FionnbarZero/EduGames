@@ -126,6 +126,20 @@ function WhisperingScrollArt() {
   </svg>
 }
 
+function RainbowReadingArt() {
+  return <svg viewBox="0 0 420 150" role="presentation">
+    <path className="art-rainbow red" d="M-20 28C122 5 258 40 440 133" />
+    <path className="art-rainbow orange" d="M-20 40C122 17 258 52 440 145" />
+    <path className="art-rainbow yellow" d="M-20 52C122 29 258 64 440 157" />
+    <path className="art-rainbow green" d="M-20 64C122 41 258 76 440 169" />
+    <path className="art-rainbow blue" d="M-20 76C122 53 258 88 440 181" />
+    <path className="art-rainbow purple" d="M-20 88C122 65 258 100 440 193" />
+    <g className="art-rainbow-egg"><path d="M185 117c0-40 23-78 49-78s49 38 49 78c0 17-15 28-49 28s-49-11-49-28Z" /><path d="m192 108 14-12 15 13 14-14 16 14 15-13 12 11" /></g>
+    <g className="art-rainbow-face"><circle cx="220" cy="77" r="5" /><circle cx="249" cy="77" r="5" /><path d="M225 91q10 9 19 0" /></g>
+    {[50,112,173,298,347,392].map((x,index) => <path key={x} className={`art-rainbow-gem g${index + 1}`} d={`M${x} ${24 + index * 12}l10 7 3 12-13 12-13-12 3-12z`} />)}
+  </svg>
+}
+
 function DictationArt() {
   return <svg viewBox="0 0 420 150" role="presentation">
     <g className="art-headphones"><path d="M130 88V68a80 58 0 0 1 160 0v20" /><rect x="103" y="75" width="39" height="57" rx="16" /><rect x="278" y="75" width="39" height="57" rx="16" /></g>
@@ -152,6 +166,7 @@ function ArtworkFor({ gameId }: { readonly gameId: LearningGameId }) {
     case 'context-gap-dash': return <ContextArt />
     case 'sentence-scramble': return <ScrambleArt />
     case 'read-aloud-boss-rush': return <WhisperingScrollArt />
+    case 'rainbow-reading': return <RainbowReadingArt />
     case 'dictation-streak': return <DictationArt />
     case 'speller-bee': return <DictationArt />
     case 'copy-hide-write-combo': return <StrokeArt />

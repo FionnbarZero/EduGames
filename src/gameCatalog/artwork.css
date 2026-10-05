@@ -75,6 +75,11 @@
 .art-chopsticks { fill: none; stroke: #d19b50; stroke-width: 7; stroke-linecap: round; filter: drop-shadow(0 4px 3px rgb(0 0 0 / 35%)); }
 .lg-art-read-aloud-boss-rush { --art-accent: #e9bd63; --art-accent-2: #b9404c; }
 .lg-art-read-aloud-boss-rush .lg-art-scene { background: radial-gradient(circle at 82% 17%,rgb(240 219 163 / 18%),transparent 94px),linear-gradient(180deg,#182033,#27202a 64%,#0c0d13); }
+.lg-art-rainbow-reading { --art-accent: #ff72bb; --art-accent-2: #74dfff; }
+.lg-art-rainbow-reading .lg-art-scene { background: radial-gradient(circle at 75% 15%,rgb(255 255 255 / 82%),transparent 95px),linear-gradient(160deg,#fff0fa,#dff7ff); }
+.art-rainbow { fill: none; stroke-width: 13; stroke-linecap: round; }.art-rainbow.red { stroke: #ff719f; }.art-rainbow.orange { stroke: #ffad64; }.art-rainbow.yellow { stroke: #ffe06e; }.art-rainbow.green { stroke: #77dfa0; }.art-rainbow.blue { stroke: #65bcec; }.art-rainbow.purple { stroke: #aa75dd; }
+.art-rainbow-egg { fill: #fffaf0; stroke: #b463bb; stroke-width: 3; }.art-rainbow-face { fill: #63305f; stroke: #63305f; stroke-width: 3; stroke-linecap: round; }
+.art-rainbow-gem { fill: #ff78c1; stroke: white; stroke-width: 2; filter: drop-shadow(0 3px 4px rgb(88 54 117 / 23%)); }.art-rainbow-gem.g2 { fill: #ffb65d; }.art-rainbow-gem.g3 { fill: #ffe26d; }.art-rainbow-gem.g4 { fill: #77dfa0; }.art-rainbow-gem.g5 { fill: #65bcec; }.art-rainbow-gem.g6 { fill: #aa75dd; }
 .art-scroll-moon { fill: #eee4bd; opacity: .87; filter: drop-shadow(0 0 16px rgb(239 222 163 / 42%)); }
 .art-scroll-roofs { fill: #090b12; stroke: #713943; stroke-width: 2; }
 .art-scroll-bamboo { fill: none; stroke: #6f805f; stroke-width: 5; stroke-linecap: round; opacity: .58; }
