@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { findCharacterCorrections, isCorrectCharacterAt, isExactPinyin, isPinyinPrefix, normalizePinyin } from '../src/gameModules/dictation-streak/runtime/pinyin.ts'
+import { validDictationRound } from '../src/gameModules/dictation-streak/runtime/model.ts'
 
 for (const answer of ['nǐ', 'ni3', 'NI']) {
   assert.equal(isExactPinyin(answer, 'nǐ'), true, `${answer} should reveal the character candidates`)
@@ -31,5 +32,16 @@ assert.deepEqual(findCharacterCorrections('你号', '你好'), [
 ], 'the correction card should identify a later wrong character')
 assert.equal(isCorrectCharacterAt('再', '再见', 0), true, 'the correct first character should continue the word')
 assert.equal(isCorrectCharacterAt('在', '再见', 0), false, 'a wrong first character should trigger its correction card immediately')
+
+const baseRound = { id: 'hello', targetId: 'hello', targetText: '你好' }
+assert.equal(validDictationRound(baseRound), true, 'direct Chinese keyboard rounds may omit Pinyin guidance')
+assert.equal(validDictationRound({ ...baseRound, pinyinSteps: [
+  { pinyin: 'ni', candidates: ['你', '尼'] },
+  { pinyin: 'hao', candidates: ['好', '号'] },
+] }), true, 'one Pinyin step per target character is valid')
+assert.equal(validDictationRound({ ...baseRound, pinyinSteps: [
+  { pinyin: 'ni', candidates: ['你'] },
+] }), false, 'incomplete Pinyin guidance must be rejected')
+assert.equal(validDictationRound({ ...baseRound, pinyinSteps: [] }), false, 'an empty guided Pinyin sequence must be rejected')
 
 console.log('Dictation Streak Pinyin candidate matching passed.')

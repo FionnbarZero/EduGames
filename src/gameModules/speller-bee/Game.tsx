@@ -1,19 +1,14 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Headphones, PencilLine, Volume2 } from 'lucide-react'
+import { Headphones, PencilLine } from 'lucide-react'
 import type { LearningGameBaseProps, PlayLearningAudio, ProductionGameRound } from './runtime/contracts'
-import { SelfAssessmentButtons } from './runtime/GameShell'
 import { ProductionRunner } from './runtime/ProductionGameShared'
+import { spellingIsCorrect } from './runtime/spelling'
 
-type SubmittedSpelling = {
-  readonly roundId: string
-  readonly response: string
-}
-
-function SpellingPrompt({ round, playAudio, streak, onReveal }: {
+function SpellingPrompt({ round, playAudio, streak, onAssess }: {
   readonly round: ProductionGameRound
   readonly playAudio: PlayLearningAudio
   readonly streak: number
-  readonly onReveal: (response: string) => void
+  readonly onAssess: (correct: boolean, response: string) => void
 }) {
   const [answer, setAnswer] = useState('')
   const [audioError, setAudioError] = useState(false)
@@ -39,7 +34,7 @@ function SpellingPrompt({ round, playAudio, streak, onReveal }: {
   function submit(event: FormEvent) {
     event.preventDefault()
     const response = answer.trim()
-    if (response) onReveal(response)
+    if (response) onAssess(spellingIsCorrect(response, round.targetText), response)
   }
 
   return <form className="lg-dictation-console lg-speller-console" onSubmit={submit}>
@@ -56,18 +51,16 @@ function SpellingPrompt({ round, playAudio, streak, onReveal }: {
       <input value={answer} onChange={(event) => setAnswer(event.target.value)} autoFocus autoCapitalize="none" autoComplete="off" spellCheck={false} lang="en" placeholder="Type the word you heard" />
       <i aria-hidden="true" />
     </label>
-    <button className="lg-primary lg-launch-answer" type="submit" disabled={!answer.trim()}><PencilLine size={18} /> Reveal spelling</button>
+    <button className="lg-primary lg-launch-answer" type="submit" disabled={!answer.trim()}><PencilLine size={18} /> Check spelling</button>
   </form>
 }
 
-function SpellingReview({ round, response, playAudio, onAssess }: {
+function SpellingCorrection({ round, response }: {
   readonly round: ProductionGameRound
   readonly response: string
-  readonly playAudio: PlayLearningAudio
-  readonly onAssess: (correct: boolean, response?: string) => void
 }) {
-  return <div className="lg-speller-review">
-    <p className="lg-kicker">Check your spelling</p>
+  return <div className="lg-speller-review" role="alert">
+    <p className="lg-kicker">Spelling correction</p>
     <div className="lg-spelling-comparison">
       <section>
         <span>You typed</span>
@@ -79,13 +72,7 @@ function SpellingReview({ round, response, playAudio, onAssess }: {
         <strong lang="en">{round.targetText}</strong>
       </section>
     </div>
-    <button className="lg-audio" type="button" onClick={() => { void Promise.resolve(playAudio(round.audioText || round.targetText, 'en-US')).catch(() => undefined) }}><Volume2 size={20} /> Hear the word again</button>
-    <p>Does your spelling match the correct word?</p>
-    <SelfAssessmentButtons
-      incorrectLabel="Try this word again"
-      correctLabel="I spelled it right"
-      onAnswer={(correct) => onAssess(correct, response)}
-    />
+    <p>Study the correct spelling. This word will repeat automatically.</p>
   </div>
 }
 
@@ -97,34 +84,21 @@ export function SpellerBee({
   readonly rounds: readonly ProductionGameRound[]
   readonly playAudio: PlayLearningAudio
 }) {
-  const [submitted, setSubmitted] = useState<SubmittedSpelling | null>(null)
-
   return <ProductionRunner
     {...props}
     rounds={rounds}
     playAudio={playAudio}
     gameId="speller-bee"
-    assessmentMode="self-assessment"
     defaultTitle="SpellerBee"
     defaultEyebrow="Tier 1 · English Spelling"
-    completionMessage="Ten English spelling words are now mastered."
+    completionMessage={`${rounds.length} English spelling words completed.`}
+    incorrectFeedback={(round, response) => <SpellingCorrection round={round} response={response} />}
+    incorrectFeedbackDuration={2600}
     prompt={(round, controls) => <SpellingPrompt
       round={round}
       playAudio={controls.playAudio!}
       streak={controls.streak}
-      onReveal={(response) => {
-        setSubmitted({ roundId: round.id, response })
-        controls.reveal()
-      }}
-    />}
-    directResponse={(round, controls) => <SpellingReview
-      round={round}
-      response={submitted?.roundId === round.id ? submitted.response : ''}
-      playAudio={playAudio}
-      onAssess={(correct, response) => {
-        setSubmitted(null)
-        controls.onAssess(correct, response)
-      }}
+      onAssess={controls.assess}
     />}
   />
 }

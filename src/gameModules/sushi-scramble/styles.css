@@ -11,7 +11,7 @@
 .lg-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .lg-exit { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; cursor: pointer; }
 .lg-exit { padding: 9px 13px; border-radius: 999px; color: #5b5670; background: #efeaf6; font-size: .78rem; font-weight: 800; }
-.lg-progress { display: grid; gap: 6px; width: min(260px, 48vw); padding: 8px 12px 10px; border-radius: 15px; color: #4d3e63; background: #eee6f7; font-size: .68rem; font-weight: 850; }
+.lg-progress { display: grid; gap: 6px; width: min(260px, 48vw); padding: 8px 12px 10px; border-radius: 15px; color: #4d3e63; background: #eee6f7; font-size: .75rem; font-weight: 850; }
 .lg-progress > span { display: flex; align-items: center; gap: 6px; letter-spacing: .04em; text-transform: uppercase; }
 .lg-progress strong { margin-left: auto; font-size: .72rem; letter-spacing: 0; text-transform: none; }
 .lg-progress > i { display: block; height: 7px; overflow: hidden; border-radius: 999px; background: rgb(0 0 0 / 12%); }
@@ -196,7 +196,7 @@
 .lg-shuriken-timeout .lg-primary { margin-top: 15px; color: #29170d; background: linear-gradient(135deg,#ffe27a,#ff925c); }
 .lg-sushi-listen-panel { display: flex; align-items: center; justify-content: space-between; gap: 20px; width: min(790px,100%); margin: 0 auto 13px; padding: 15px 17px; border: 1px solid rgb(255 205 106 / 35%); border-radius: 19px; color: #fff6d7; background: linear-gradient(135deg,rgb(72 31 26 / 94%),rgb(28 20 31 / 96%)); box-shadow: 0 14px 35px rgb(0 0 0 / 22%),inset 0 1px rgb(255 255 255 / 7%); text-align: left; }
 .lg-sushi-listen-panel > div { display: grid; gap: 4px; }
-.lg-sushi-listen-panel > div > span { display: inline-flex; align-items: center; gap: 7px; color: #ffbc67; font-size: .64rem; font-weight: 950; letter-spacing: .13em; text-transform: uppercase; }
+.lg-sushi-listen-panel > div > span { display: inline-flex; align-items: center; gap: 7px; color: #ffbc67; font-size: .75rem; font-weight: 950; letter-spacing: .13em; text-transform: uppercase; }
 .lg-sushi-listen-panel > div > strong { font-size: clamp(1rem,2vw,1.32rem); }
 .lg-sushi-listen-panel > div > small { color: #c8b7ad; font-size: .72rem; line-height: 1.35; }
 .lg-sushi-listen-panel > button { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: 7px; min-height: 43px; padding: 9px 14px; border: 1px solid rgb(255 211 124 / 55%); border-radius: 999px; color: #2d1c11; background: linear-gradient(145deg,#ffe49a,#f2ad4c); box-shadow: 0 7px 18px rgb(0 0 0 / 24%); cursor: pointer; font-size: .72rem; font-weight: 900; }
@@ -213,14 +213,14 @@
 .lg-sushi-lantern.is-left { left: 25px; }
 .lg-sushi-lantern.is-right { right: 25px; }
 .lg-sushi-answer-zone { position: relative; z-index: 3; margin: 0 34px 10px; }
-.lg-sushi-zone-label { display: flex; align-items: center; justify-content: space-between; margin: 0 19px 5px; color: #d0bcae; font-size: .62rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.lg-sushi-zone-label { display: flex; align-items: center; justify-content: space-between; margin: 0 19px 5px; color: #d0bcae; font-size: .75rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
 .lg-sushi-zone-label strong { color: #ffce77; }
 .lg-sushi-plate { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); align-items: center; gap: 9px; min-height: 142px; padding: 21px 29px; border: 4px solid #7c3940; border-radius: 48% / 27%; background: radial-gradient(ellipse at 50% 38%,#34303a,#12131b 72%); box-shadow: inset 0 0 0 4px #0a0b10,inset 0 -15px 26px rgb(0 0 0 / 50%),0 13px 0 #160e12,0 20px 30px rgb(0 0 0 / 31%); }
 .lg-sushi-place-setting { position: relative; display: grid; place-items: center; min-width: 0; height: 91px; border: 2px dashed #5a5660; border-radius: 48%; background: radial-gradient(ellipse,rgb(255 255 255 / 5%),transparent 70%); }
 .lg-sushi-place-setting::before { position: absolute; width: 70%; height: 5px; border-radius: 99px; background: #34323a; box-shadow: 0 13px #292831,-1px -13px #292831; content: ""; }
-.lg-sushi-place-setting small { position: relative; z-index: 1; display: grid; place-items: center; width: 25px; aspect-ratio: 1; border-radius: 50%; color: #807985; background: #1b1b24; font-size: .62rem; font-style: normal; font-weight: 950; }
+.lg-sushi-place-setting small { position: relative; z-index: 1; display: grid; place-items: center; width: 25px; aspect-ratio: 1; border-radius: 50%; color: #807985; background: #1b1b24; font-size: .75rem; font-style: normal; font-weight: 950; }
 .lg-sushi-tools { position: relative; z-index: 4; display: flex; justify-content: flex-end; gap: 7px; margin: 0 39px 8px; }
-.lg-sushi-tools button { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid transparent; border-radius: 999px; color: #d6c1b5; background: rgb(21 12 15 / 45%); cursor: pointer; font-size: .67rem; font-weight: 850; }
+.lg-sushi-tools button { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid transparent; border-radius: 999px; color: #d6c1b5; background: rgb(21 12 15 / 45%); cursor: pointer; font-size: .75rem; font-weight: 850; }
 .lg-sushi-tools button:hover:not(:disabled) { border-color: rgb(255 205 119 / 34%); color: #ffe2a1; }
 .lg-sushi-tools button:disabled { cursor: default; opacity: .34; }
 .lg-sushi-bar { position: relative; z-index: 3; display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); align-items: end; gap: 12px; min-height: 156px; padding: 18px 16px 20px; border: 3px solid #9a6540; border-radius: 20px; background: repeating-linear-gradient(96deg,rgb(255 255 255 / 4%) 0 3px,transparent 4px 45px),linear-gradient(180deg,#74482d,#412516); box-shadow: inset 0 7px 0 rgb(255 221 161 / 9%),inset 0 -13px 21px rgb(35 13 8 / 30%),0 13px 24px rgb(0 0 0 / 29%); }
@@ -247,7 +247,7 @@
 .lg-sushi-piece.is-plated:hover:not(:disabled) { transform: translateY(-5px) rotate(2deg); }
 .lg-chopstick-carrier { position: absolute; z-index: 20; top: 238px; left: 50%; width: 145px; height: 115px; pointer-events: none; }
 .lg-chopstick-carrier .lg-sushi-piece { width: 145px; min-height: 108px; }
-.lg-chopstick-carrier .lg-sushi-piece > strong { font-size: 2.45rem; }
+.lg-chopstick-carrier .lg-sushi-piece > strong { font-size: 2.75rem; }
 .lg-carry-chopsticks { position: absolute; z-index: 22; top: -35px; left: -39px; width: 225px; height: 60px; rotate: -6deg; }
 .lg-carry-chopsticks i { position: absolute; right: 0; width: 218px; height: 7px; border: 1px solid #9a632b; border-radius: 99px 4px 4px 99px; background: linear-gradient(90deg,#d8a95b,#6f3e1d); box-shadow: 0 3px 5px rgb(0 0 0 / 28%); transform-origin: right; }
 .lg-carry-chopsticks i:first-child { top: 8px; rotate: 8deg; }

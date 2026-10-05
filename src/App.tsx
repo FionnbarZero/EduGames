@@ -5,6 +5,7 @@ import { LEARNING_GAME_CATALOG } from './gameCatalog/catalog'
 import type {
   ContextGameRound,
   GamePair,
+  LearningGameAttempt,
   LearningGameId,
   LearningGameSummary,
   ProductionGameRound,
@@ -12,6 +13,14 @@ import type {
   SequenceGameRound,
   StrokeOrderGameRound,
 } from './gameCatalog/contracts'
+import {
+  createLearningSession,
+  PROGRESS_STORAGE_KEY,
+  readLearningProgress,
+  updateLearningSession,
+  type LearningProgress,
+} from './gameCatalog/progress'
+import { defineCurriculumPack } from './gameCatalog/curriculum'
 
 const SpeedMatch = lazy(() => import('./gameModules/speed-match').then((module) => ({ default: module.SpeedMatch })))
 const TargetBlast = lazy(() => import('./gameModules/target-blast').then((module) => ({ default: module.TargetBlast })))
@@ -222,6 +231,22 @@ const strokeOrderRounds: readonly StrokeOrderGameRound[] = [
   },
 ]
 
+const starterCurriculum = defineCurriculumPack({
+  id: 'mandarin-english-starter',
+  version: 1,
+  title: 'Mandarin + English Starter',
+  language: 'zh-CN',
+  learnerLevel: 'beginner',
+  targetLevel: 'developing',
+  pairs,
+  selectionRounds,
+  contextRounds,
+  sequenceRounds,
+  productionRounds,
+  spellingRounds,
+  strokeOrderRounds,
+})
+
 let speechRequestId = 0
 let speechStartTimer: number | undefined
 let settleActiveSpeech: (() => void) | undefined
@@ -408,24 +433,25 @@ function channelLabel(channels: readonly ('tier-1-writing' | 'tier-2-reading')[]
   return labels.join(' + ')
 }
 
-function GamePreview({ gameId, onExit, onComplete }: {
+function GamePreview({ gameId, onExit, onAttempt, onComplete }: {
   readonly gameId: LearningGameId
   readonly onExit: () => void
+  readonly onAttempt: (attempt: LearningGameAttempt) => void
   readonly onComplete: (summary: LearningGameSummary) => void
 }) {
-  const shared = { onExit, onComplete }
+  const shared = { onExit, onAttempt, onComplete }
 
   switch (gameId) {
-    case 'speed-match': return <SpeedMatch {...shared} pairs={pairs} playAudio={playAudio} />
-    case 'target-blast': return <TargetBlast {...shared} rounds={selectionRounds} playAudio={playAudio} />
-    case 'lily-pad-path': return <LilyPadPath {...shared} rounds={selectionRounds} playAudio={playAudio} />
-    case 'memory-flip': return <MemoryFlip {...shared} pairs={pairs} playAudio={playAudio} />
-    case 'context-gap-dash': return <ContextGapDash {...shared} rounds={contextRounds} playAudio={playAudio} />
-    case 'sentence-scramble': return <SentenceScramble {...shared} rounds={sequenceRounds} playAudio={playAudio} />
-    case 'read-aloud-boss-rush': return <ReadAloudBossRush {...shared} rounds={productionRounds} playAudio={playAudio} />
-    case 'dictation-streak': return <DictationStreak {...shared} rounds={productionRounds} playAudio={playAudio} />
-    case 'speller-bee': return <SpellerBee {...shared} rounds={spellingRounds} playAudio={playAudio} />
-    case 'copy-hide-write-combo': return <StrokeOrderSlay {...shared} rounds={strokeOrderRounds} playAudio={playAudio} />
+    case 'speed-match': return <SpeedMatch {...shared} pairs={starterCurriculum.pairs} playAudio={playAudio} />
+    case 'target-blast': return <TargetBlast {...shared} rounds={starterCurriculum.selectionRounds} playAudio={playAudio} />
+    case 'lily-pad-path': return <LilyPadPath {...shared} rounds={starterCurriculum.selectionRounds} playAudio={playAudio} />
+    case 'memory-flip': return <MemoryFlip {...shared} pairs={starterCurriculum.pairs} playAudio={playAudio} />
+    case 'context-gap-dash': return <ContextGapDash {...shared} rounds={starterCurriculum.contextRounds} playAudio={playAudio} />
+    case 'sentence-scramble': return <SentenceScramble {...shared} rounds={starterCurriculum.sequenceRounds} playAudio={playAudio} />
+    case 'read-aloud-boss-rush': return <ReadAloudBossRush {...shared} rounds={starterCurriculum.productionRounds} playAudio={playAudio} />
+    case 'dictation-streak': return <DictationStreak {...shared} rounds={starterCurriculum.productionRounds} playAudio={playAudio} />
+    case 'speller-bee': return <SpellerBee {...shared} rounds={starterCurriculum.spellingRounds} playAudio={playAudio} />
+    case 'copy-hide-write-combo': return <StrokeOrderSlay {...shared} rounds={starterCurriculum.strokeOrderRounds} playAudio={playAudio} />
   }
 }
 
@@ -433,11 +459,19 @@ export function App() {
   const [activeGame, setActiveGame] = useState<LearningGameId | null>(null)
   const [lastSummary, setLastSummary] = useState<LearningGameSummary | null>(null)
   const [sessionKey, setSessionKey] = useState(0)
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null)
+  const [progress, setProgress] = useState<LearningProgress>(() => readLearningProgress(window.localStorage.getItem(PROGRESS_STORAGE_KEY)))
 
   useEffect(() => () => stopLearningAudio(), [])
+  useEffect(() => {
+    window.localStorage.setItem(PROGRESS_STORAGE_KEY, JSON.stringify(progress))
+  }, [progress])
 
-  function openGame(gameId: LearningGameId) {
+  function openGame(gameId: LearningGameId, resumedFrom?: string) {
     stopLearningAudio()
+    const session = createLearningSession(gameId, new Date().toISOString(), resumedFrom)
+    setProgress((current) => ({ ...current, sessions: [...current.sessions, session].slice(-100) }))
+    setActiveSessionId(session.id)
     setActiveGame(gameId)
     setSessionKey((current) => current + 1)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -445,18 +479,48 @@ export function App() {
 
   function finishGame(summary: LearningGameSummary) {
     stopLearningAudio()
+    const now = new Date().toISOString()
+    if (activeSessionId) {
+      setProgress((current) => updateLearningSession(current, activeSessionId, (session) => ({
+        ...session,
+        status: 'completed',
+        updatedAt: now,
+        attempts: summary.attempts,
+        summary,
+      })))
+    }
     setLastSummary(summary)
+    setActiveSessionId(null)
     setActiveGame(null)
   }
 
   function exitGame() {
     stopLearningAudio()
+    const now = new Date().toISOString()
+    if (activeSessionId) {
+      setProgress((current) => updateLearningSession(current, activeSessionId, (session) => ({
+        ...session,
+        status: 'exited',
+        updatedAt: now,
+      })))
+    }
+    setActiveSessionId(null)
     setActiveGame(null)
+  }
+
+  function saveAttempt(attempt: LearningGameAttempt) {
+    if (!activeSessionId) return
+    const now = new Date().toISOString()
+    setProgress((current) => updateLearningSession(current, activeSessionId, (session) => ({
+      ...session,
+      updatedAt: now,
+      attempts: [...session.attempts, attempt],
+    })))
   }
 
   if (activeGame) {
     return <Suspense fallback={<main className="playground"><p role="status">Loading game module…</p></main>}>
-      <GamePreview key={`${activeGame}-${sessionKey}`} gameId={activeGame} onExit={exitGame} onComplete={finishGame} />
+      <GamePreview key={`${activeGame}-${sessionKey}`} gameId={activeGame} onExit={exitGame} onAttempt={saveAttempt} onComplete={finishGame} />
     </Suspense>
   }
 
@@ -492,13 +556,26 @@ export function App() {
       <button type="button" onClick={() => openGame(lastSummary.gameId)}><RotateCcw size={15} /> Play again</button>
     </section>}
 
+    {progress.sessions.length > 0 && <section className="practice-history" aria-labelledby="practice-history-title">
+      <div><p className="eyebrow">Saved on this device</p><h2 id="practice-history-title">Recent practice</h2></div>
+      <ul>
+        {[...progress.sessions].reverse().slice(0, 5).map((session) => <li key={session.id}>
+          <span><strong>{LEARNING_GAME_CATALOG.find((game) => game.id === session.gameId)?.title}</strong><small>{session.status === 'completed' ? 'Completed' : session.attempts.length ? 'Exited early · progress saved' : 'Opened'} · {session.attempts.length} {session.attempts.length === 1 ? 'attempt' : 'attempts'}</small></span>
+          {session.status === 'exited' && <button type="button" onClick={() => openGame(session.gameId, session.id)}>Continue practice</button>}
+        </li>)}
+      </ul>
+      <p>Continuing starts at the first prompt while keeping the earlier attempts as a separate saved session.</p>
+    </section>}
+
     <section className="catalog" aria-labelledby="catalog-title">
       <div className="section-heading">
         <div><p className="eyebrow">10 ways to practice</p><h2 id="catalog-title">Choose your challenge</h2></div>
         <p>Pick any game. Each one shows you what to do.</p>
       </div>
       <div className="game-grid">
-        {LEARNING_GAME_CATALOG.map((game, index) => <article className={`game-card tone-${(index % 5) + 1}`} key={game.id}>
+        {LEARNING_GAME_CATALOG.map((game, index) => {
+          const latestSession = [...progress.sessions].reverse().find((session) => session.gameId === game.id)
+          return <article className={`game-card tone-${(index % 5) + 1}`} key={game.id}>
           <div className="card-top">
             <GameArtwork gameId={game.id} compact />
             <span className="game-time">{game.estimatedSeconds[0]}–{game.estimatedSeconds[1]} sec</span>
@@ -507,9 +584,11 @@ export function App() {
             <p>{channelLabel(game.channels)} · {game.activityLabel}</p>
             <h3>{game.title}</h3>
             <p>{game.description}</p>
+            {'releaseStatus' in game && game.releaseStatus === 'hold' && <span className="release-hold">Release hold · {game.releaseNote}</span>}
+            {latestSession && <span className="game-progress">{latestSession.status === 'completed' ? 'Last run completed' : 'Practice saved'} · {latestSession.attempts.length} attempts</span>}
           </div>
-          <button type="button" onClick={() => openGame(game.id)}>Play game <ArrowRight size={17} /></button>
-        </article>)}
+          <button type="button" onClick={() => openGame(game.id)}>{'releaseStatus' in game && game.releaseStatus === 'hold' ? 'Open safety preview' : 'Play game'} <ArrowRight size={17} /></button>
+        </article>})}
       </div>
     </section>
   </main>

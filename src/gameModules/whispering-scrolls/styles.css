@@ -11,7 +11,7 @@
 .lg-topbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .lg-exit,.lg-audio { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; cursor: pointer; }
 .lg-exit { padding: 9px 13px; border-radius: 999px; color: #5b5670; background: #efeaf6; font-size: .78rem; font-weight: 800; }
-.lg-progress { display: grid; gap: 6px; width: min(260px, 48vw); padding: 8px 12px 10px; border-radius: 15px; color: #4d3e63; background: #eee6f7; font-size: .68rem; font-weight: 850; }
+.lg-progress { display: grid; gap: 6px; width: min(260px, 48vw); padding: 8px 12px 10px; border-radius: 15px; color: #4d3e63; background: #eee6f7; font-size: .75rem; font-weight: 850; }
 .lg-progress > span { display: flex; align-items: center; gap: 6px; letter-spacing: .04em; text-transform: uppercase; }
 .lg-progress strong { margin-left: auto; font-size: .72rem; letter-spacing: 0; text-transform: none; }
 .lg-progress > i { display: block; height: 7px; overflow: hidden; border-radius: 999px; background: rgb(0 0 0 / 12%); }
@@ -176,7 +176,7 @@
 .lg-scroll-progress { display: grid; gap: 7px; width: min(470px,90%); margin: 5px 0 18px; }
 .lg-scroll-progress > span { display: block; height: 13px; overflow: hidden; border: 2px solid #6c4932; border-radius: 999px; background: #17141a; box-shadow: 0 0 0 2px rgb(229 183 93 / 11%),inset 0 2px 6px rgb(0 0 0 / 45%); }
 .lg-scroll-progress b { display: block; min-width: 4px; height: 100%; border-radius: inherit; background: repeating-linear-gradient(90deg,#e8c36f 0 29px,#b43e48 29px 33px); box-shadow: 0 0 15px rgb(234 191 99 / 39%); transition: width 300ms ease; }
-.lg-scroll-progress small { color: #a9977e; font-size: .61rem; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; }
+.lg-scroll-progress small { color: #a9977e; font-size: .75rem; font-weight: 900; letter-spacing: .09em; text-transform: uppercase; }
 .lg-production-icon { color: var(--lg-accent); filter: drop-shadow(0 0 15px rgb(var(--lg-accent-rgb) / 27%)); }
 .lg-prompt-word { color: white; text-shadow: 0 0 30px rgb(var(--lg-accent-rgb) / 26%); }
 .lg-reveal-word { border: 1px solid rgb(var(--lg-accent-rgb) / 20%); color: #fbfbff; background: rgb(6 11 27 / 58%); box-shadow: 0 14px 35px rgb(0 0 0 / 25%), inset 0 0 30px rgb(var(--lg-accent-rgb) / 5%); text-shadow: 0 0 25px rgb(var(--lg-accent-rgb) / 23%); }
@@ -259,7 +259,7 @@
 .lg-live-wave { display: flex; align-items: center; justify-content: center; gap: 4px; width: 70%; height: 55px; margin: 3px auto 3px; }
 .lg-live-wave i { width: 5px; height: 12px; border-radius: 999px; background: linear-gradient(#f176ff,#ff6d8b); box-shadow: 0 0 7px rgb(239 103 255 / 35%); transition: height 70ms linear,opacity 70ms linear,filter 120ms ease; }
 .lg-combat-word { position: relative; z-index: 2; margin: 8px 0 20px; padding: 17px 35px; border: 1px solid rgb(239 113 255 / 35%); border-radius: 20px; background: rgb(43 19 55 / 72%); box-shadow: inset 0 0 28px rgb(239 113 255 / 9%),0 0 35px rgb(239 113 255 / 13%); }
-.lg-microphone-label { margin: 8px 0 0 !important; color: #9a8ead !important; font-size: .68rem !important; font-weight: 750; }
+.lg-microphone-label { margin: 8px 0 0 !important; color: #9a8ead !important; font-size: .75rem !important; font-weight: 750; }
 .lg-read-aloud-review { display: flex; flex-direction: column; align-items: center; width: min(690px,100%); padding: 4px 0 10px; }
 .lg-read-aloud-review > h2 { margin: 3px 0 17px; color: #f8eaff; font-size: clamp(1.25rem,3vw,1.7rem); }
 .lg-reading-comparison { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: stretch; gap: 12px; width: 100%; }
@@ -268,7 +268,7 @@
 .lg-reading-comparison section > strong { font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; }
 .lg-reading-comparison section > small { max-width: 220px; margin-top: 7px; overflow: hidden; color: #887c93; font-size: .6rem; text-overflow: ellipsis; white-space: nowrap; }
 .lg-comparison-number { position: absolute; top: 11px; left: 12px; display: grid; place-items: center; width: 25px; aspect-ratio: 1; border: 1px solid rgb(244 177 255 / 35%); border-radius: 50%; color: #f6bdff; background: rgb(237 114 255 / 12%); font-size: .72rem; font-weight: 950; }
-.lg-comparison-arrow { align-self: center; color: #f19cff; font-size: 1.65rem; font-weight: 900; }
+.lg-comparison-arrow { align-self: center; color: #f19cff; font-size: 1.75rem; font-weight: 900; }
 .lg-recording-wave { display: flex; align-items: center; justify-content: center; gap: 3px; width: 100%; height: 44px; margin: 8px 0 5px; }
 .lg-recording-wave i { width: 4px; min-height: 4px; border-radius: 99px; background: linear-gradient(#ef75ff,#ff6f8d); transition: filter 130ms ease,opacity 130ms ease; }
 .lg-reading-comparison section.is-playing .lg-recording-wave i { filter: brightness(1.35); opacity: 1; }
@@ -294,6 +294,9 @@
 .lg-scroll-briefing-mark svg:last-child { color: #a32e39; }
 .lg-read-aloud-briefing .lg-briefing-status { border: 1px solid rgb(231 189 100 / 21%); color: #e3c581; background: rgb(231 189 100 / 8%); }
 .lg-read-aloud-briefing .lg-audio { color: #f2dba7; }
+.lg-voice-privacy { display: flex; gap: 10px; max-width: 560px; margin: 8px 0 4px; padding: 12px 14px; border: 1px solid rgb(231 189 100 / 27%); border-radius: 12px; color: #d9d0bc; background: rgb(8 12 20 / 42%); font-size: .82rem; line-height: 1.45; text-align: left; }
+.lg-voice-privacy svg { flex: 0 0 auto; margin-top: 2px; color: #e3c581; }
+.lg-read-aloud-fallback > p:not(.lg-kicker) { max-width: 48ch; color: #cfc4ad; text-align: center; }
 .lg-scroll-reading-stage { isolation: isolate; min-height: 390px; padding: 25px 118px 30px; overflow: hidden; border-color: rgb(226 184 96 / 30%); background: radial-gradient(circle at 82% 14%,rgb(237 224 176 / 16%),transparent 94px),linear-gradient(180deg,#1a2233 0 58%,#15151d 59% 100%); box-shadow: inset 0 0 65px rgb(0 0 0 / 38%),0 18px 37px rgb(0 0 0 / 23%); }
 .lg-scroll-reading-stage > *:not(.lg-scroll-night):not(.lg-scroll-ninja-reader) { position: relative; z-index: 3; }
 .lg-scroll-night { position: absolute; z-index: 0; inset: 0; pointer-events: none; }

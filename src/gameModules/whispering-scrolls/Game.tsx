@@ -8,7 +8,15 @@ import type {
   RenderReadingResponse,
 } from './runtime/contracts'
 import { ProductionRunner } from './runtime/ProductionGameShared'
-import { scoreRecordedWord, type AcousticWordScore, type ReadAloudModel } from './runtime/readAloudScoring'
+import { SelfAssessmentButtons } from './runtime/GameShell'
+import {
+  normalizeSpokenText,
+  readAloudOutcome,
+  scoreRecordedWord,
+  transcriptEvidence,
+  type AcousticWordScore,
+  type ReadAloudModel,
+} from './runtime/readAloudScoring'
 
 const RECORDING_SECONDS = 6
 const MIN_SPEECH_MILLISECONDS = 450
@@ -21,9 +29,10 @@ const READ_ALOUD_MODELS: readonly ReadAloudModel[] = [
   { text: '再见', url: new URL('./assets/goodbye.wav', import.meta.url).href },
 ]
 
-function ReadAloudBriefing({ onComplete, instructionAudioUrl }: {
+function ReadAloudBriefing({ onComplete, instructionAudioUrl, privacyNotice }: {
   readonly onComplete: () => void
   readonly instructionAudioUrl: string
+  readonly privacyNotice: string
 }) {
   const [instructionState, setInstructionState] = useState<'playing' | 'ready' | 'blocked'>('playing')
   const instructionAudioRef = useRef<HTMLAudioElement | null>(null)
@@ -64,6 +73,7 @@ function ReadAloudBriefing({ onComplete, instructionAudioUrl }: {
     <p className="lg-kicker">Scroll keeper briefing</p>
     <h2>Enter the Whispering Scroll trial</h2>
     <p>Each scroll reveals one Mandarin word. Read it aloud before the six-second whisper window closes, then compare your echo with the scroll keeper’s voice.</p>
+    <div className="lg-voice-privacy" role="note"><Mic size={18} aria-hidden="true" /><span><strong>Before using the microphone:</strong> {privacyNotice}</span></div>
     <span className="lg-briefing-status" role="status" aria-live="polite"><span aria-hidden="true" /> {instructionState === 'playing' ? 'The scroll keeper is speaking…' : instructionState === 'blocked' ? 'Tap “Hear the scroll keeper” to listen.' : 'Ready to enter the dojo'}</span>
     <button className="lg-audio" type="button" onClick={playInstructions}><Volume2 size={18} /> Hear the scroll keeper</button>
     <button className="lg-primary lg-start-recording" type="button" onClick={startRecording}><ScrollText size={18} /> Unroll the first scroll</button>
@@ -137,10 +147,11 @@ async function recordingHasAudibleSpeech(recording: Blob) {
   }
 }
 
-function TimedReadAloudCapture({ round, onReady, onCapture, meterAudioContext }: {
+function TimedReadAloudCapture({ round, onReady, onCapture, onFallback, meterAudioContext }: {
   readonly round: ProductionGameRound
   readonly onReady: () => void
   readonly onCapture: (round: ProductionGameRound, recording: RecordedReading) => void
+  readonly onFallback: (round: ProductionGameRound) => void
   readonly meterAudioContext: AudioContext | null
 }) {
   const [state, setState] = useState<ReadAloudCaptureState>('requesting')
@@ -364,38 +375,9 @@ function TimedReadAloudCapture({ round, onReady, onCapture, meterAudioContext }:
       <strong>{state === 'silent' ? 'We could not hear your voice.' : 'Microphone setup needs attention.'}</strong>
       <p>{errorMessage}</p>
       <button className="lg-primary" type="button" onClick={() => setRetryKey((current) => current + 1)}>Try microphone again</button>
+      <button className="lg-audio" type="button" onClick={() => { onFallback(round); onReady() }}>Continue without a microphone</button>
     </div>}
   </div>
-}
-
-function normalizeSpokenText(text: string) {
-  return Array.from(text.normalize('NFKC').toLowerCase()).filter((character) => /[\p{L}\p{N}]/u.test(character)).join('')
-}
-
-function editDistance(left: readonly string[], right: readonly string[]) {
-  const previous = Array.from({ length: right.length + 1 }, (_, index) => index)
-  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
-    const current = [leftIndex]
-    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
-      current[rightIndex] = left[leftIndex - 1] === right[rightIndex - 1]
-        ? previous[rightIndex - 1]
-        : Math.min(previous[rightIndex - 1], previous[rightIndex], current[rightIndex - 1]) + 1
-    }
-    for (let index = 0; index < current.length; index += 1) previous[index] = current[index]
-  }
-  return previous[right.length]
-}
-
-type TranscriptEvidence = 'unavailable' | 'exact' | 'close' | 'different'
-
-function transcriptEvidence(target: string, transcript: string): TranscriptEvidence {
-  const normalizedTarget = normalizeSpokenText(target)
-  const normalizedTranscript = normalizeSpokenText(transcript)
-  if (!normalizedTarget || !normalizedTranscript) return 'unavailable'
-  if (normalizedTranscript === normalizedTarget) return 'exact'
-  const targetCharacters = Array.from(normalizedTarget)
-  const transcriptCharacters = Array.from(normalizedTranscript)
-  return editDistance(targetCharacters, transcriptCharacters) === 1 ? 'close' : 'different'
 }
 
 function useRecordingWaveform(recording: Blob, barCount = 24) {
@@ -459,21 +441,7 @@ function ReadAloudReview({ round, recording, playAudio, models, onAssess }: {
   const recognizedEvidence = transcriptEvidence(round.targetText, recording.transcript)
   const scoring = acousticScore === undefined
   const acousticMatchedTarget = acousticScore?.matchedText === round.targetText
-  const acousticStrong = Boolean(acousticScore
-    && acousticMatchedTarget
-    && acousticScore.separation >= .08
-    && acousticScore.bestDistance <= 1.2)
-  const outcome = scoring
-    ? 'analyzing'
-    : acousticScore === null
-      ? recognizedEvidence === 'exact' ? 'close' : 'unavailable'
-      : recognizedEvidence === 'exact' && acousticMatchedTarget
-        ? 'strong'
-        : recognizedEvidence === 'unavailable' && acousticStrong
-          ? 'strong'
-          : recognizedEvidence === 'exact' || acousticMatchedTarget
-            ? 'close'
-            : 'retry'
+  const outcome = scoring ? 'analyzing' : readAloudOutcome(recognizedEvidence, acousticScore, round.targetText)
   const passed = outcome === 'strong'
 
   useEffect(() => {
@@ -592,9 +560,11 @@ function ReadAloudReview({ round, recording, playAudio, models, onAssess }: {
         <strong>The scroll is listening…</strong>
         <span>Comparing the recognized word and the shape of your voice.</span>
       </> : outcome === 'strong' ? <>
-        <strong>Scroll mastered</strong>
-        <span>{recognizedEvidence === 'exact'
+        <strong>Scroll completed</strong>
+        <span>{recognizedEvidence === 'exact' && acousticScore
           ? <>Both checks matched <b lang="zh-Hans">{round.targetText}</b>.</>
+          : recognizedEvidence === 'exact'
+            ? <>The browser recognized <b lang="zh-Hans">{round.targetText}</b>. Voice-pattern comparison was unavailable, so the transcript was used.</>
           : <>The voice comparison strongly matched <b lang="zh-Hans">{round.targetText}</b>.</>}</span>
       </> : outcome === 'close' ? <>
         <strong>The whisper is close—read again</strong>
@@ -608,10 +578,35 @@ function ReadAloudReview({ round, recording, playAudio, models, onAssess }: {
         <span>{recording.transcript ? <>Browser heard: <b lang="zh-Hans">{recording.transcript}</b>. </> : null}Voice comparison was closest to <b lang="zh-Hans">{acousticScore?.matchedText}</b>; target: <b lang="zh-Hans">{round.targetText}</b>.</span>
       </> : <>
         <strong>The scroll could not judge this echo</strong>
-        <span>The recording did not provide enough reliable evidence. Check the microphone and try again.</span>
+        <span>The recording did not provide enough reliable evidence. Listen to the model, then record your own self-check.</span>
       </>}
-      {!scoring && <button className={passed ? 'lg-primary' : 'lg-incorrect'} type="button" onClick={() => onAssess(passed, `${outcome}:heard-${normalizeSpokenText(recording.transcript) || 'none'}:acoustic-${acousticScore?.matchedText || 'none'}`)}>{passed ? 'Open next scroll' : 'Read scroll again'}</button>}
+      {!scoring && outcome === 'unavailable'
+        ? <SelfAssessmentButtons
+            incorrectLabel="Read scroll again"
+            correctLabel="My reading matched"
+            onAnswer={(correct) => onAssess(correct, `self-review:heard-${normalizeSpokenText(recording.transcript) || 'none'}:acoustic-none`)}
+          />
+        : !scoring && <button className={passed ? 'lg-primary' : 'lg-incorrect'} type="button" onClick={() => onAssess(passed, `${outcome}:heard-${normalizeSpokenText(recording.transcript) || 'none'}:acoustic-${acousticScore?.matchedText || 'none'}`)}>{passed ? 'Open next scroll' : 'Read scroll again'}</button>}
     </div>}
+  </div>
+}
+
+function ReadAloudSelfReview({ round, playAudio, onAssess }: {
+  readonly round: ProductionGameRound
+  readonly playAudio?: PlayLearningAudio
+  readonly onAssess: (correct: boolean, response?: string) => void
+}) {
+  return <div className="lg-read-aloud-review lg-read-aloud-fallback">
+    <p className="lg-kicker">No-microphone practice</p>
+    <h2>Listen, read, and check your own attempt</h2>
+    <div className="lg-review-word" lang="zh-Hans">{round.targetText}</div>
+    {playAudio && <button className="lg-audio" type="button" onClick={() => void playAudio(round.audioText || round.targetText)}><Volume2 size={18} /> Hear the scroll keeper</button>}
+    <p>This fallback records completion as a self-check, not an automatic pronunciation score.</p>
+    <SelfAssessmentButtons
+      incorrectLabel="I want another try"
+      correctLabel="My reading matched"
+      onAnswer={(correct) => onAssess(correct, `no-microphone-self-review:${correct ? 'matched' : 'retry'}`)}
+    />
   </div>
 }
 
@@ -635,6 +630,7 @@ export function ReadAloudBossRush({
 }) {
   const [briefingComplete, setBriefingComplete] = useState(false)
   const [recording, setRecording] = useState<(RecordedReading & { readonly roundId: string }) | null>(null)
+  const [fallbackRoundId, setFallbackRoundId] = useState('')
   const meterAudioContextRef = useRef<AudioContext | null>(null)
 
   useEffect(() => () => {
@@ -651,13 +647,16 @@ export function ReadAloudBossRush({
   }
 
   const saveRecording = useCallback((round: ProductionGameRound, capturedReading: RecordedReading) => {
+    setFallbackRoundId('')
     setRecording({ roundId: round.id, ...capturedReading })
     onRecording?.(round, capturedReading.blob)
   }, [onRecording])
 
   const defaultResponse: RenderReadingResponse | undefined = renderCapture ? undefined : (round, controls) => recording?.roundId === round.id
     ? <ReadAloudReview round={round} recording={recording} playAudio={playAudio} models={models} onAssess={controls.onAssess} />
-    : <div className="lg-read-aloud-review" role="status">Preparing your recording…</div>
+    : fallbackRoundId === round.id
+      ? <ReadAloudSelfReview round={round} playAudio={playAudio} onAssess={controls.onAssess} />
+      : <div className="lg-read-aloud-review" role="status">Preparing your recording…</div>
 
   return <ProductionRunner
     {...props}
@@ -669,13 +668,17 @@ export function ReadAloudBossRush({
     completionMessage="Every whispering scroll is sealed. The dojo recognizes your reading voice."
     directResponse={renderResponse || defaultResponse}
     prompt={(round, controls) => briefingComplete ? <>
-      <div className="lg-scroll-progress" aria-label={`${controls.index} of ${controls.total} scrolls mastered`}>
+      <div className="lg-scroll-progress" aria-label={`${controls.index} of ${controls.total} scrolls completed`}>
         <span><b style={{ width: `${(controls.index / controls.total) * 100}%` }} /></span>
-        <small>{controls.index}/{controls.total} scroll seals mastered</small>
+        <small>{controls.index}/{controls.total} scroll seals completed</small>
       </div>
       {renderCapture
         ? renderCapture(round, { onReady: controls.reveal })
-        : <TimedReadAloudCapture key={round.id} round={round} onReady={controls.reveal} onCapture={saveRecording} meterAudioContext={meterAudioContextRef.current} />}
-    </> : <ReadAloudBriefing onComplete={beginRecordingSession} instructionAudioUrl={instructionAudioUrl} />}
+        : <TimedReadAloudCapture key={round.id} round={round} onReady={controls.reveal} onCapture={saveRecording} onFallback={(fallbackRound) => setFallbackRoundId(fallbackRound.id)} meterAudioContext={meterAudioContextRef.current} />}
+    </> : <ReadAloudBriefing
+      onComplete={beginRecordingSession}
+      instructionAudioUrl={instructionAudioUrl}
+      privacyNotice={`This game analyzes a short recording in this browser. Browser speech recognition may use your browser provider's service. ${onRecording ? 'The host app is configured to receive the recording.' : 'This module does not save or upload the recording itself.'} Ask an adult before continuing.`}
+    />}
   />
 }

@@ -27,7 +27,7 @@ function AutoAssessmentFeedback({ feedback, lastRound }: {
   return <div className={`lg-feedback is-${feedback} is-auto lg-assessment-feedback`} role="status">
     <div className="lg-feedback-energy" aria-hidden="true">{Array.from({ length: 10 }, (_, index) => <i key={index} />)}</div>
     <span className="lg-feedback-emblem" aria-hidden="true">{feedback === 'correct' ? '印' : '↻'}</span>
-    <strong>{feedback === 'correct' ? 'Scroll mastered!' : 'The scroll whispers—read it once more.'}</strong>
+    <strong>{feedback === 'correct' ? 'Scroll completed!' : 'The scroll whispers—read it once more.'}</strong>
     <span className="lg-feedback-detail">{feedback === 'correct' ? 'Your voice has sealed this scroll.' : 'Listen to the echo and steady your voice.'}</span>
     <span className="lg-auto-status">{feedback === 'correct' ? lastRound ? 'The final seal is opening…' : 'Unfurling the next scroll…' : 'Rolling the scroll back for another reading…'}</span>
   </div>
@@ -111,7 +111,7 @@ export function ProductionRunner({
   }
 
   const summary = summarizeLearningGame(gameId, attempts)
-  return <LearningGameShell gameId={gameId} title={title || defaultTitle} eyebrow={eyebrow || defaultEyebrow} progress={`${Math.min(index + (feedback === 'correct' ? 1 : 0), rounds.length)}/${rounds.length} mastered`} onExit={onExit}>
+  return <LearningGameShell gameId={gameId} title={title || defaultTitle} eyebrow={eyebrow || defaultEyebrow} progress={`${Math.min(index + (feedback === 'correct' ? 1 : 0), rounds.length)}/${rounds.length} completed`} onExit={onExit}>
     {!valid ? <LearningGameEmpty onExit={onExit} /> : complete ? <LearningGameComplete
       summary={summary}
       message={completionMessage}

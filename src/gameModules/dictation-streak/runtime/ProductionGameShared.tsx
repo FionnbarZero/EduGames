@@ -28,8 +28,8 @@ function AutoAssessmentFeedback({ feedback, lastRound, children }: {
   return <div className={`lg-feedback is-${feedback} is-auto lg-assessment-feedback`} role="status">
     <div className="lg-feedback-energy" aria-hidden="true">{Array.from({ length: 10 }, (_, index) => <i key={index} />)}</div>
     <span className="lg-feedback-emblem" aria-hidden="true">{feedback === 'correct' ? '✓' : '↻'}</span>
-    <strong>{feedback === 'correct' ? 'Target mastered!' : 'Learning moment — one more try.'}</strong>
-    <span className="lg-feedback-detail">{feedback === 'correct' ? 'Mastery +1' : 'This target stays in practice until it feels solid.'}</span>
+    <strong>{feedback === 'correct' ? 'Target correct!' : 'Learning moment — one more try.'}</strong>
+    <span className="lg-feedback-detail">{feedback === 'correct' ? 'Correct answer' : 'This target stays in practice until it feels solid.'}</span>
     {children}
     <span className="lg-auto-status">{feedback === 'correct' ? lastRound ? 'Preparing your result…' : 'Next challenge coming up…' : 'Resetting for your retry…'}</span>
   </div>
@@ -58,6 +58,8 @@ type ProductionRunnerProps = LearningGameBaseProps & {
   readonly incorrectFeedback?: (round: ProductionGameRound, response: string) => ReactNode
   readonly incorrectFeedbackDuration?: number
   readonly completionMessage: string
+  readonly validateRound?: (round: ProductionGameRound) => boolean
+  readonly invalidContentMessage?: string
 }
 
 export function ProductionRunner({
@@ -73,6 +75,8 @@ export function ProductionRunner({
   incorrectFeedback,
   incorrectFeedbackDuration = 1900,
   completionMessage,
+  validateRound,
+  invalidContentMessage,
   title,
   eyebrow,
   onExit,
@@ -87,7 +91,7 @@ export function ProductionRunner({
   const [feedback, setFeedback] = useState<AssessmentFeedback | null>(null)
   const [feedbackResponse, setFeedbackResponse] = useState('')
   const round = rounds[index]
-  const valid = validProductionRounds(rounds)
+  const valid = validProductionRounds(rounds) && (!validateRound || rounds.every(validateRound))
   const complete = valid && index >= rounds.length
 
   useEffect(() => {
@@ -122,8 +126,8 @@ export function ProductionRunner({
   }
 
   const summary = summarizeLearningGame(gameId, attempts)
-  return <LearningGameShell gameId={gameId} title={title || defaultTitle} eyebrow={eyebrow || defaultEyebrow} progress={`${Math.min(index + (feedback === 'correct' ? 1 : 0), rounds.length)}/${rounds.length} mastered`} onExit={onExit}>
-    {!valid ? <LearningGameEmpty onExit={onExit} /> : complete ? <LearningGameComplete
+  return <LearningGameShell gameId={gameId} title={title || defaultTitle} eyebrow={eyebrow || defaultEyebrow} progress={`${Math.min(index + (feedback === 'correct' ? 1 : 0), rounds.length)}/${rounds.length} completed`} onExit={onExit}>
+    {!valid ? <LearningGameEmpty onExit={onExit} message={invalidContentMessage} /> : complete ? <LearningGameComplete
       summary={summary}
       message={completionMessage}
       onDone={() => onComplete(summary)}

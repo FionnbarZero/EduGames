@@ -11,6 +11,57 @@ export type AcousticWordScore = {
   readonly separation: number
 }
 
+export type TranscriptEvidence = 'unavailable' | 'exact' | 'close' | 'different'
+export type ReadAloudOutcome = 'strong' | 'close' | 'retry' | 'unavailable'
+
+export function normalizeSpokenText(text: string) {
+  return Array.from(text.normalize('NFKC').toLowerCase())
+    .filter((character) => /[\p{L}\p{N}]/u.test(character))
+    .join('')
+}
+
+function editDistance(left: readonly string[], right: readonly string[]) {
+  const previous = Array.from({ length: right.length + 1 }, (_, index) => index)
+  for (let leftIndex = 1; leftIndex <= left.length; leftIndex += 1) {
+    const current = [leftIndex]
+    for (let rightIndex = 1; rightIndex <= right.length; rightIndex += 1) {
+      current[rightIndex] = left[leftIndex - 1] === right[rightIndex - 1]
+        ? previous[rightIndex - 1]
+        : Math.min(previous[rightIndex - 1], previous[rightIndex], current[rightIndex - 1]) + 1
+    }
+    for (let index = 0; index < current.length; index += 1) previous[index] = current[index]
+  }
+  return previous[right.length]
+}
+
+export function transcriptEvidence(target: string, transcript: string): TranscriptEvidence {
+  const normalizedTarget = normalizeSpokenText(target)
+  const normalizedTranscript = normalizeSpokenText(transcript)
+  if (!normalizedTarget || !normalizedTranscript) return 'unavailable'
+  if (normalizedTranscript === normalizedTarget) return 'exact'
+  return editDistance(Array.from(normalizedTarget), Array.from(normalizedTranscript)) === 1 ? 'close' : 'different'
+}
+
+export function readAloudOutcome(
+  evidence: TranscriptEvidence,
+  acousticScore: AcousticWordScore | null,
+  targetText: string,
+): ReadAloudOutcome {
+  if (acousticScore === null) {
+    if (evidence === 'exact') return 'strong'
+    if (evidence === 'close') return 'close'
+    return 'unavailable'
+  }
+
+  const acousticMatchedTarget = acousticScore.matchedText === targetText
+  const acousticStrong = acousticMatchedTarget
+    && acousticScore.separation >= .08
+    && acousticScore.bestDistance <= 1.2
+  if ((evidence === 'exact' && acousticMatchedTarget) || (evidence === 'unavailable' && acousticStrong)) return 'strong'
+  if (evidence === 'exact' || acousticMatchedTarget) return 'close'
+  return 'retry'
+}
+
 type AudioSignal = {
   readonly samples: Float32Array
   readonly sampleRate: number

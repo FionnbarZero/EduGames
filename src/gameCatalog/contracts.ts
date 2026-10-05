@@ -23,6 +23,8 @@ export type LearningGameDefinition = {
   readonly skills: readonly LearningGameSkill[]
   readonly inputKind: LearningGameInputKind
   readonly estimatedSeconds: readonly [minimum: number, maximum: number]
+  readonly releaseStatus?: 'ready' | 'hold'
+  readonly releaseNote?: string
 }
 
 export type GameChoice = {

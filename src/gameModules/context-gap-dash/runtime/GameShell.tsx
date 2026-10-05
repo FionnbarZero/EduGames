@@ -20,8 +20,8 @@ export function LearningGameShell({ gameId, title, eyebrow, progress, onExit, ch
     <div className="lg-world-atmosphere" aria-hidden="true"><i /><i /><i /></div>
     <div className="lg-topbar">
       <button className="lg-exit" type="button" onClick={onExit}><X size={18} /> Exit game</button>
-      <div className="lg-progress" aria-label={`Mastery progress: ${progress}`}>
-        <span><Sparkles size={13} aria-hidden="true" /> Mastery <strong>{progress}</strong></span>
+      <div className="lg-progress" aria-label={`Game progress: ${progress}`}>
+        <span><Sparkles size={13} aria-hidden="true" /> Progress <strong>{progress}</strong></span>
         <i aria-hidden="true"><b style={{ width: `${percentage}%` }} /></i>
       </div>
     </div>
@@ -40,12 +40,12 @@ export function LearningGameComplete({ summary, message, onDone }: {
 }) {
   const accuracy = summary.attempted ? Math.round((summary.correct / summary.attempted) * 100) : 0
   const retries = summary.attempted - summary.correct
-  const achievement = retries === 0 ? 'Flawless mastery' : retries <= 2 ? 'Strong mastery' : 'Practice powered'
+  const achievement = retries === 0 ? 'Flawless run' : retries <= 2 ? 'Strong run' : 'Practice powered'
   return <section className="lg-card lg-complete" aria-live="polite">
     <div className="lg-complete-burst" aria-hidden="true">{Array.from({ length: 8 }, (_, index) => <i key={index} />)}</div>
     <span className="lg-complete-mark"><Check size={30} /></span>
     <p className="lg-kicker">{achievement}</p>
-    <h2>{summary.correct} mastered</h2>
+    <h2>{summary.correct} correct</h2>
     <div className="lg-complete-stats">
       <span><strong>{accuracy}%</strong> attempt accuracy</span>
       <span>{retries ? <><strong>{retries}</strong> learning {retries === 1 ? 'retry' : 'retries'}</> : <><strong>★</strong> first try</>}</span>
@@ -55,10 +55,13 @@ export function LearningGameComplete({ summary, message, onDone }: {
   </section>
 }
 
-export function LearningGameEmpty({ onExit }: { readonly onExit: () => void }) {
+export function LearningGameEmpty({ onExit, message = 'The learning engine must provide a validated prompt set before play begins.' }: {
+  readonly onExit: () => void
+  readonly message?: string
+}) {
   return <section className="lg-card lg-empty" role="status">
-    <h2>This game has no prompts yet.</h2>
-    <p>The learning engine must provide a validated prompt set before play begins.</p>
+    <h2>This game needs valid prompts.</h2>
+    <p>{message}</p>
     <button className="lg-primary" type="button" onClick={onExit}>Return</button>
   </section>
 }

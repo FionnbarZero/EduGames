@@ -19,6 +19,7 @@ import { LearningGameComplete, LearningGameEmpty, LearningGameShell, SelfAssessm
 import { AutoAssessmentFeedback, type AssessmentFeedback } from './runtime/AssessmentFeedback'
 import { playGameSound } from './runtime/gameFeel'
 import { summarizeLearningGame } from './runtime/model'
+import { strokeMatchesGuide } from './runtime/strokeAssessment'
 
 type StrokePhase = 'trace' | 'write' | 'compare'
 type NarrationState = 'idle' | 'playing' | 'ready' | 'error'
@@ -81,6 +82,9 @@ function StrokePad({
   showGuide,
   animationKey,
   label,
+  validateStroke,
+  onStrokeAccepted,
+  onStrokeRejected,
 }: {
   readonly round: StrokeOrderGameRound
   readonly strokes: InkDrawing
@@ -88,6 +92,9 @@ function StrokePad({
   readonly showGuide: boolean
   readonly animationKey: number
   readonly label: string
+  readonly validateStroke?: (stroke: InkStroke, strokeIndex: number) => boolean
+  readonly onStrokeAccepted?: () => void
+  readonly onStrokeRejected?: () => void
 }) {
   const activePointer = useRef<number | null>(null)
   const activePoints = useRef<InkStroke>([])
@@ -147,7 +154,14 @@ function StrokePad({
       paintFrame.current = null
     }
     const completedStroke = simplifyStroke(activePoints.current)
-    if (completedStroke.length >= 2) onStrokesChange?.((current) => [...current, completedStroke])
+    if (completedStroke.length >= 2) {
+      if (!validateStroke || validateStroke(completedStroke, strokes.length)) {
+        onStrokesChange?.((current) => [...current, completedStroke])
+        onStrokeAccepted?.()
+      } else {
+        onStrokeRejected?.()
+      }
+    }
     activePath.current?.removeAttribute('d')
     activePointer.current = null
     activePoints.current = []
@@ -233,6 +247,7 @@ export function StrokeOrderSlay({
   const [narrationState, setNarrationState] = useState<NarrationState>('idle')
   const [attempts, setAttempts] = useState<readonly LearningGameAttempt[]>([])
   const [feedback, setFeedback] = useState<AssessmentFeedback | null>(null)
+  const [traceMessage, setTraceMessage] = useState('')
   const narrationRequestRef = useRef(0)
   const round = rounds[index]
   const valid = validStrokeOrderRounds(rounds)
@@ -268,6 +283,7 @@ export function StrokeOrderSlay({
       setMemoryDrawing([])
       setSavedDrawing([])
       setAnimationKey((current) => current + 1)
+      setTraceMessage('')
       setFeedback(null)
     }, feedback === 'correct' ? 1000 : 1900)
     return () => window.clearTimeout(timer)
@@ -294,7 +310,7 @@ export function StrokeOrderSlay({
     gameId="copy-hide-write-combo"
     title={title}
     eyebrow={eyebrow}
-    progress={`${Math.min(index + (feedback === 'correct' ? 1 : 0), rounds.length)}/${rounds.length} mastered`}
+    progress={`${Math.min(index + (feedback === 'correct' ? 1 : 0), rounds.length)}/${rounds.length} completed`}
     onExit={onExit}
   >
     {!valid ? <LearningGameEmpty onExit={onExit} /> : complete ? <LearningGameComplete
@@ -315,7 +331,18 @@ export function StrokeOrderSlay({
             ? 'Playing…'
             : narrationState === 'error' ? `Tap to hear ${round.targetText}` : 'Hear it'}</button>
         </div>
-        <StrokePad round={round} strokes={traceDrawing} onStrokesChange={setTraceDrawing} showGuide animationKey={animationKey} label={`Trace the guide · ${traceDrawing.length}/${round.strokes.length} strokes`} />
+        <StrokePad
+          round={round}
+          strokes={traceDrawing}
+          onStrokesChange={setTraceDrawing}
+          showGuide
+          animationKey={animationKey}
+          label={`Trace the guide · ${traceDrawing.length}/${round.strokes.length} strokes`}
+          validateStroke={(stroke, strokeIndex) => Boolean(round.strokes[strokeIndex] && strokeMatchesGuide(stroke, round.strokes[strokeIndex]))}
+          onStrokeAccepted={() => setTraceMessage('Stroke accepted. Follow the next numbered guide.')}
+          onStrokeRejected={() => setTraceMessage('That stroke missed the guide or moved in the wrong direction. Try it again.')}
+        />
+        <p className={`lg-stroke-validation${traceMessage.startsWith('That') ? ' is-error' : ''}`} role="status">{traceMessage || 'Pointer-based practice: use touch, a stylus, or a mouse and follow each numbered stroke.'}</p>
         <div className="lg-stroke-actions">
           <DrawingTools drawing={traceDrawing} setDrawing={setTraceDrawing} />
           <button className="lg-stroke-replay" type="button" onClick={() => setAnimationKey((current) => current + 1)}><Play size={17} /> Replay stroke order</button>
