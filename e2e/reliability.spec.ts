@@ -12,11 +12,13 @@ const gameTitles = [
   'Rainbow Reading',
   'Dictation Streak',
   'SpellerBee',
-  'Stroke-order Slay',
+  'Stroke-order Slay - Kinder',
+  'Stroke-order Slay - 2nd',
+  'Stroke-order Slay - 5th',
 ] as const
 
 async function openGame(page: Page, title: string) {
-  const card = page.locator('.game-card').filter({ has: page.getByRole('heading', { name: title }) })
+  const card = page.locator('.game-card').filter({ has: page.getByRole('heading', { name: title, exact: true }) })
   await card.getByRole('button', { name: /Play game|Open safety preview/ }).click()
   await expect(page.getByRole('button', { name: 'Exit game' })).toBeVisible()
 }

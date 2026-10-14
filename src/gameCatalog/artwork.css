@@ -102,8 +102,8 @@
 .art-wave { fill: none; stroke: #ffd55e; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 7px #ff9b46); }
 .art-pencil { fill: #ff7a55; stroke: #ffc17f; stroke-width: 3; }
 .art-pencil-tip { fill: #fff0c0; }
-.lg-art-copy-hide-write-combo { --art-accent: #ff5a5f; --art-accent-2: #ffd36a; }
-.lg-art-copy-hide-write-combo .lg-art-scene { background: radial-gradient(circle at 78% 12%,rgb(255 215 121 / 18%),transparent 100px),linear-gradient(180deg,#341e27,#120f1d); }
+:is(.lg-art-copy-hide-write-combo, .lg-art-stroke-order-slay-kinder, .lg-art-stroke-order-slay-grade-2, .lg-art-stroke-order-slay-grade-5) { --art-accent: #ff5a5f; --art-accent-2: #ffd36a; }
+:is(.lg-art-copy-hide-write-combo, .lg-art-stroke-order-slay-kinder, .lg-art-stroke-order-slay-grade-2, .lg-art-stroke-order-slay-grade-5) .lg-art-scene { background: radial-gradient(circle at 78% 12%,rgb(255 215 121 / 18%),transparent 100px),linear-gradient(180deg,#341e27,#120f1d); }
 .art-stroke-grid { fill: #fff8ea; stroke: #ef5b5f; stroke-width: 3; }
 .art-stroke-grid path { fill: none; stroke: #f2a3a1; stroke-width: 1.5; stroke-dasharray: 6 5; }
 .art-stroke-character { fill: none; stroke: #dc3f48; stroke-width: 12; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 6px rgb(255 69 79 / 25%)); }

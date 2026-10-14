@@ -16,19 +16,18 @@ export function LearningGameShell({ gameId, title, eyebrow, progress, onExit, ch
   const total = Number(progressValues?.[2] || 0)
   const percentage = total ? Math.min(100, Math.max(0, (current / total) * 100)) : 0
 
-  return <main className={`lg-shell${gameId ? ` lg-world-${gameId}` : ''}`}>
+  return <main className={`lg-shell lg-stroke-shell${gameId ? ` lg-world-${gameId}` : ''}`}>
     <div className="lg-world-atmosphere" aria-hidden="true"><i /><i /><i /></div>
     <div className="lg-topbar">
-      <button className="lg-exit" type="button" onClick={onExit}><X size={18} /> Exit game</button>
+      <button className="lg-exit" type="button" aria-label="Exit game" onClick={onExit}><X size={18} /><span>Exit game</span></button>
+      <header className="lg-heading" aria-label={eyebrow}>
+        <h1>{title}</h1>
+      </header>
       <div className="lg-progress" aria-label={`Game progress: ${progress}`}>
-        <span><Sparkles size={13} aria-hidden="true" /> Progress <strong>{progress}</strong></span>
+        <span><Sparkles size={13} aria-hidden="true" /><strong>{progress}</strong></span>
         <i aria-hidden="true"><b style={{ width: `${percentage}%` }} /></i>
       </div>
     </div>
-    <header className="lg-heading">
-      <p>{eyebrow}</p>
-      <h1>{title}</h1>
-    </header>
     {children}
   </main>
 }

@@ -169,7 +169,10 @@ function ArtworkFor({ gameId }: { readonly gameId: LearningGameId }) {
     case 'rainbow-reading': return <RainbowReadingArt />
     case 'dictation-streak': return <DictationArt />
     case 'speller-bee': return <DictationArt />
-    case 'copy-hide-write-combo': return <StrokeArt />
+    case 'copy-hide-write-combo':
+    case 'stroke-order-slay-kinder':
+    case 'stroke-order-slay-grade-2':
+    case 'stroke-order-slay-grade-5': return <StrokeArt />
   }
 }
 

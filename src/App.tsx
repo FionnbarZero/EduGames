@@ -34,6 +34,9 @@ const RainbowReading = lazy(() => import('./gameModules/rainbow-reading').then((
 const DictationStreak = lazy(() => import('./gameModules/dictation-streak').then((module) => ({ default: module.DictationStreak })))
 const SpellerBee = lazy(() => import('./gameModules/speller-bee').then((module) => ({ default: module.SpellerBee })))
 const StrokeOrderSlay = lazy(() => import('./gameModules/stroke-order-slay').then((module) => ({ default: module.StrokeOrderSlay })))
+const StrokeOrderSlayKinder = lazy(() => import('./gameModules/stroke-order-slay').then((module) => ({ default: module.StrokeOrderSlayKinder })))
+const StrokeOrderSlayGrade2 = lazy(() => import('./gameModules/stroke-order-slay').then((module) => ({ default: module.StrokeOrderSlayGrade2 })))
+const StrokeOrderSlayGrade5 = lazy(() => import('./gameModules/stroke-order-slay').then((module) => ({ default: module.StrokeOrderSlayGrade5 })))
 
 const pairs: readonly GamePair[] = [
   { id: 'pair-1', targetId: 'hello', left: { id: 'left-nihao', label: '你好' }, right: { id: 'right-hello', label: 'hello' } },
@@ -464,6 +467,9 @@ function GamePreview({ gameId, onExit, onAttempt, onComplete }: {
     case 'dictation-streak': return <DictationStreak {...shared} rounds={starterCurriculum.productionRounds} playAudio={playAudio} />
     case 'speller-bee': return <SpellerBee {...shared} rounds={starterCurriculum.spellingRounds} playAudio={playAudio} />
     case 'copy-hide-write-combo': return <StrokeOrderSlay {...shared} rounds={starterCurriculum.strokeOrderRounds} playAudio={playAudio} />
+    case 'stroke-order-slay-kinder': return <StrokeOrderSlayKinder {...shared} playAudio={playAudio} />
+    case 'stroke-order-slay-grade-2': return <StrokeOrderSlayGrade2 {...shared} playAudio={playAudio} />
+    case 'stroke-order-slay-grade-5': return <StrokeOrderSlayGrade5 {...shared} playAudio={playAudio} />
   }
 }
 

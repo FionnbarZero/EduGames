@@ -1,5 +1,19 @@
 import type { StrokePoint } from './contracts'
 
+export type StrokeAssessmentSettings = {
+  readonly maximumEndpointDistance: number
+  readonly minimumLengthRatio: number
+  readonly maximumLengthRatio: number
+  readonly maximumAverageDeviation: number
+}
+
+export const DEFAULT_STROKE_ASSESSMENT_SETTINGS: StrokeAssessmentSettings = {
+  maximumEndpointDistance: 18,
+  minimumLengthRatio: .55,
+  maximumLengthRatio: 1.8,
+  maximumAverageDeviation: 11,
+}
+
 function distance(left: StrokePoint, right: StrokePoint) {
   return Math.hypot(left[0] - right[0], left[1] - right[1])
 }
@@ -27,13 +41,20 @@ function distanceToPath(point: StrokePoint, path: readonly StrokePoint[]) {
   return nearest
 }
 
-export function strokeMatchesGuide(drawn: readonly StrokePoint[], guide: readonly StrokePoint[]) {
+export function strokeMatchesGuide(
+  drawn: readonly StrokePoint[],
+  guide: readonly StrokePoint[],
+  settings: StrokeAssessmentSettings = DEFAULT_STROKE_ASSESSMENT_SETTINGS,
+) {
   if (drawn.length < 2 || guide.length < 2) return false
-  if (distance(drawn[0], guide[0]) > 18 || distance(drawn[drawn.length - 1], guide[guide.length - 1]) > 18) return false
+  if (distance(drawn[0], guide[0]) > settings.maximumEndpointDistance
+    || distance(drawn[drawn.length - 1], guide[guide.length - 1]) > settings.maximumEndpointDistance) return false
 
   const guideLength = pathLength(guide)
   const drawnLength = pathLength(drawn)
-  if (!guideLength || drawnLength < guideLength * .55 || drawnLength > guideLength * 1.8) return false
+  if (!guideLength
+    || drawnLength < guideLength * settings.minimumLengthRatio
+    || drawnLength > guideLength * settings.maximumLengthRatio) return false
 
   const sampleStep = Math.max(1, Math.floor(drawn.length / 18))
   let totalDeviation = 0
@@ -42,5 +63,5 @@ export function strokeMatchesGuide(drawn: readonly StrokePoint[], guide: readonl
     totalDeviation += distanceToPath(drawn[index], guide)
     samples += 1
   }
-  return totalDeviation / Math.max(1, samples) <= 11
+  return totalDeviation / Math.max(1, samples) <= settings.maximumAverageDeviation
 }

@@ -1,4 +1,8 @@
-export type LearningGameId = 'copy-hide-write-combo'
+export type LearningGameId =
+  | 'copy-hide-write-combo'
+  | 'stroke-order-slay-kinder'
+  | 'stroke-order-slay-grade-2'
+  | 'stroke-order-slay-grade-5'
 
 export type LearningGameChannel = 'tier-1-writing' | 'tier-2-reading'
 export type LearningGameSkill = 'writing' | 'reading' | 'receptive'
@@ -27,7 +31,17 @@ export type StrokePoint = readonly [x: number, y: number]
 
 export type StrokeOrderGameRound = GamePrompt & {
   readonly meaning: string
+  readonly lessonId?: string
+  readonly word?: string
+  readonly pinyin?: string
+  readonly wordCharacterIndex?: number
+  readonly wordCharacterCount?: number
   readonly strokes: readonly (readonly StrokePoint[])[]
+  readonly strokeDataSource?: {
+    readonly provider: 'Hanzi Writer Data'
+    readonly version: string
+    readonly url: string
+  }
 }
 
 export type LearningGameAttempt = {

@@ -10,6 +10,9 @@ export type LearningGameId =
   | 'dictation-streak'
   | 'speller-bee'
   | 'copy-hide-write-combo'
+  | 'stroke-order-slay-kinder'
+  | 'stroke-order-slay-grade-2'
+  | 'stroke-order-slay-grade-5'
 
 export type LearningGameChannel = 'tier-1-writing' | 'tier-2-reading'
 export type LearningGameSkill = 'writing' | 'reading' | 'receptive'

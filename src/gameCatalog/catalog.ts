@@ -5,7 +5,7 @@ import { gameManifest as lilyPadPath } from '../gameModules/lily-pad-path/manife
 import { gameManifest as memoryLanterns } from '../gameModules/memory-lanterns/manifest'
 import { gameManifest as shurikenMatch } from '../gameModules/speed-match/manifest'
 import { gameManifest as spellerBee } from '../gameModules/speller-bee/manifest'
-import { gameManifest as strokeOrderSlay } from '../gameModules/stroke-order-slay/manifest'
+import { gradeGameManifests as strokeOrderSlayGrades } from '../gameModules/stroke-order-slay/manifest'
 import { gameManifest as sushiScramble } from '../gameModules/sushi-scramble/manifest'
 import { gameManifest as shadowStrikeDojo } from '../gameModules/target-blast/manifest'
 import { gameManifest as whisperingScrolls } from '../gameModules/whispering-scrolls/manifest'
@@ -22,5 +22,5 @@ export const LEARNING_GAME_CATALOG = [
   rainbowReading,
   dictationStreak,
   spellerBee,
-  strokeOrderSlay,
+  ...strokeOrderSlayGrades,
 ] as const satisfies readonly LearningGameDefinition[]
