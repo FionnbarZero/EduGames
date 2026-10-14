@@ -28,7 +28,7 @@ import { KinderRounds } from './data/kinderRounds'
 import { Grade2Rounds } from './data/grade2Rounds'
 import { Grade5Rounds } from './data/grade5Rounds'
 
-type StrokePhase = 'trace' | 'write' | 'compare'
+type StrokePhase = 'practice' | 'compare'
 type NarrationState = 'idle' | 'playing' | 'ready' | 'error'
 type InkStroke = StrokePoint[]
 type InkDrawing = InkStroke[]
@@ -102,6 +102,9 @@ function StrokePad({
   animationStepSeconds,
   resetKey = 0,
   rejectedStroke = null,
+  suppliedStrokeCount = 0,
+  inputDisabled = false,
+  validated = false,
 }: {
   readonly round: StrokeOrderGameRound
   readonly strokes: InkDrawing
@@ -115,6 +118,9 @@ function StrokePad({
   readonly animationStepSeconds: number
   readonly resetKey?: number
   readonly rejectedStroke?: InkStroke | null
+  readonly suppliedStrokeCount?: number
+  readonly inputDisabled?: boolean
+  readonly validated?: boolean
 }) {
   const padElement = useRef<SVGSVGElement | null>(null)
   const activePointer = useRef<number | null>(null)
@@ -156,7 +162,7 @@ function StrokePad({
   }
 
   function beginStroke(event: ReactPointerEvent<SVGSVGElement>) {
-    if (!onStrokesChange || activePointer.current !== null || (event.pointerType === 'mouse' && event.button !== 0)) return
+    if (!onStrokesChange || inputDisabled || activePointer.current !== null || (event.pointerType === 'mouse' && event.button !== 0)) return
     event.preventDefault()
     event.currentTarget.setPointerCapture(event.pointerId)
     activePointer.current = event.pointerId
@@ -226,22 +232,25 @@ function StrokePad({
     >
       <PracticeGrid />
       <g transform={`translate(${layout.offsetX} ${layout.offsetY}) scale(${layout.scale})`}>
+      {suppliedStrokeCount > 0 && <g className="lg-supplied-ink" aria-label={`${suppliedStrokeCount} supplied strokes`}>
+        {round.strokes.slice(0, suppliedStrokeCount).map((stroke, index) => <path key={`supplied-${index}`} d={strokePath(stroke)} />)}
+      </g>}
       {showGuide && <g className="lg-stroke-guide" key={`${round.id}-${animationKey}`} aria-hidden="true">
-        {round.strokes.map((stroke, index) => <path
+        {round.strokes.slice(suppliedStrokeCount).map((stroke, index) => <path
           key={`${round.id}-guide-${index}`}
           d={strokePath(stroke)}
           pathLength={1}
           style={{ animationDelay: `${index * animationStepSeconds}s` }}
         />)}
-        {round.strokes.map((stroke, index) => <g className="lg-stroke-marker" key={`${round.id}-marker-${index}`} style={{ animationDelay: `${index * animationStepSeconds}s` }}>
+        {round.strokes.slice(suppliedStrokeCount).map((stroke, index) => <g className="lg-stroke-marker" key={`${round.id}-marker-${index}`} style={{ animationDelay: `${index * animationStepSeconds}s` }}>
           <circle cx={stroke[0][0]} cy={stroke[0][1]} r="4.3" />
-          <text x={stroke[0][0]} y={stroke[0][1] + 1.7}>{index + 1}</text>
+          <text x={stroke[0][0]} y={stroke[0][1] + 1.7}>{suppliedStrokeCount + index + 1}</text>
         </g>)}
       </g>}
       {rejectedStroke && <g className="lg-stroke-retry-ink" aria-label="Incorrect stroke">
         <path d={strokePath(rejectedStroke)} />
       </g>}
-      <g className={`lg-student-ink${validateStroke ? ' is-validated' : ''}`}>
+      <g className={`lg-student-ink${validateStroke || validated ? ' is-validated' : ''}`}>
         {strokes.map((stroke, index) => <path key={`ink-${index}`} d={strokePath(stroke)} />)}
         {interactive && <path className="lg-active-ink" ref={activePath} />}
       </g>
@@ -325,10 +334,10 @@ export function StrokeOrderSlay({
   const visibleTitle = title || (profileId ? profile.title : 'Stroke-order Slay')
   const visibleEyebrow = eyebrow || (profileId ? profile.eyebrow : 'Tier 1 · Touch Writing')
   const [index, setIndex] = useState(0)
-  const [phase, setPhase] = useState<StrokePhase>('trace')
-  const [traceDrawing, setTraceDrawing] = useState<InkDrawing>([])
-  const [rejectedTraceStroke, setRejectedTraceStroke] = useState<InkStroke | null>(null)
-  const [memoryDrawing, setMemoryDrawing] = useState<InkDrawing>([])
+  const [phase, setPhase] = useState<StrokePhase>('practice')
+  const [chainLength, setChainLength] = useState(1)
+  const [drawing, setDrawing] = useState<InkDrawing>([])
+  const [rejectedStroke, setRejectedStroke] = useState<InkStroke | null>(null)
   const [savedDrawing, setSavedDrawing] = useState<InkDrawing>([])
   const [padResetKey, setPadResetKey] = useState(0)
   const [animationKey, setAnimationKey] = useState(0)
@@ -336,14 +345,18 @@ export function StrokeOrderSlay({
   const [narrationState, setNarrationState] = useState<NarrationState>('idle')
   const [attempts, setAttempts] = useState<readonly LearningGameAttempt[]>([])
   const [feedback, setFeedback] = useState<AssessmentFeedback | null>(null)
-  const [traceMessage, setTraceMessage] = useState('')
+  const [strokeError, setStrokeError] = useState(false)
   const narrationRequestRef = useRef(0)
   const round = rounds[index]
   const valid = validStrokeOrderRounds(rounds)
   const complete = valid && index >= rounds.length
-  const memoryStrokeCountMatches = !round
-    || !profile.requireMatchingMemoryStrokeCount
-    || memoryDrawing.length === round.strokes.length
+  const requiredStrokes = Math.min(chainLength, round?.strokes.length || 1)
+  const suppliedStrokeCount = Math.max(0, (round?.strokes.length || 0) - requiredStrokes)
+  const wholeCharacter = suppliedStrokeCount === 0
+  const stageComplete = drawing.length === requiredStrokes
+  const currentStep = phase === 'compare' ? 'compare' : wholeCharacter ? 'write' : 'chain'
+  const nextStrokeNumber = suppliedStrokeCount + drawing.length + 1
+  const showGuide = !wholeCharacter || profile.memoryGuideVisible
 
   const playCurrentNarration = useCallback(() => {
     if (!round || !playAudio) return
@@ -365,24 +378,24 @@ export function StrokeOrderSlay({
   }, [index, narrationKey, playCurrentNarration])
 
   useEffect(() => {
-    if (!rejectedTraceStroke) return
+    if (!rejectedStroke) return
     // Leave enough time to see the error; cancel stale removal on retry or Clear.
-    const timer = window.setTimeout(() => setRejectedTraceStroke(null), 700)
+    const timer = window.setTimeout(() => setRejectedStroke(null), 700)
     return () => window.clearTimeout(timer)
-  }, [rejectedTraceStroke])
+  }, [rejectedStroke])
 
   useEffect(() => {
     if (!feedback) return
     const timer = window.setTimeout(() => {
       if (feedback === 'correct') setIndex((current) => current + 1)
       else setNarrationKey((current) => current + 1)
-      setPhase('trace')
-      setTraceDrawing([])
-      setRejectedTraceStroke(null)
-      setMemoryDrawing([])
+      setPhase('practice')
+      setChainLength(1)
+      setDrawing([])
+      setRejectedStroke(null)
       setSavedDrawing([])
       setAnimationKey((current) => current + 1)
-      setTraceMessage('')
+      setStrokeError(false)
       setFeedback(null)
     }, feedback === 'correct' ? 1000 : 1900)
     return () => window.clearTimeout(timer)
@@ -406,8 +419,22 @@ export function StrokeOrderSlay({
 
   function resetCurrentPad() {
     setPadResetKey((current) => current + 1)
-    setTraceMessage('')
-    setRejectedTraceStroke(null)
+    setStrokeError(false)
+    setRejectedStroke(null)
+  }
+
+  function advanceStage() {
+    if (!stageComplete || !round) return
+    playGameSound('progress')
+    resetCurrentPad()
+    if (wholeCharacter) {
+      setSavedDrawing(drawing.map((stroke) => [...stroke]))
+      setPhase('compare')
+    } else {
+      setChainLength((current) => current + 1)
+      setDrawing([])
+      setAnimationKey((current) => current + 1)
+    }
   }
 
   const summary = summarizeLearningGame(gameId, attempts)
@@ -425,71 +452,61 @@ export function StrokeOrderSlay({
     /> : round ? <section className={`lg-card lg-production-card lg-stroke-order-card lg-stroke-profile-${profile.id}`}>
       <div className="lg-stroke-roundbar">
         <p className="lg-round-label">Character {index + 1} / {rounds.length}</p>
-        <div className="lg-phase-steps" aria-label={`Current step: ${phase}`}>
-          <span aria-current={phase === 'trace' ? 'step' : undefined} className={phase === 'trace' ? 'is-current' : 'is-complete'}><b>1</b>Trace</span>
-          <span aria-current={phase === 'write' ? 'step' : undefined} className={phase === 'write' ? 'is-current' : phase === 'compare' || feedback ? 'is-complete' : ''}><b>2</b>{profile.memoryGuideVisible ? 'Write again' : 'Write'}</span>
-          <span aria-current={phase === 'compare' ? 'step' : undefined} className={phase === 'compare' && !feedback ? 'is-current' : feedback ? 'is-complete' : ''}><b>3</b>Compare</span>
+        <div className="lg-phase-steps" aria-label={`Current step: ${currentStep}`}>
+          <span aria-current={currentStep === 'chain' ? 'step' : undefined} className={currentStep === 'chain' ? 'is-current' : 'is-complete'}><b>1</b>Build</span>
+          <span aria-current={currentStep === 'write' ? 'step' : undefined} className={currentStep === 'write' ? 'is-current' : currentStep === 'compare' ? 'is-complete' : ''}><b>2</b>Whole</span>
+          <span aria-current={currentStep === 'compare' ? 'step' : undefined} className={currentStep === 'compare' && !feedback ? 'is-current' : feedback ? 'is-complete' : ''}><b>3</b>Compare</span>
         </div>
       </div>
       <VocabularyContext round={round} audioState={narrationState} onPlay={playCurrentNarration} />
-      {feedback ? <AutoAssessmentFeedback feedback={feedback} lastRound={index + 1 === rounds.length} /> : phase === 'trace' ? <div className="lg-stroke-workspace">
+      {feedback ? <AutoAssessmentFeedback feedback={feedback} lastRound={index + 1 === rounds.length} /> : phase === 'practice' ? <div className="lg-stroke-workspace">
         <StrokePad
-          key={`${round.id}-trace`}
+          key={`${round.id}-chain-${requiredStrokes}`}
           round={round}
-          strokes={traceDrawing}
-          onStrokesChange={setTraceDrawing}
-          showGuide
+          strokes={drawing}
+          onStrokesChange={setDrawing}
+          showGuide={showGuide}
+          suppliedStrokeCount={suppliedStrokeCount}
+          inputDisabled={stageComplete}
           animationKey={animationKey}
           animationStepSeconds={profile.animationStepSeconds}
           resetKey={padResetKey}
-          rejectedStroke={rejectedTraceStroke}
-          label={`Trace the guide · ${traceDrawing.length}/${round.strokes.length} strokes`}
-          validateStroke={(stroke, strokeIndex) => Boolean(round.strokes[strokeIndex] && strokeMatchesGuide(stroke, round.strokes[strokeIndex], profile.assessment))}
+          rejectedStroke={rejectedStroke}
+          label={`Backward chaining · stage ${requiredStrokes} of ${round.strokes.length} · ${suppliedStrokeCount} supplied strokes · ${drawing.length}/${requiredStrokes} strokes written`}
+          validateStroke={(stroke, strokeIndex) => {
+            const guide = round.strokes[suppliedStrokeCount + strokeIndex]
+            return Boolean(guide && strokeMatchesGuide(stroke, guide, profile.assessment))
+          }}
           onStrokeAccepted={() => {
-            setRejectedTraceStroke(null)
-            setTraceMessage(profile.traceSuccessMessage)
+            setRejectedStroke(null)
+            setStrokeError(false)
           }}
           onStrokeRejected={(stroke) => {
-            setRejectedTraceStroke(stroke)
-            setTraceMessage(profile.traceErrorMessage)
+            setRejectedStroke(stroke)
+            setStrokeError(true)
             playGameSound('incorrect')
           }}
         />
         <div className="lg-stroke-actions">
-          <p className={`lg-stroke-status${traceMessage === profile.traceErrorMessage ? ' is-error' : ''}`} role="status">
-            <strong>{traceDrawing.length} / {round.strokes.length}</strong><span>{traceMessage === profile.traceErrorMessage ? `Retry stroke ${Math.min(traceDrawing.length + 1, round.strokes.length)}` : 'strokes'}</span>
+          <p className={`lg-stroke-status${strokeError ? ' is-error' : ''}`} role="status">
+            <span className="lg-chain-stage">{wholeCharacter ? 'Whole character' : requiredStrokes === 1 ? 'Last stroke' : `Last ${requiredStrokes} strokes`}</span>
+            <strong>{drawing.length} / {requiredStrokes}</strong>
+            <span>{stageComplete ? 'Complete!' : `${strokeError ? 'Retry' : 'Write'} stroke ${nextStrokeNumber}`}</span>
           </p>
-          <DrawingTools drawing={traceDrawing} setDrawing={setTraceDrawing} onReset={resetCurrentPad} hasRejectedStroke={Boolean(rejectedTraceStroke)} />
-          <button className="lg-stroke-replay" type="button" aria-label="Replay stroke order" onClick={() => setAnimationKey((current) => current + 1)}><Play size={18} /> Replay</button>
-          <button className="lg-primary" type="button" disabled={traceDrawing.length < round.strokes.length} onClick={() => {
-            playGameSound('progress')
+          <DrawingTools drawing={drawing} setDrawing={setDrawing} onReset={resetCurrentPad} hasRejectedStroke={Boolean(rejectedStroke)} />
+          {showGuide ? <button className="lg-stroke-replay" type="button" aria-label="Replay stroke order" onClick={() => setAnimationKey((current) => current + 1)}><Play size={18} /> Replay</button> : <button type="button" className="lg-stroke-replay" onClick={() => {
             resetCurrentPad()
-            setMemoryDrawing([])
-            setPhase('write')
-          }}>{profile.memoryGuideVisible ? 'Write again' : 'Write from memory'} <ArrowRight size={18} /></button>
-        </div>
-      </div> : phase === 'write' ? <div className="lg-stroke-workspace">
-        <StrokePad key={`${round.id}-write`} round={round} strokes={memoryDrawing} onStrokesChange={setMemoryDrawing} showGuide={profile.memoryGuideVisible} animationKey={animationKey} animationStepSeconds={profile.animationStepSeconds} resetKey={padResetKey} label={`${profile.memoryGuideVisible ? 'Guided writing' : 'Memory writing'} · ${memoryDrawing.length} strokes saved`} />
-        <div className="lg-stroke-actions">
-          <p className={`lg-stroke-status${profile.requireMatchingMemoryStrokeCount && memoryDrawing.length > round.strokes.length ? ' is-error' : ''}`} role="status">
-            <strong>{memoryDrawing.length}{profile.requireMatchingMemoryStrokeCount ? ` / ${round.strokes.length}` : ''}</strong><span>{profile.requireMatchingMemoryStrokeCount ? 'strokes needed' : 'strokes'}</span>
-          </p>
-          <DrawingTools drawing={memoryDrawing} setDrawing={setMemoryDrawing} onReset={resetCurrentPad} />
-          <button type="button" className="lg-stroke-replay" onClick={() => {
-            resetCurrentPad()
-            setTraceDrawing([])
+            setChainLength(1)
+            setDrawing([])
             setNarrationKey((current) => current + 1)
-            setPhase('trace')
-          }}><RotateCcw size={18} /> Trace again</button>
-          <button className="lg-primary" type="button" disabled={!memoryDrawing.length || !memoryStrokeCountMatches} onClick={() => {
-            setSavedDrawing(memoryDrawing.map((stroke) => [...stroke]))
-            setPhase('compare')
-            playGameSound('progress')
-          }}>Compare <ArrowRight size={18} /></button>
+          }}><RotateCcw size={18} /> Practice again</button>}
+          <button className="lg-primary" type="button" disabled={!stageComplete} onClick={advanceStage}>
+            {wholeCharacter ? 'Compare' : suppliedStrokeCount === 1 ? 'Next: whole character' : `Next: last ${requiredStrokes + 1} strokes`} <ArrowRight size={18} />
+          </button>
         </div>
       </div> : <div className="lg-stroke-review">
         <div className="lg-stroke-comparison">
-          <section><strong>Your writing</strong><StrokePad round={round} strokes={savedDrawing} showGuide={false} animationKey={animationKey} animationStepSeconds={profile.animationStepSeconds} label={`${savedDrawing.length} saved strokes`} /></section>
+          <section><strong>Your writing</strong><StrokePad round={round} strokes={savedDrawing} showGuide={false} validated animationKey={animationKey} animationStepSeconds={profile.animationStepSeconds} label={`${savedDrawing.length} saved strokes`} /></section>
           <section className="is-target"><strong>Correct character</strong><ReferencePad round={round} /></section>
         </div>
         <SelfAssessmentButtons incorrectLabel={profile.incorrectLabel} correctLabel={profile.correctLabel} onAnswer={assess} />

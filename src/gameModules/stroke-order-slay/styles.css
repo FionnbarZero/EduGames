@@ -258,10 +258,12 @@ body:has(.lg-stroke-shell) .problem-report-trigger svg { width: 20px; height: 20
 .lg-stroke-marker text,.lg-reference-marker text { fill: white; font: 900 4px/1 Inter,sans-serif; text-anchor: middle; }
 .lg-student-ink path { fill: none; stroke: #12131a; stroke-width: 4.8; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 1px .4px rgb(0 0 0 / 25%)); }
 .lg-student-ink.is-validated path:not(.lg-active-ink) { stroke: #16803d; }
+.lg-supplied-ink path { fill: none; stroke: #8b8d95; stroke-width: 4.8; stroke-linecap: round; stroke-linejoin: round; }
 .lg-stroke-retry-ink path { fill: none; stroke: #8b1525; stroke-width: 4.8; stroke-linecap: round; stroke-linejoin: round; }
 .lg-stroke-actions { display: grid; align-content: center; gap: 10px; width: 100%; }
 .lg-stroke-status { display: grid; justify-items: center; gap: 3px; margin: 0 0 8px; color: #bdc7da; font-size: .8rem; line-height: 1.3; }
 .lg-stroke-status strong { color: #f1f4fc; font-size: 1.65rem; font-weight: 850; }
+.lg-chain-stage { color: #ffe4ad; font-weight: 750; }
 .lg-stroke-status.is-error,.lg-stroke-status.is-error strong { color: #ffb4ac; }
 .lg-stroke-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
 .lg-stroke-tools button,.lg-stroke-replay { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; padding: 10px 8px; border: 1px solid rgb(255 255 255 / 15%); border-radius: 12px; color: #d9e0ef; background: #171d31; cursor: pointer; font-size: .8rem; font-weight: 750; }

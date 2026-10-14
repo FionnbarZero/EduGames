@@ -6,23 +6,31 @@ Copy this folder into another React project and import `StrokeOrderSlay` from it
 
 The module exports three configuration-driven game variants. They share one engine, so fixes and future migration work apply to every grade without maintaining duplicate game code.
 
-- `StrokeOrderSlayKinder` — `Stroke-order Slay - Kinder`; large guides, slower animation, generous tracing tolerance, and a visible helper during the second writing pass. Recommended for 1–3 stroke characters.
-- `StrokeOrderSlayGrade2` — `Stroke-order Slay - 2nd`; standard tracing tolerance followed by hidden-guide memory writing. Recommended for 2–8 stroke characters.
-- `StrokeOrderSlayGrade5` — `Stroke-order Slay - 5th`; precise tracing, hidden-guide writing, and an exact memory stroke-count requirement. Recommended for 5–18 stroke characters.
+- `StrokeOrderSlayKinder` — `Stroke-order Slay - Kinder`; large guides, slower animation, generous tracing tolerance, and a visible helper for the whole-character stage. Recommended for 1–3 stroke characters.
+- `StrokeOrderSlayGrade2` — `Stroke-order Slay - 2nd`; standard tracing tolerance with the guide hidden for the whole-character stage. Recommended for 2–8 stroke characters.
+- `StrokeOrderSlayGrade5` — `Stroke-order Slay - 5th`; precise tracing with the guide hidden for the whole-character stage. Recommended for 5–18 stroke characters.
 
 The stable profile keys are `kinder`, `grade-2`, and `grade-5`. A larger game can either render one of the three wrapper components or pass a profile key to `StrokeOrderSlay` through `profileId`. Each profile still accepts its own `rounds`, allowing the future parent game to supply grade-appropriate character sets from its profile dropdown.
 
 The original `StrokeOrderSlay` export remains backward compatible and uses the existing ungraded title and 2nd-grade behavior unless a `profileId` is supplied.
 
+## Backward chaining
+
+Every character starts with the final stroke. The app supplies the preceding strokes in gray; only the learner's remaining strokes are numbered and guided. One successful attempt unlocks the next stage: last stroke, last two strokes, last three, and so on, ending with the whole character. Within each stage the learner writes in normal stroke order, never reverse order. The Next button preserves the completed character until the learner is ready to continue.
+
+For eight strokes the supplied/learner counts are 7/1, 6/2, 5/3, 4/4, 3/5, 2/6, 1/7, 0/8. One-stroke characters have one whole-character stage. Kinder keeps its numbered helper at the final stage; 2nd and 5th hide it. All stages, including the whole character, check direction, path, and order using the grade's tolerance. Incorrect strokes do not advance the stage. Whole-character success opens comparison; the learner self-check remains the recorded attempt, containing only the learner's whole drawing. New characters and retrying a comparison reset to the final stroke.
+
+Clear and Undo only affect learner ink, never the supplied prefix or the current stage. Restarting practice from the hidden-guide whole-character stage returns to the final stroke. The full vocabulary word remains visible throughout.
+
 ## Compact writing layout
 
-All three grades use a compact header, large full-word display with the current character highlighted, and a writing square sized to the viewport. Wide screens place drawing controls beside the pad; smaller screens place them below it. The drawing surface has no text overlays. Stroke counts, audio, undo, clear, replay, and phase controls stay outside the square. Comparison uses two side-by-side squares, including on phones. Grade-specific tracing tolerance, guided writing, and exact stroke-count rules are unchanged.
+All three grades use a compact header, large full-word display with the current character highlighted, and a writing square sized to the viewport. Wide screens place drawing controls beside the pad; smaller screens place them below it. The drawing surface has no text overlays. Stage labels, stroke counts, audio, undo, clear, replay, and phase controls stay outside the square. Comparison uses two side-by-side squares, including on phones.
 
 Character guides are centered as a complete shape with consistent edge clearance. The display transform is reversed for pointer input, so source stroke coordinates, stored drawings, and assessment rules stay consistent.
 
 Clear discards both completed and live ink, including queued paint and pointer capture. It remains available on an empty pad so interrupted input cannot strand a stroke. Canceled touches and lost pointer capture discard unfinished ink; switching phases starts a fresh pointer gesture. With the local Vite preview running, run `node src/gameModules/stroke-order-slay/tools/testDrawingReset.mjs` from the playground root to verify these cases in all three grades at desktop and iPad sizes.
 
-In tracing, live ink starts black and accepted strokes turn green. An incorrect attempt turns dark red, plays a short buzzer, and disappears after 700 ms without advancing the stroke count. The retry status remains so the student knows which stroke is next. Undo removes a visible incorrect attempt first; Clear, a successful retry, phase changes, and exit cancel its pending removal. Ungraded memory writing remains black. Tracing tolerance and progression gates remain grade-specific.
+During every practice stage, live ink starts black and accepted strokes turn green. An incorrect attempt turns dark red, plays a short buzzer, and disappears after 700 ms without advancing the stroke count. The retry status names the original stroke number. Undo removes a visible incorrect attempt first; Clear, a successful retry, stage changes, and exit cancel its pending removal. Completed stages ignore extra input until Next, Undo, or Clear.
 
 Pointer capture lost after the button is released finalizes the stroke even if the browser has not delivered `pointerup` yet. The later release event cannot duplicate that stroke. Capture loss while the button is held and explicit cancellation still discard unfinished ink.
 
@@ -40,4 +48,4 @@ Hanzi Writer Data is derived from Make Me a Hanzi and distributed under the Arph
 
 Dependencies: `react`, `react-dom`, `lucide-react`.
 
-This is pointer-based guided handwriting practice. The trace phase checks broad start position, direction, length, and path proximity. The hidden-writing comparison remains a learner self-check and is not a formal handwriting assessment.
+This is pointer-based handwriting practice. Each stage checks broad start position, direction, length, and path proximity. Comparison remains a learner self-check and is not a formal handwriting assessment.

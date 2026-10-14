@@ -7,7 +7,7 @@ export type StrokeOrderSlayProfile = {
   readonly title: string
   readonly eyebrow: string
   readonly recommendedStrokeRange: readonly [minimum: number, maximum: number]
-  readonly phaseLabels: readonly [trace: string, write: string, compare: string]
+  readonly phaseLabels: readonly [chain: string, write: string, compare: string]
   readonly tracePrompt: string
   readonly traceSuccessMessage: string
   readonly traceErrorMessage: string
@@ -29,16 +29,16 @@ export const STROKE_ORDER_SLAY_PROFILES = {
     title: 'Stroke-order Slay - Kinder',
     eyebrow: 'Kinder · Guided Touch Writing',
     recommendedStrokeRange: [1, 3],
-    phaseLabels: ['Trace', 'Try again', 'Check'],
-    tracePrompt: 'Trace the big guide with your finger or stylus',
+    phaseLabels: ['Build', 'Whole', 'Check'],
+    tracePrompt: 'Finish the character, starting with its last stroke',
     traceSuccessMessage: 'Great stroke! Follow the next number.',
     traceErrorMessage: 'Almost! Start at the number and follow the bright path.',
     memoryKicker: 'Guide stays on',
-    memoryPrompt: 'Write the character one more time with help',
+    memoryPrompt: 'Write the whole character with the numbered guide',
     memoryGuideVisible: true,
-    requireMatchingMemoryStrokeCount: false,
+    requireMatchingMemoryStrokeCount: true,
     reviewPrompt: 'Do the two characters look alike?',
-    incorrectLabel: 'Try with the guide again',
+    incorrectLabel: 'Practice again',
     correctLabel: 'I did it!',
     completionMessage: 'You followed every Kinder stroke path.',
     animationStepSeconds: 1,
@@ -54,16 +54,16 @@ export const STROKE_ORDER_SLAY_PROFILES = {
     title: 'Stroke-order Slay - 2nd',
     eyebrow: '2nd Grade · Touch Writing',
     recommendedStrokeRange: [2, 8],
-    phaseLabels: ['Trace order', 'Hide & write', 'Compare'],
-    tracePrompt: 'Trace the character with your finger or stylus',
+    phaseLabels: ['Build', 'Whole', 'Compare'],
+    tracePrompt: 'Finish the remaining strokes in order',
     traceSuccessMessage: 'Stroke accepted. Follow the next numbered guide.',
     traceErrorMessage: 'That stroke missed the guide or moved in the wrong direction. Try it again.',
     memoryKicker: 'Guide hidden',
     memoryPrompt: 'Write the character from memory',
     memoryGuideVisible: false,
-    requireMatchingMemoryStrokeCount: false,
+    requireMatchingMemoryStrokeCount: true,
     reviewPrompt: 'Does your character match the shape and stroke order?',
-    incorrectLabel: 'Trace it again',
+    incorrectLabel: 'Practice again',
     correctLabel: 'I slayed it',
     completionMessage: 'Every 2nd-grade stroke-order challenge is complete.',
     animationStepSeconds: .7,
@@ -79,8 +79,8 @@ export const STROKE_ORDER_SLAY_PROFILES = {
     title: 'Stroke-order Slay - 5th',
     eyebrow: '5th Grade · Precision Writing',
     recommendedStrokeRange: [5, 18],
-    phaseLabels: ['Trace precisely', 'Write from memory', 'Review'],
-    tracePrompt: 'Trace each stroke precisely in the numbered order',
+    phaseLabels: ['Build', 'Whole', 'Review'],
+    tracePrompt: 'Complete the remaining strokes precisely in order',
     traceSuccessMessage: 'Precise stroke accepted. Keep the order going.',
     traceErrorMessage: 'Check the start point, direction, and path, then try that stroke again.',
     memoryKicker: 'No guide · exact stroke count',
